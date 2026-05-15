@@ -1,0 +1,285 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.ChatSnap" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Main Brand Colors -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/white</item>
+
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondaryContainer">@color/secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/on_surface</item>
+
+        <item name="colorTertiary">#E966FF</item>
+        <item name="colorOnTertiary">@color/white</item>
+
+        <item name="android:windowBackground">@color/background</item>
+        <item name="colorSurface">@color/surface_container</item>
+        <item name="colorOnSurface">@color/on_surface</item>
+        <item name="colorSurfaceVariant">@color/surface_container_low</item>
+        <item name="colorOnSurfaceVariant">@color/on_surface_variant</item>
+
+        <item name="colorOutline">@color/outline</item>
+        <item name="colorOutlineVariant">@color/outline_variant</item>
+
+        <!-- Text Colors -->
+        <item name="android:textColorPrimary">?attr/colorOnSurface</item>
+        <item name="android:textColorSecondary">?attr/colorOnSurfaceVariant</item>
+        <item name="android:textColorHint">?attr/colorOutline</item>
+
+        <!-- System Bars -->
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <item name="android:windowLightStatusBar">false</item>
+
+        <!-- Custom Attributes -->
+        <item name="chatBubbleSentColor">#DCF8C6</item>
+        <item name="chatBubbleReceivedColor">@color/white</item>
+        <item name="chatBubbleSentTextColor">@color/black</item>
+        <item name="chatBubbleReceivedTextColor">@color/black</item>
+
+        <item name="editTextStyle">@style/Widget.Material3.TextInputEditText.OutlinedBox</item>
+        <item name="textInputStyle">@style/Widget.Material3.TextInputLayout.OutlinedBox</item>
+        <item name="android:windowAnimationStyle">@style/Animation.Activity</item>
+    </style>
+
+    <style name="Animation.Activity" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:activityOpenExitAnimation">@anim/slide_out_left</item>
+        <item name="android:activityCloseEnterAnimation">@anim/slide_in_left</item>
+        <item name="android:activityCloseExitAnimation">@anim/slide_out_right</item>
+    </style>
+
+    <style name="Theme.ChatSnap" parent="Base.Theme.ChatSnap" />
+
+    <style name="Theme.ChatSnap.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <!-- 1. Full Black Theme - Improved Visibility -->
+    <style name="Theme.ChatSnap.FullBlack" parent="Base.Theme.ChatSnap">
+        <item name="colorPrimary">@color/black_primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/black_surface</item>
+        <item name="colorOnPrimaryContainer">@color/white</item>
+
+        <item name="colorSecondary">#B0B0B0</item>
+        <item name="colorTertiary">#E966FF</item>
+
+        <item name="android:windowBackground">@color/black_bg</item>
+        <item name="colorSurface">@color/black_surface</item>
+        <item name="colorOnSurface">@color/white</item>
+        <item name="colorSurfaceVariant">@color/black_primary</item>
+        <item name="colorOnSurfaceVariant">#B0B0B0</item>
+        <item name="colorOutlineVariant">#333333</item>
+
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">#B0B0B0</item>
+        <item name="android:statusBarColor">@color/black_bg</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">@color/black_bg</item>
+
+        <item name="chatBubbleSentColor">#303030</item>
+        <item name="chatBubbleReceivedColor">#1E1E1E</item>
+        <item name="chatBubbleSentTextColor">@color/white</item>
+        <item name="chatBubbleReceivedTextColor">@color/white</item>
+    </style>
+
+    <!-- 2. Full White Theme -->
+    <style name="Theme.ChatSnap.FullWhite" parent="Base.Theme.ChatSnap">
+        <item name="colorPrimary">@color/white_bg</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorPrimaryContainer">#F5F5F5</item>
+        <item name="colorOnPrimaryContainer">@color/black</item>
+
+        <item name="colorSecondary">#666666</item>
+        <item name="colorTertiary">#810CA8</item>
+
+        <item name="android:windowBackground">@color/white_bg</item>
+        <item name="colorSurface">@color/white_bg</item>
+        <item name="colorOnSurface">@color/black</item>
+        <item name="colorSurfaceVariant">#F5F5F5</item>
+        <item name="colorOnSurfaceVariant">#666666</item>
+
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textColorSecondary">#666666</item>
+        <item name="android:statusBarColor">@color/white_bg</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">@color/white_bg</item>
+
+        <item name="chatBubbleSentColor">#E1FFC7</item>
+        <item name="chatBubbleReceivedColor">#F0F0F0</item>
+        <item name="chatBubbleSentTextColor">@color/black</item>
+        <item name="chatBubbleReceivedTextColor">@color/black</item>
+    </style>
+
+    <!-- 4. Emerald Green Theme -->
+    <style name="Theme.ChatSnap.EmeraldGreen" parent="Base.Theme.ChatSnap">
+        <item name="colorPrimary">@color/emerald_primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/emerald_surface</item>
+        <item name="colorOnPrimaryContainer">@color/white</item>
+
+        <item name="android:windowBackground">@color/emerald_bg</item>
+        <item name="colorSurface">@color/emerald_bg</item>
+        <item name="colorOnSurface">@color/white</item>
+        <item name="colorSurfaceVariant">@color/emerald_surface</item>
+        <item name="colorOnSurfaceVariant">#B0B0B0</item>
+        <item name="colorOutlineVariant">#004D40</item>
+
+        <item name="android:statusBarColor">@color/emerald_bg</item>
+        <item name="chatBubbleSentColor">#1E3D40</item>
+        <item name="chatBubbleReceivedColor">#004D40</item>
+        <item name="chatBubbleSentTextColor">@color/white</item>
+        <item name="chatBubbleReceivedTextColor">@color/white</item>
+    </style>
+
+    <!-- 5. Maroon Velvet -->
+    <style name="Theme.ChatSnap.Maroon" parent="Base.Theme.ChatSnap">
+        <item name="colorPrimary">@color/maroon_primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/maroon_surface</item>
+        <item name="colorOnPrimaryContainer">@color/white</item>
+
+        <item name="android:windowBackground">@color/maroon_bg</item>
+        <item name="colorSurface">@color/maroon_bg</item>
+        <item name="colorOnSurface">@color/maroon_text</item>
+        <item name="colorSurfaceVariant">@color/maroon_surface</item>
+        <item name="colorOnSurfaceVariant">#FFCDD2</item>
+        <item name="colorOutlineVariant">#4D1414</item>
+
+        <item name="android:statusBarColor">@color/maroon_bg</item>
+        <item name="chatBubbleSentColor">#7F2020</item>
+        <item name="chatBubbleReceivedColor">#4D1414</item>
+        <item name="chatBubbleSentTextColor">@color/white</item>
+        <item name="chatBubbleReceivedTextColor">@color/white</item>
+    </style>
+
+    <!-- 6. Cyan Blast -->
+    <style name="Theme.ChatSnap.Magenta" parent="Base.Theme.ChatSnap">
+        <item name="colorPrimary">@color/magenta_primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/magenta_surface</item>
+        <item name="colorOnPrimaryContainer">@color/white</item>
+
+        <item name="android:windowBackground">@color/magenta_bg</item>
+        <item name="colorSurface">@color/magenta_bg</item>
+        <item name="colorOnSurface">@color/magenta_text</item>
+        <item name="colorSurfaceVariant">@color/magenta_surface</item>
+        <item name="colorOnSurfaceVariant">#E0F7FA</item>
+        <item name="colorOutlineVariant">#004347</item>
+
+        <item name="android:statusBarColor">@color/magenta_bg</item>
+        <item name="chatBubbleSentColor">#00B4C5</item>
+        <item name="chatBubbleReceivedColor">#004347</item>
+        <item name="chatBubbleSentTextColor">@color/white</item>
+        <item name="chatBubbleReceivedTextColor">@color/white</item>
+    </style>
+
+    <!-- 7. Teal Breeze -->
+    <style name="Theme.ChatSnap.Teal" parent="Base.Theme.ChatSnap">
+        <item name="colorPrimary">@color/teal_primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/teal_surface</item>
+        <item name="colorOnPrimaryContainer">@color/white</item>
+
+        <item name="android:windowBackground">@color/teal_bg</item>
+        <item name="colorSurface">@color/teal_bg</item>
+        <item name="colorOnSurface">@color/teal_text</item>
+        <item name="colorSurfaceVariant">@color/teal_surface</item>
+        <item name="colorOnSurfaceVariant">#E0F2F1</item>
+        <item name="colorOutlineVariant">#004D40</item>
+
+        <item name="android:statusBarColor">@color/teal_bg</item>
+        <item name="chatBubbleSentColor">#2FA084</item>
+        <item name="chatBubbleReceivedColor">#004D40</item>
+        <item name="chatBubbleSentTextColor">@color/white</item>
+        <item name="chatBubbleReceivedTextColor">@color/white</item>
+    </style>
+
+    <!-- 8. Coral Soft -->
+    <style name="Theme.ChatSnap.Coral" parent="Base.Theme.ChatSnap">
+        <item name="colorPrimary">@color/coral_primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/coral_surface</item>
+        <item name="colorOnPrimaryContainer">@color/coral_text</item>
+
+        <item name="android:windowBackground">@color/coral_bg</item>
+        <item name="colorSurface">@color/coral_bg</item>
+        <item name="colorOnSurface">@color/coral_text</item>
+        <item name="colorSurfaceVariant">@color/coral_surface</item>
+        <item name="colorOnSurfaceVariant">#4A1919</item>
+        <item name="colorOutlineVariant">#FFEBEE</item>
+
+        <item name="android:statusBarColor">@color/coral_bg</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="chatBubbleSentColor">#E36A6A</item>
+        <item name="chatBubbleReceivedColor">@color/white</item>
+        <item name="chatBubbleSentTextColor">@color/white</item>
+        <item name="chatBubbleReceivedTextColor">@color/black</item>
+    </style>
+
+    <!-- 6. Sakura Pink Theme - Premium Soft -->
+    <style name="Theme.ChatSnap.SakuraPink" parent="Base.Theme.ChatSnap">
+        <item name="colorPrimary">@color/sakura_primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/sakura_surface</item>
+        <item name="colorOnPrimaryContainer">@color/sakura_text_primary</item>
+
+        <item name="android:windowBackground">@color/sakura_bg</item>
+        <item name="colorSurface">@color/sakura_bg</item>
+        <item name="colorOnSurface">@color/sakura_text_primary</item>
+        <item name="colorSurfaceVariant">@color/sakura_surface</item>
+        <item name="colorOnSurfaceVariant">@color/sakura_text_secondary</item>
+
+        <item name="android:textColorPrimary">@color/sakura_text_primary</item>
+        <item name="android:textColorSecondary">@color/sakura_text_secondary</item>
+        <item name="android:statusBarColor">@color/sakura_bg</item>
+        <item name="android:windowLightStatusBar">true</item>
+
+        <item name="chatBubbleSentColor">#FFCCBC</item>
+        <item name="chatBubbleReceivedColor">@color/white</item>
+        <item name="chatBubbleSentTextColor">#4E342E</item>
+        <item name="chatBubbleReceivedTextColor">#4E342E</item>
+    </style>
+
+    <!-- 7. Neon Pink Theme - Modern Light -->
+    <style name="Theme.ChatSnap.NeonPink" parent="Base.Theme.ChatSnap">
+        <item name="colorPrimary">@color/neon_pink_primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/neon_pink_surface</item>
+        <item name="colorOnPrimaryContainer">@color/neon_pink_text_primary</item>
+
+        <item name="android:windowBackground">@color/neon_pink_bg</item>
+        <item name="colorSurface">@color/neon_pink_bg</item>
+        <item name="colorOnSurface">@color/neon_pink_text_primary</item>
+        <item name="colorSurfaceVariant">@color/neon_pink_surface</item>
+        <item name="colorOnSurfaceVariant">@color/neon_pink_text_secondary</item>
+
+        <item name="android:textColorPrimary">@color/neon_pink_text_primary</item>
+        <item name="android:textColorSecondary">@color/neon_pink_text_secondary</item>
+        <item name="android:statusBarColor">@color/neon_pink_bg</item>
+        <item name="android:windowLightStatusBar">true</item>
+
+        <item name="chatBubbleSentColor">#FCE4EC</item>
+        <item name="chatBubbleReceivedColor">@color/white</item>
+        <item name="chatBubbleSentTextColor">#4A148C</item>
+        <item name="chatBubbleReceivedTextColor">#4A148C</item>
+    </style>
+
+    <style name="ShapeAppearance.Circle" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="ShapeAppearance.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
+
+    <style name="Theme.ChatSnap.Dialog.Transparent" parent="Theme.MaterialComponents.Dialog.Alert">
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+</resources>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ChatSnap - OTP Verification</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed-variant": "#444749",
+                    "surface-container-high": "#e6e7f2",
+                    "tertiary-container": "#b75b00",
+                    "on-primary": "#ffffff",
+                    "surface-container-low": "#f2f3fd",
+                    "tertiary-fixed": "#ffdcc6",
+                    "surface-tint": "#005ac2",
+                    "tertiary": "#924700",
+                    "primary": "#0058be",
+                    "on-tertiary-fixed-variant": "#723600",
+                    "primary-fixed-dim": "#adc6ff",
+                    "on-tertiary-fixed": "#311400",
+                    "surface-container": "#ecedf7",
+                    "primary-fixed": "#d8e2ff",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-variant": "#e1e2ec",
+                    "error": "#ba1a1a",
+                    "on-background": "#191b23",
+                    "secondary": "#5c5f61",
+                    "on-secondary-container": "#626567",
+                    "secondary-fixed": "#e0e3e5",
+                    "on-primary-container": "#fefcff",
+                    "on-secondary": "#ffffff",
+                    "outline": "#727785",
+                    "on-error": "#ffffff",
+                    "surface-dim": "#d8d9e3",
+                    "secondary-fixed-dim": "#c4c7c9",
+                    "inverse-surface": "#2e3038",
+                    "on-primary-fixed-variant": "#004395",
+                    "on-surface": "#191b23",
+                    "inverse-on-surface": "#eff0fa",
+                    "outline-variant": "#c2c6d6",
+                    "error-container": "#ffdad6",
+                    "on-secondary-fixed": "#191c1e",
+                    "secondary-container": "#e0e3e5",
+                    "surface": "#f9f9ff",
+                    "on-surface-variant": "#424754",
+                    "background": "#f9f9ff",
+                    "on-error-container": "#93000a",
+                    "surface-container-highest": "#e1e2ec",
+                    "surface-bright": "#f9f9ff",
+                    "on-tertiary": "#ffffff",
+                    "inverse-primary": "#adc6ff",
+                    "primary-container": "#2170e4",
+                    "on-tertiary-container": "#fffbff",
+                    "on-primary-fixed": "#001a42",
+                    "tertiary-fixed-dim": "#ffb786"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "base": "4px",
+                    "sm": "8px",
+                    "xl": "32px",
+                    "gutter": "12px",
+                    "margin-edge": "20px",
+                    "xs": "4px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "h3": ["Inter"],
+                    "h1": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "body-md": ["Inter"],
+                    "h2": ["Inter"],
+                    "label-bold": ["Inter"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "h3": ["20px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "h1": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-caps": ["11px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "h2": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "label-bold": ["12px", {"lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .otp-input:focus {
+            box-shadow: 0 0 0 2px rgba(0, 88, 190, 0.1);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body-md text-on-background min-h-screen flex flex-col items-center">
+<!-- Top Navigation Anchor (Shared Component Execution) -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-5 h-16 bg-white/70 backdrop-blur-xl border-b border-white/20 shadow-[0_20px_40px_rgba(59,130,246,0.05)]">
+<div class="flex items-center gap-2 active:scale-95 transition-all duration-200 ease-out cursor-pointer">
+<span class="material-symbols-outlined text-blue-500">arrow_back_ios</span>
+<span class="font-inter font-semibold tracking-tight text-slate-400">Back</span>
+</div>
+<div class="text-xl font-black text-blue-600 tracking-tighter">ChatSnap</div>
+<div class="active:scale-95 transition-all duration-200 ease-out cursor-pointer">
+<span class="material-symbols-outlined text-blue-500">help_outline</span>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="w-full max-w-[440px] px-margin-edge mt-32 flex-grow flex flex-col">
+<!-- Brand Identity Section -->
+<div class="mb-lg text-center">
+<div class="inline-flex p-4 rounded-3xl bg-primary-fixed mb-md">
+<span class="material-symbols-outlined text-[40px] text-primary" data-icon="lock">lock</span>
+</div>
+<h1 class="font-h1 text-h1 text-on-background mb-base">Verify Identity</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-[300px] mx-auto">
+                We've sent a 6-digit code to <span class="text-primary font-semibold">+1 (555) ••• ••92</span>
+</p>
+</div>
+<!-- High-Density OTP Entry -->
+<div class="flex justify-between gap-base mb-xl">
+<input autofocus="" class="otp-input w-14 h-16 text-center text-h2 font-h2 rounded-xl bg-surface-container-low border-none focus:ring-2 focus:ring-primary text-on-background transition-all outline-none" maxlength="1" placeholder="•" type="text"/>
+<input class="otp-input w-14 h-16 text-center text-h2 font-h2 rounded-xl bg-surface-container-low border-none focus:ring-2 focus:ring-primary text-on-background transition-all outline-none" maxlength="1" placeholder="•" type="text"/>
+<input class="otp-input w-14 h-16 text-center text-h2 font-h2 rounded-xl bg-surface-container-low border-none focus:ring-2 focus:ring-primary text-on-background transition-all outline-none" maxlength="1" placeholder="•" type="text"/>
+<input class="otp-input w-14 h-16 text-center text-h2 font-h2 rounded-xl bg-surface-container-low border-none focus:ring-2 focus:ring-primary text-on-background transition-all outline-none" maxlength="1" placeholder="•" type="text"/>
+<input class="otp-input w-14 h-16 text-center text-h2 font-h2 rounded-xl bg-surface-container-low border-none focus:ring-2 focus:ring-primary text-on-background transition-all outline-none" maxlength="1" placeholder="•" type="text"/>
+<input class="otp-input w-14 h-16 text-center text-h2 font-h2 rounded-xl bg-surface-container-low border-none focus:ring-2 focus:ring-primary text-on-background transition-all outline-none" maxlength="1" placeholder="•" type="text"/>
+</div>
+<!-- Action Section -->
+<div class="space-y-md">
+<button class="w-full h-14 bg-primary text-on-primary font-label-bold text-lg rounded-2xl shadow-[0_15px_30px_rgba(0,88,190,0.2)] active:scale-95 transition-all duration-150">
+                Continue
+            </button>
+<div class="flex justify-center items-center gap-sm">
+<p class="font-body-md text-on-surface-variant">Didn't receive code?</p>
+<button class="font-label-bold text-primary hover:underline transition-all">Resend in 0:45</button>
+</div>
+</div>
+<!-- Information Bento Grid -->
+<div class="mt-xl grid grid-cols-2 gap-sm">
+<div class="bg-surface-container-lowest p-md rounded-3xl border border-white/40 shadow-sm flex flex-col gap-sm">
+<span class="material-symbols-outlined text-tertiary-container" data-icon="verified_user">verified_user</span>
+<div>
+<h3 class="font-label-bold text-on-background">Secure Sync</h3>
+<p class="text-[10px] leading-relaxed text-on-surface-variant">End-to-end encrypted verification process.</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-md rounded-3xl border border-white/40 shadow-sm flex flex-col gap-sm">
+<span class="material-symbols-outlined text-primary-container" data-icon="speed">speed</span>
+<div>
+<h3 class="font-label-bold text-on-background">Instant Link</h3>
+<p class="text-[10px] leading-relaxed text-on-surface-variant">Immediate access to your encrypted history.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Visual Polish: Decorative Element -->
+<div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full -z-10 pointer-events-none opacity-40">
+<div class="absolute top-[10%] left-[20%] w-64 h-64 rounded-full bg-primary-fixed blur-[100px]"></div>
+<div class="absolute bottom-[20%] right-[10%] w-80 h-80 rounded-full bg-tertiary-fixed blur-[120px]"></div>
+</div>
+<!-- Security Footer -->
+<footer class="mt-auto pb-12 px-margin-edge text-center">
+<div class="flex items-center justify-center gap-base mb-sm">
+<span class="material-symbols-outlined text-on-surface-variant text-[16px]">shield</span>
+<span class="font-label-caps text-[10px] text-on-surface-variant">BANK-GRADE ENCRYPTION</span>
+</div>
+<div class="flex justify-center gap-md">
+<img class="h-4 grayscale opacity-30 object-contain" data-alt="visa security partner logo grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdE857sab9H3TFKxAcRcihPPEfTAS772V3JVe3wyWtsHC3_BsyUcT7NwK8Lz8xTkgajQdDUgtS8K2oS12MclBz3qazkFJY1gq5s1wRY6FxvNJxWhbKgfPbfrttootR6KTfbCLXrF1LGU9GN8gS2UwFWyCGCnPTKMy769GjDePbd9mjTTcY6I4JBJbRkCYxpmwH2p-xamnR_TmpyHLA3WgGBn-ljsdyewz4qIIWAOQrH8FK5V9Gqgwm4VcbLH3YAzxykXTwAAsfyh8"/>
+<img class="h-4 grayscale opacity-30 object-contain" data-alt="mastercard security partner logo grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzl_nBzG1m6-EoGd0VORXMG_MzI5pGyHJaqP4f25Moz_6sotnDABhoh4ZWZ8htLQfNE2jQ1nxxd-P5UqKCYgWdPnqOjBJhUTALjOOnAYQIxBGRHBvaUHK_n3FgdDctpI3fTF9ovNjDIZarkSOrfipLjl8Rw3JM1Dlo4pH7HDkMqdtISZ8CQ6VOItG4uVSd_zZjehsYe81Dc5azCeVuwdVsEQEepV7wIdd2wCqXEl44_RlrQveE2fC1M2w1tZq2jWBiPo9iismxqWQ"/>
+<img class="h-4 grayscale opacity-30 object-contain" data-alt="pci dss compliance logo grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSHHYtmSf95LeIKF1Ep6ozqR52B21orVIp4ozyT9O0KCSlJ85MEZbKGVTvT-V778fgA2AXipY335xzJdeoEc6Wpk6lRslQ7PFHZ0yLodLx-M_DJOCRa4vkU_FL2q-YjFYMScDmmSfIm5yoaeIkMt2v86nNLdZmsLrWcOASrXajutqTJ-1qgVdS7Wg_8SgN0qmcuYMsUXgcROB5weUe4OH_CGsV4uM7t0zBGqINsO71VIQxrXsJLXVIzx5Uhh2FWjXPPw1iHZZs_us"/>
+</div>
+</footer>
+<!-- Bottom Nav Suppression Check: OTP screens are focused journeys, hence nav is excluded. -->
+</body></html>

@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/windowBackground">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:elevation="0dp">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsingToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:titleEnabled="false">
+
+            <!-- Profile Header Card - Theme Synced with Gap -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="8dp"
+                app:strokeWidth="0dp"
+                app:layout_collapseMode="parallax">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="48dp"
+                    android:paddingBottom="40dp"
+                    android:gravity="center"
+                    android:background="?attr/colorPrimary">
+
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/ivProfile"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:padding="3dp"
+                            android:src="@drawable/ic_launcher_background"
+                            app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
+                            app:strokeColor="?attr/colorOnPrimary"
+                            app:strokeWidth="3dp"
+                            android:scaleType="centerCrop" />
+
+                        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                            android:id="@+id/fabEditAvatar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom|end"
+                            app:fabSize="mini"
+                            app:srcCompat="@drawable/ic_camera"
+                            app:tint="?attr/colorPrimary"
+                            android:backgroundTint="?attr/colorOnPrimary"
+                            app:elevation="4dp" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:id="@+id/tvUserName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:fontFamily="sans-serif-black"
+                        android:text="User Name"
+                        android:textColor="?attr/colorOnPrimary"
+                        android:textSize="22sp"
+                        android:letterSpacing="-0.01" />
+
+                    <TextView
+                        android:id="@+id/tvUserPhone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+92 300 0000000"
+                        android:textColor="?attr/colorOnPrimary"
+                        android:alpha="0.8"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="100dp">
+
+            <!-- Stats & Privacy Row - Theme Synced -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="24dp">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="?attr/colorSurfaceVariant">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:gravity="center">
+                        <TextView android:id="@+id/tvStatFriends" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textSize="18sp" android:fontFamily="sans-serif-black" android:textColor="?attr/colorPrimary" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Friends" android:textSize="11sp" android:textColor="?android:attr/textColorSecondary" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="3dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="?attr/colorSurfaceVariant">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:gravity="center">
+                        <TextView android:id="@+id/tvStatSnaps" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textSize="18sp" android:fontFamily="sans-serif-black" android:textColor="?attr/colorPrimary" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Snaps" android:textSize="11sp" android:textColor="?android:attr/textColorSecondary" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/btnPrivacyScore"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="?attr/colorSurfaceVariant">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:gravity="center">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="98%" android:textSize="18sp" android:fontFamily="sans-serif-black" android:textColor="?attr/colorPrimary" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Privacy" android:textSize="11sp" android:textColor="?android:attr/textColorSecondary" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <!-- Premium Banner -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="28dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="?attr/colorPrimary"
+                app:strokeWidth="0dp">
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="20dp">
+                    <TextView
+                        android:id="@+id/lblPrem"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SNAP PREMIER"
+                        android:textColor="?attr/colorOnPrimary"
+                        android:alpha="0.7"
+                        android:textSize="10sp"
+                        android:fontFamily="sans-serif-black"
+                        android:letterSpacing="0.1" />
+                    <TextView
+                        android:id="@+id/descPrem"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/lblPrem"
+                        android:layout_marginTop="4dp"
+                        android:text="Get exclusive features &amp; badges"
+                        android:textColor="?attr/colorOnPrimary"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-medium" />
+                    <com.google.android.material.button.MaterialButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_below="@id/descPrem"
+                        android:layout_marginTop="12dp"
+                        android:text="Upgrade Now"
+                        android:textSize="11sp"
+                        android:textColor="?attr/colorPrimary"
+                        app:backgroundTint="?attr/colorOnPrimary"
+                        app:cornerRadius="18dp"
+                        android:paddingHorizontal="16dp"
+                        style="@style/Widget.Material3.Button.TonalButton"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp" />
+                    <ImageView
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:src="@android:drawable/btn_star_big_on"
+                        app:tint="?attr/colorOnPrimary"
+                        android:alpha="0.3" />
+                </RelativeLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Settings Groups -->
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="PREFERENCES" android:textSize="11sp" android:fontFamily="sans-serif-black" android:textColor="?attr/colorPrimary" android:layout_marginStart="4dp" android:layout_marginBottom="12dp" android:letterSpacing="0.1" />
+            <include android:id="@+id/itemNotifications" layout="@layout/view_setting_item" />
+            <include android:id="@+id/itemGhostMode" layout="@layout/view_setting_item" />
+            <include android:id="@+id/itemVault" layout="@layout/view_setting_item" />
+            <include android:id="@+id/itemAppLock" layout="@layout/view_setting_item" />
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="APPEARANCE" android:textSize="11sp" android:fontFamily="sans-serif-black" android:textColor="?attr/colorPrimary" android:layout_marginStart="4dp" android:layout_marginTop="24dp" android:layout_marginBottom="12dp" android:letterSpacing="0.1" />
+            <include android:id="@+id/itemTheme" layout="@layout/view_setting_item" />
+            <include android:id="@+id/itemWallpaper" layout="@layout/view_setting_item" />
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/tvAdminHeader" android:text="MANAGEMENT" android:textSize="11sp" android:fontFamily="sans-serif-black" android:textColor="?attr/colorPrimary" android:layout_marginStart="4dp" android:layout_marginTop="24dp" android:layout_marginBottom="12dp" android:letterSpacing="0.1" android:visibility="gone" />
+            <include android:id="@+id/itemAdmin" layout="@layout/view_setting_item" android:visibility="gone" />
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="RESOURCES" android:textSize="11sp" android:fontFamily="sans-serif-black" android:textColor="?attr/colorPrimary" android:layout_marginStart="4dp" android:layout_marginTop="24dp" android:layout_marginBottom="12dp" android:letterSpacing="0.1" />
+            <include android:id="@+id/itemHelp" layout="@layout/view_setting_item" />
+            <include android:id="@+id/itemPrivacyPolicy" layout="@layout/view_setting_item" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnLogout"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="40dp"
+                android:text="Logout Session"
+                android:fontFamily="sans-serif-black"
+                android:textColor="@android:color/holo_red_dark"
+                app:backgroundTint="#1AFF0000"
+                app:cornerRadius="16dp"
+                app:icon="@android:drawable/ic_lock_power_off"
+                app:iconTint="@android:color/holo_red_dark"
+                app:iconGravity="textStart"
+                style="@style/Widget.Material3.Button.TonalButton"
+                app:strokeColor="#1AFF0000"
+                app:strokeWidth="1dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:gravity="center"
+                android:text="ChatSnap v4.2.0 • Build 992"
+                android:textSize="10sp"
+                android:alpha="0.4"
+                android:fontFamily="monospace"
+                android:textColor="?android:attr/textColorSecondary" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

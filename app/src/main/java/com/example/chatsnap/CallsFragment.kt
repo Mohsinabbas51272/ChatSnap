@@ -1,0 +1,123 @@
+package com.example.chatsnap
+
+import android.content.Intent
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.chatsnap.adapters.CallsAdapter
+import com.example.chatsnap.databinding.FragmentCallsBinding
+import com.example.chatsnap.models.Call
+import com.example.chatsnap.utils.SearchableFragment
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+
+class CallsFragment : Fragment(), SearchableFragment {
+    private var _binding: FragmentCallsBinding? = null
+    private val binding get() = _binding!!
+    private lateinit var auth: FirebaseAuth
+    private lateinit var firestore: FirebaseFirestore
+    private lateinit var adapter: CallsAdapter
+    private val callsList = mutableListOf<Call>()
+    private var filterMode = "ALL"
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentCallsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        auth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()
+
+        setupRecyclerView()
+        setupTabs()
+        loadCallHistory()
+    }
+
+    private fun setupTabs() {
+        binding.toggleGroup.check(R.id.btnTabAll)
+        binding.toggleGroup.addOnButtonCheckedListener { group, checkedId, isChecked ->
+            if (isChecked) {
+                filterMode = if (checkedId == R.id.btnTabMissed) "MISSED" else "ALL"
+                updateUI()
+            }
+        }
+    }
+
+    private fun setupRecyclerView() {
+        val uid = auth.currentUser?.uid ?: ""
+        adapter = CallsAdapter(emptyList(), uid) { call ->
+            val partnerId = if (call.callerId == uid) call.receiverId else call.callerId
+            val partnerName = if (call.callerId == uid) call.receiverName else call.callerName
+            
+            val intent = Intent(requireContext(), CallActivity::class.java).apply {
+                putExtra("receiverId", partnerId)
+                putExtra("receiverName", partnerName)
+                putExtra("callType", call.type)
+                putExtra("isCaller", true)
+                val ids = listOf(uid, partnerId).sorted()
+                putExtra("channelName", "${ids[0]}_${ids[1]}")
+            }
+            startActivity(intent)
+        }
+        binding.rvCalls.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvCalls.adapter = adapter
+    }
+
+    private fun loadCallHistory() {
+        val uid = auth.currentUser?.uid ?: return
+        
+        firestore.collection("calls")
+            .whereEqualTo("callerId", uid)
+            .addSnapshotListener { snapshot, _ -> processSnapshot(snapshot) }
+            
+        firestore.collection("calls")
+            .whereEqualTo("receiverId", uid)
+            .addSnapshotListener { snapshot, _ -> processSnapshot(snapshot) }
+    }
+
+    private fun processSnapshot(snapshot: com.google.firebase.firestore.QuerySnapshot?) {
+        snapshot?.documents?.forEach { doc ->
+            doc.toObject(Call::class.java)?.let { call ->
+                val index = callsList.indexOfFirst { it.timestamp == call.timestamp && it.callerId == call.callerId }
+                if (index != -1) callsList[index] = call else callsList.add(call)
+            }
+        }
+        updateUI()
+    }
+
+    private fun updateUI() {
+        if (_binding == null) return
+        val uid = auth.currentUser?.uid ?: ""
+        val filtered = callsList.filter { 
+            if (filterMode == "MISSED") {
+                it.receiverId == uid && it.status == "missed"
+            } else true
+        }.sortedByDescending { it.timestamp }
+        
+        adapter.updateData(filtered)
+        binding.tvNoCalls.visibility = if (filtered.isEmpty()) View.VISIBLE else View.GONE
+    }
+
+    override fun onSearch(query: String) {
+        if (_binding == null) return
+        val uid = auth.currentUser?.uid ?: ""
+        val filtered = callsList.filter { 
+            (it.callerName.contains(query, true) || it.receiverName.contains(query, true)) &&
+            (if (filterMode == "MISSED") it.receiverId == uid && it.status == "missed" else true)
+        }.sortedByDescending { it.timestamp }
+        adapter.updateData(filtered)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+}

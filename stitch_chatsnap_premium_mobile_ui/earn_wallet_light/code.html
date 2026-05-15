@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ChatSnap | Wallet &amp; Earn</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed-variant": "#444749",
+                    "surface-container-high": "#e6e7f2",
+                    "tertiary-container": "#b75b00",
+                    "on-primary": "#ffffff",
+                    "surface-container-low": "#f2f3fd",
+                    "tertiary-fixed": "#ffdcc6",
+                    "surface-tint": "#005ac2",
+                    "tertiary": "#924700",
+                    "primary": "#0058be",
+                    "on-tertiary-fixed-variant": "#723600",
+                    "primary-fixed-dim": "#adc6ff",
+                    "on-tertiary-fixed": "#311400",
+                    "surface-container": "#ecedf7",
+                    "primary-fixed": "#d8e2ff",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-variant": "#e1e2ec",
+                    "error": "#ba1a1a",
+                    "on-background": "#191b23",
+                    "secondary": "#5c5f61",
+                    "on-secondary-container": "#626567",
+                    "secondary-fixed": "#e0e3e5",
+                    "on-primary-container": "#fefcff",
+                    "on-secondary": "#ffffff",
+                    "outline": "#727785",
+                    "on-error": "#ffffff",
+                    "surface-dim": "#d8d9e3",
+                    "secondary-fixed-dim": "#c4c7c9",
+                    "inverse-surface": "#2e3038",
+                    "on-primary-fixed-variant": "#004395",
+                    "on-surface": "#191b23",
+                    "inverse-on-surface": "#eff0fa",
+                    "outline-variant": "#c2c6d6",
+                    "error-container": "#ffdad6",
+                    "on-secondary-fixed": "#191c1e",
+                    "secondary-container": "#e0e3e5",
+                    "surface": "#f9f9ff",
+                    "on-surface-variant": "#424754",
+                    "background": "#f9f9ff",
+                    "on-error-container": "#93000a",
+                    "surface-container-highest": "#e1e2ec",
+                    "surface-bright": "#f9f9ff",
+                    "on-tertiary": "#ffffff",
+                    "inverse-primary": "#adc6ff",
+                    "primary-container": "#2170e4",
+                    "on-tertiary-container": "#fffbff",
+                    "on-primary-fixed": "#001a42",
+                    "tertiary-fixed-dim": "#ffb786"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "base": "4px",
+                    "sm": "8px",
+                    "xl": "32px",
+                    "gutter": "12px",
+                    "margin-edge": "20px",
+                    "xs": "4px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "h3": ["Inter"],
+                    "h1": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "body-md": ["Inter"],
+                    "h2": ["Inter"],
+                    "label-bold": ["Inter"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "h3": ["20px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "h1": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-caps": ["11px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "h2": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "label-bold": ["12px", {"lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .gold-gradient {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+        }
+        .premium-shadow {
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.05);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body-md text-on-surface min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-5 h-16 bg-white/70 backdrop-blur-xl border-b border-white/20 shadow-[0_20px_40px_rgba(59,130,246,0.05)]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-blue-500" data-icon="qr_code_scanner">qr_code_scanner</span>
+</div>
+<h1 class="text-xl font-black text-blue-600 tracking-tighter">ChatSnap</h1>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-blue-500" data-icon="qr_code_2">qr_code_2</span>
+</div>
+</header>
+<main class="pt-24 px-margin-edge space-y-lg">
+<!-- Wallet Hero Section -->
+<section class="glass-card rounded-[32px] p-lg premium-shadow relative overflow-hidden">
+<div class="absolute -top-12 -right-12 w-48 h-48 bg-primary/10 rounded-full blur-3xl"></div>
+<div class="relative z-10">
+<div class="flex justify-between items-start mb-sm">
+<div>
+<p class="font-label-caps text-secondary uppercase opacity-70">Total Balance</p>
+<div class="flex items-center gap-2 mt-base">
+<h2 class="font-h1 text-[40px] text-on-surface">12,450</h2>
+<span class="material-symbols-outlined text-[#FFD700] text-3xl" data-icon="monetization_on" style="font-variation-settings: 'FILL' 1;">monetization_on</span>
+</div>
+</div>
+<button class="bg-primary-container text-on-primary-container px-md py-sm rounded-full font-label-bold active:scale-95 transition-all">
+                        Withdraw
+                    </button>
+</div>
+<!-- Gold Progress Bar -->
+<div class="mt-lg">
+<div class="flex justify-between items-end mb-base">
+<span class="font-label-bold text-on-surface">Gold Status Level 4</span>
+<span class="font-label-bold text-primary">75%</span>
+</div>
+<div class="h-3 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full gold-gradient rounded-full" style="width: 75%"></div>
+</div>
+<p class="text-label-bold text-secondary mt-sm">Earn 2,550 more to unlock Elite Tier</p>
+</div>
+</div>
+</section>
+<!-- Bento Grid Earn Activities -->
+<section class="grid grid-cols-2 gap-md">
+<div class="col-span-2 glass-card rounded-[24px] p-md flex items-center justify-between premium-shadow">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-2xl bg-tertiary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary" data-icon="auto_awesome" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<div>
+<p class="font-h3 text-on-surface">Daily Quest</p>
+<p class="text-label-bold text-secondary">Post 3 stories today</p>
+</div>
+</div>
+<div class="text-right">
+<span class="font-h3 text-tertiary">+250</span>
+</div>
+</div>
+<div class="glass-card rounded-[24px] p-md space-y-sm premium-shadow">
+<div class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-blue-600" data-icon="group" style="font-variation-settings: 'FILL' 1;">group</span>
+</div>
+<p class="font-label-bold text-on-surface">Refer Friends</p>
+<p class="text-[10px] text-secondary leading-tight">Get 1,000 gold for every new sign up</p>
+</div>
+<div class="glass-card rounded-[24px] p-md space-y-sm premium-shadow">
+<div class="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-orange-600" data-icon="bolt" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+<p class="font-label-bold text-on-surface">Streak Bonus</p>
+<p class="text-[10px] text-secondary leading-tight">Maintain a 7-day chat streak for 5x</p>
+</div>
+</section>
+<!-- Referral Section -->
+<section class="space-y-md">
+<h3 class="font-h3 text-on-surface px-base">Referral Network</h3>
+<div class="bg-white rounded-[28px] p-gutter premium-shadow">
+<div class="flex items-center gap-md bg-surface-container-low p-md rounded-2xl">
+<div class="relative">
+<img alt="User" class="w-12 h-12 rounded-full object-cover border-2 border-white" data-alt="Close-up portrait of a stylish young woman with neon city lights reflected in the background, high-end fashion photography style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLLyls-x2E09X9QybDR3QB6C3OX-ZPrsQtZpxekx7kzTh2xEPjzLBZaDEec3GLh6fS06wi7BexpqNoavJexcOtmh1sIGHmCFitUFYszS_ZHEnMTMEt97-Orlg-J8ozjPhb8DnJpEJrJARQL9soodtrKIVkAvnTZsKieaF1yMyq6UK3qu0EypfWFKW-5U3OGnu9TeHMTYyElJoD8N664_Se-jtbzdqgrurrACGiu2xeFTtqhnUPBXCtekccXU2zrA0D90i3VMZIWTI"/>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+</div>
+<div class="flex-1">
+<p class="font-label-bold text-on-surface">Sarah Mitchell</p>
+<p class="text-[10px] text-secondary">Joined via your link</p>
+</div>
+<div class="text-right">
+<p class="font-label-bold text-green-600">+1,000</p>
+</div>
+</div>
+<div class="mt-md space-y-sm">
+<div class="flex items-center justify-between p-sm border-b border-surface-variant/50">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary text-lg" data-icon="link">link</span>
+<span class="font-label-bold text-on-surface">chatsnap.io/r/alex_v3</span>
+</div>
+<button class="text-blue-600 font-label-bold hover:underline">Copy</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Transaction History -->
+<section class="space-y-md pb-12">
+<div class="flex justify-between items-center px-base">
+<h3 class="font-h3 text-on-surface">History</h3>
+<button class="text-label-bold text-blue-600">View All</button>
+</div>
+<div class="space-y-sm">
+<div class="flex items-center justify-between p-md bg-white/50 rounded-2xl">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-green-600" data-icon="arrow_downward">arrow_downward</span>
+</div>
+<div>
+<p class="font-label-bold text-on-surface">Daily Login Reward</p>
+<p class="text-[10px] text-secondary">Today, 08:30 AM</p>
+</div>
+</div>
+<p class="font-label-bold text-on-surface">+50</p>
+</div>
+<div class="flex items-center justify-between p-md bg-white/50 rounded-2xl">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-red-600" data-icon="shopping_bag">shopping_bag</span>
+</div>
+<div>
+<p class="font-label-bold text-on-surface">Premium Filter Pack</p>
+<p class="text-[10px] text-secondary">Yesterday, 11:45 PM</p>
+</div>
+</div>
+<p class="font-label-bold text-on-surface">-1,200</p>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB: New Chat (Suppressed per task-focused intent, but prompt suggests Wallet/Earn context. Usually FAB in Wallet could be "Add Funds" or "Scan to Pay") -->
+<!-- Let's follow the mandate: suppress FAB on Transactional/Detail screens. Since this is Wallet/Earn, I'll exclude the primary FAB to keep it focused. -->
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pt-3 pb-8 bg-white/80 backdrop-blur-2xl border-t border-white/10 shadow-[0_-15px_35px_rgba(59,130,246,0.08)] rounded-t-3xl">
+<div class="flex flex-col items-center justify-center text-slate-400">
+<span class="material-symbols-outlined mb-1" data-icon="chat_bubble">chat_bubble</span>
+<span class="text-[11px] font-medium font-inter uppercase tracking-widest">Chats</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400">
+<span class="material-symbols-outlined mb-1" data-icon="auto_awesome">auto_awesome</span>
+<span class="text-[11px] font-medium font-inter uppercase tracking-widest">Stories</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400">
+<div class="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center text-white -mt-8 shadow-lg">
+<span class="material-symbols-outlined" data-icon="photo_camera" style="font-variation-settings: 'FILL' 1;">photo_camera</span>
+</div>
+<span class="text-[11px] font-medium font-inter uppercase tracking-widest mt-1">Camera</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400">
+<span class="material-symbols-outlined mb-1" data-icon="group">group</span>
+<span class="text-[11px] font-medium font-inter uppercase tracking-widest">People</span>
+</div>
+<div class="flex flex-col items-center justify-center text-blue-600 scale-110 transition-transform">
+<span class="material-symbols-outlined mb-1" data-icon="person" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="text-[11px] font-medium font-inter uppercase tracking-widest">Settings</span>
+</div>
+</nav>
+</body></html>

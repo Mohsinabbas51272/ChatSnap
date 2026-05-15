@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "890504550859",
+    "firebase_url": "https://chatsnap-aa8c7-default-rtdb.firebaseio.com",
+    "project_id": "chatsnap-aa8c7",
+    "storage_bucket": "chatsnap-aa8c7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:890504550859:android:a1bec74f9df93df4047e4e",
+        "android_client_info": {
+          "package_name": "com.example.chatsnap"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAt4U4iqLsl17R7olSLyPi0OtCmP2NQVQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

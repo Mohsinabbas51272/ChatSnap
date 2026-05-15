@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-secondary-fixed-variant": "#444749",
+            "surface-container-high": "#e6e7f2",
+            "tertiary-container": "#b75b00",
+            "on-primary": "#ffffff",
+            "surface-container-low": "#f2f3fd",
+            "tertiary-fixed": "#ffdcc6",
+            "surface-tint": "#005ac2",
+            "tertiary": "#924700",
+            "primary": "#0058be",
+            "on-tertiary-fixed-variant": "#723600",
+            "primary-fixed-dim": "#adc6ff",
+            "on-tertiary-fixed": "#311400",
+            "surface-container": "#ecedf7",
+            "primary-fixed": "#d8e2ff",
+            "surface-container-lowest": "#ffffff",
+            "surface-variant": "#e1e2ec",
+            "error": "#ba1a1a",
+            "on-background": "#191b23",
+            "secondary": "#5c5f61",
+            "on-secondary-container": "#626567",
+            "secondary-fixed": "#e0e3e5",
+            "on-primary-container": "#fefcff",
+            "on-secondary": "#ffffff",
+            "outline": "#727785",
+            "on-error": "#ffffff",
+            "surface-dim": "#d8d9e3",
+            "secondary-fixed-dim": "#c4c7c9",
+            "inverse-surface": "#2e3038",
+            "on-primary-fixed-variant": "#004395",
+            "on-surface": "#191b23",
+            "inverse-on-surface": "#eff0fa",
+            "outline-variant": "#c2c6d6",
+            "error-container": "#ffdad6",
+            "on-secondary-fixed": "#191c1e",
+            "secondary-container": "#e0e3e5",
+            "surface": "#f9f9ff",
+            "on-surface-variant": "#424754",
+            "background": "#f9f9ff",
+            "on-error-container": "#93000a",
+            "surface-container-highest": "#e1e2ec",
+            "surface-bright": "#f9f9ff",
+            "on-tertiary": "#ffffff",
+            "inverse-primary": "#adc6ff",
+            "primary-container": "#2170e4",
+            "on-tertiary-container": "#fffbff",
+            "on-primary-fixed": "#001a42",
+            "tertiary-fixed-dim": "#ffb786"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "md": "16px",
+            "base": "4px",
+            "sm": "8px",
+            "xl": "32px",
+            "gutter": "12px",
+            "margin-edge": "20px",
+            "xs": "4px",
+            "lg": "24px"
+          },
+          "fontFamily": {
+            "h3": ["Inter"],
+            "h1": ["Inter"],
+            "label-caps": ["Inter"],
+            "body-md": ["Inter"],
+            "h2": ["Inter"],
+            "label-bold": ["Inter"],
+            "body-lg": ["Inter"]
+          },
+          "fontSize": {
+            "h3": ["20px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "h1": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+            "label-caps": ["11px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "700"}],
+            "body-md": ["14px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+            "h2": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+            "label-bold": ["12px", {"lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "600"}],
+            "body-lg": ["16px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      background-color: #f9f9ff;
+      font-family: 'Inter', sans-serif;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface">
+<!-- TopAppBar Shell -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-5 h-16 bg-white/70 backdrop-blur-xl border-b border-white/20 shadow-[0_20px_40px_rgba(59,130,246,0.05)]">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-blue-500 active:scale-95 transition-all duration-200 ease-out cursor-pointer">qr_code_scanner</span>
+<h1 class="text-xl font-black text-blue-600 tracking-tighter font-inter">ChatSnap</h1>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-blue-500 active:scale-95 transition-all duration-200 ease-out cursor-pointer">qr_code_2</span>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-24 pb-32 px-margin-edge max-w-screen-xl mx-auto">
+<!-- Bento Grid Section -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter lg:gap-md">
+<!-- Profile Widget (Large Hero) -->
+<div class="md:col-span-8 glass-card rounded-[2rem] p-lg flex flex-col md:flex-row items-center gap-lg shadow-[0_30px_60px_rgba(59,130,246,0.06)]">
+<div class="relative">
+<div class="w-24 h-24 rounded-full p-[2px] ring-2 ring-blue-500/20">
+<img alt="Profile" class="w-full h-full rounded-full object-cover" data-alt="portrait of a confident stylish young woman with minimalist fashion aesthetic in soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDh4GwB1HSSrAxjwy_WQFtkSpiddVDAtRIEGKuXQ35Wr3xdsINxXtR1FCmbXQ4zFbkaVqt9MmT_n7Mk-MAlRwojyJW7usmBxwxlOWRVbIv-P2w1Qhn1OgKV4hHhcf15fOIoCKQE41tZcxD9mXkVgf2WOFx-AjYZkZrgDf16rhIqqJnK4Q2LhvYbPHRGTsdGZLEqkMIYiA0QDZHJtKc8PsxBSUZhvhTIAPqdL-EuLOlYHryOOwE8ZyNliOCJQbIFGNHhtFfXLvBq4Kg"/>
+</div>
+<div class="absolute bottom-1 right-1 w-5 h-5 bg-[#4caf50] border-2 border-white rounded-full"></div>
+</div>
+<div class="text-center md:text-left flex-1">
+<h2 class="font-h2 text-h2 text-on-surface">Alex Sterling</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">@alex_digital_nomad</p>
+<div class="mt-md flex flex-wrap justify-center md:justify-start gap-sm">
+<span class="px-3 py-1 bg-primary/10 text-primary font-label-bold text-label-bold rounded-full">Snap+ Member</span>
+<span class="px-3 py-1 bg-surface-container text-on-surface-variant font-label-bold text-label-bold rounded-full">Verified Creator</span>
+</div>
+</div>
+<button class="bg-primary text-on-primary px-lg py-md rounded-xl font-label-bold text-label-bold hover:opacity-90 active:scale-95 transition-all">
+          Edit Profile
+        </button>
+</div>
+<!-- Wallet (Small Square) -->
+<div class="md:col-span-4 glass-card rounded-[2rem] p-lg flex flex-col justify-between shadow-[0_30px_60px_rgba(59,130,246,0.06)] relative overflow-hidden">
+<div class="absolute -top-4 -right-4 w-24 h-24 bg-blue-100/50 rounded-full blur-2xl"></div>
+<div class="flex justify-between items-start relative">
+<span class="material-symbols-outlined text-blue-600 bg-blue-50 p-sm rounded-lg" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+<span class="text-on-surface-variant font-label-bold text-label-bold uppercase tracking-widest">Wallet</span>
+</div>
+<div class="mt-xl">
+<p class="font-h2 text-h2 text-on-surface">$1,284.50</p>
+<p class="font-label-bold text-label-bold text-[#4caf50] mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">trending_up</span> +12% this month
+          </p>
+</div>
+</div>
+<!-- Themes & Accessories (Tall Column) -->
+<div class="md:col-span-4 glass-card rounded-[2rem] p-lg flex flex-col shadow-[0_30px_60px_rgba(59,130,246,0.06)]">
+<h3 class="font-h3 text-h3 mb-md">Accessories</h3>
+<div class="space-y-gutter">
+<div class="p-sm bg-surface-container rounded-2xl flex items-center gap-md hover:bg-surface-container-high transition-colors cursor-pointer group">
+<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center text-white">
+<span class="material-symbols-outlined">palette</span>
+</div>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">Premium Themes</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-tight">12 Active</p>
+</div>
+<span class="material-symbols-outlined ml-auto text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
+</div>
+<div class="p-sm bg-surface-container rounded-2xl flex items-center gap-md hover:bg-surface-container-high transition-colors cursor-pointer group">
+<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-400 to-rose-600 flex items-center justify-center text-white">
+<span class="material-symbols-outlined">smart_toy</span>
+</div>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">AI Chat Bots</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-tight">4 Installed</p>
+</div>
+<span class="material-symbols-outlined ml-auto text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
+</div>
+<div class="p-sm bg-surface-container rounded-2xl flex items-center gap-md hover:bg-surface-container-high transition-colors cursor-pointer group">
+<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center text-white">
+<span class="material-symbols-outlined">auto_awesome</span>
+</div>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">Custom Emojis</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-tight">842 Pack</p>
+</div>
+<span class="material-symbols-outlined ml-auto text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
+</div>
+</div>
+</div>
+<!-- Security & Privacy (Horizontal Bento) -->
+<div class="md:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-gutter lg:gap-md">
+<div class="glass-card rounded-[2rem] p-lg flex flex-col justify-between shadow-[0_30px_60px_rgba(59,130,246,0.06)] min-h-[200px]">
+<div>
+<div class="flex items-center gap-md mb-md">
+<span class="material-symbols-outlined text-blue-600" style="font-variation-settings: 'FILL' 1;">security</span>
+<h3 class="font-h3 text-h3">Security</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">2-Step Verification is active via Auth App.</p>
+</div>
+<button class="w-fit text-blue-600 font-label-bold text-label-bold flex items-center gap-1 hover:gap-2 transition-all">
+            Manage Keys <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+<div class="glass-card rounded-[2rem] p-lg flex flex-col justify-between shadow-[0_30px_60px_rgba(59,130,246,0.06)] bg-blue-600 text-white">
+<div>
+<div class="flex items-center gap-md mb-md">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">admin_panel_settings</span>
+<h3 class="font-h3 text-h3">Admin Panel</h3>
+</div>
+<p class="font-body-md text-body-md text-blue-100">Enterprise controls and multi-channel moderation tools.</p>
+</div>
+<button class="w-fit bg-white/20 backdrop-blur-md px-lg py-sm rounded-xl font-label-bold text-label-bold hover:bg-white/30 transition-all">
+            Access Portal
+          </button>
+</div>
+</div>
+<!-- High Density Widgets Row -->
+<div class="md:col-span-12 grid grid-cols-2 md:grid-cols-4 gap-gutter lg:gap-md">
+<div class="glass-card rounded-3xl p-md flex flex-col items-center justify-center text-center shadow-sm">
+<span class="material-symbols-outlined text-on-surface-variant mb-2">notifications_active</span>
+<p class="font-label-bold text-label-bold text-on-surface">Notifications</p>
+</div>
+<div class="glass-card rounded-3xl p-md flex flex-col items-center justify-center text-center shadow-sm">
+<span class="material-symbols-outlined text-on-surface-variant mb-2">data_usage</span>
+<p class="font-label-bold text-label-bold text-on-surface">Data Usage</p>
+</div>
+<div class="glass-card rounded-3xl p-md flex flex-col items-center justify-center text-center shadow-sm">
+<span class="material-symbols-outlined text-on-surface-variant mb-2">cloud_done</span>
+<p class="font-label-bold text-label-bold text-on-surface">Backup</p>
+</div>
+<div class="glass-card rounded-3xl p-md flex flex-col items-center justify-center text-center shadow-sm">
+<span class="material-symbols-outlined text-on-surface-variant mb-2">help_center</span>
+<p class="font-label-bold text-label-bold text-on-surface">Support</p>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar Shell -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pt-3 pb-8 bg-white/80 backdrop-blur-2xl border-t border-white/10 shadow-[0_-15px_35px_rgba(59,130,246,0.08)] rounded-t-3xl">
+<div class="flex flex-col items-center justify-center text-slate-400 active:scale-90 transition-transform duration-150 cursor-pointer">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="text-[11px] font-medium font-inter uppercase tracking-widest mt-1">Chats</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 active:scale-90 transition-transform duration-150 cursor-pointer">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="text-[11px] font-medium font-inter uppercase tracking-widest mt-1">Stories</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 active:scale-90 transition-transform duration-150 cursor-pointer -translate-y-4">
+<div class="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-blue-500/40">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">photo_camera</span>
+</div>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 active:scale-90 transition-transform duration-150 cursor-pointer">
+<span class="material-symbols-outlined">group</span>
+<span class="text-[11px] font-medium font-inter uppercase tracking-widest mt-1">People</span>
+</div>
+<div class="flex flex-col items-center justify-center text-blue-600 scale-110 transition-transform active:scale-90 duration-150 cursor-pointer">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="text-[11px] font-medium font-inter uppercase tracking-widest mt-1 font-bold">Settings</span>
+</div>
+</nav>
+</body></html>

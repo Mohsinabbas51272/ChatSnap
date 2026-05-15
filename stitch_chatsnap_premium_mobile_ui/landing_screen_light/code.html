@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed-variant": "#444749",
+                    "surface-container-high": "#e6e7f2",
+                    "tertiary-container": "#b75b00",
+                    "on-primary": "#ffffff",
+                    "surface-container-low": "#f2f3fd",
+                    "tertiary-fixed": "#ffdcc6",
+                    "surface-tint": "#005ac2",
+                    "tertiary": "#924700",
+                    "primary": "#0058be",
+                    "on-tertiary-fixed-variant": "#723600",
+                    "primary-fixed-dim": "#adc6ff",
+                    "on-tertiary-fixed": "#311400",
+                    "surface-container": "#ecedf7",
+                    "primary-fixed": "#d8e2ff",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-variant": "#e1e2ec",
+                    "error": "#ba1a1a",
+                    "on-background": "#191b23",
+                    "secondary": "#5c5f61",
+                    "on-secondary-container": "#626567",
+                    "secondary-fixed": "#e0e3e5",
+                    "on-primary-container": "#fefcff",
+                    "on-secondary": "#ffffff",
+                    "outline": "#727785",
+                    "on-error": "#ffffff",
+                    "surface-dim": "#d8d9e3",
+                    "secondary-fixed-dim": "#c4c7c9",
+                    "inverse-surface": "#2e3038",
+                    "on-primary-fixed-variant": "#004395",
+                    "on-surface": "#191b23",
+                    "inverse-on-surface": "#eff0fa",
+                    "outline-variant": "#c2c6d6",
+                    "error-container": "#ffdad6",
+                    "on-secondary-fixed": "#191c1e",
+                    "secondary-container": "#e0e3e5",
+                    "surface": "#f9f9ff",
+                    "on-surface-variant": "#424754",
+                    "background": "#f9f9ff",
+                    "on-error-container": "#93000a",
+                    "surface-container-highest": "#e1e2ec",
+                    "surface-bright": "#f9f9ff",
+                    "on-tertiary": "#ffffff",
+                    "inverse-primary": "#adc6ff",
+                    "primary-container": "#2170e4",
+                    "on-tertiary-container": "#fffbff",
+                    "on-primary-fixed": "#001a42",
+                    "tertiary-fixed-dim": "#ffb786"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "base": "4px",
+                    "sm": "8px",
+                    "xl": "32px",
+                    "gutter": "12px",
+                    "margin-edge": "20px",
+                    "xs": "4px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "h3": ["Inter"],
+                    "h1": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "body-md": ["Inter"],
+                    "h2": ["Inter"],
+                    "label-bold": ["Inter"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "h3": ["20px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "h1": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-caps": ["11px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "h2": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "label-bold": ["12px", {"lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #f9f9ff;
+            color: #191b23;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-on-surface antialiased overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-5 h-16 bg-white/70 backdrop-blur-xl border-b border-white/20 shadow-[0_20px_40px_rgba(59,130,246,0.05)]">
+<div class="flex items-center gap-sm active:scale-95 transition-all duration-200 ease-out hover:opacity-80">
+<span class="material-symbols-outlined text-blue-500" data-icon="qr_code_scanner">qr_code_scanner</span>
+</div>
+<h1 class="text-xl font-black text-blue-600 tracking-tighter font-inter">ChatSnap</h1>
+<div class="flex items-center gap-sm active:scale-95 transition-all duration-200 ease-out hover:opacity-80">
+<span class="material-symbols-outlined text-blue-500" data-icon="qr_code_2">qr_code_2</span>
+</div>
+</header>
+<main class="pt-32 pb-40 px-margin-edge flex flex-col items-center max-w-lg mx-auto text-center">
+<!-- Hero Visual Element -->
+<div class="relative mb-xl w-full aspect-square max-w-[320px]">
+<div class="absolute inset-0 bg-primary/10 rounded-full blur-3xl"></div>
+<div class="relative w-full h-full rounded-[48px] overflow-hidden shadow-2xl rotate-3 glass-panel p-2">
+<img alt="ChatSnap Interface" class="w-full h-full object-cover rounded-[40px]" data-alt="Modern smartphone interface showing vibrant chat bubbles and user profiles in a clean high-end minimal aesthetic with soft studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVPPbu5OPuOLgYXzn_84RditfTEFqqVsHz5cC8iSXi1Okh2jHgXik6jnHqCes59Axe0303YgR6mB6PPm1jcSKDgacU4-2hG2FIbgiyJQgvtGo9tcqjG8l7M-lWun0OPUybJdhD3UhuWAjGhJh7oF0WFfOY8tS-Z--RMI6Ajz5OSRWvEX4fDIL4A4YcL4swMRoIDo4qo_OcxRQhCQX56vqZ3Sn3e1JUvdoaL0aB_bUd4jqJdVLd51sZmmAepmvvLC0nr3E6NuBQwxM"/>
+</div>
+<!-- Floating interaction chips -->
+<div class="absolute -right-4 top-1/4 glass-panel px-md py-sm rounded-full shadow-lg flex items-center gap-xs animate-bounce" style="animation-duration: 3s;">
+<span class="material-symbols-outlined text-[#F43F5E] text-lg" data-icon="auto_awesome" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span class="font-label-bold text-on-surface">New Story</span>
+</div>
+<div class="absolute -left-6 bottom-1/4 glass-panel px-md py-sm rounded-full shadow-lg flex items-center gap-xs animate-pulse">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="chat_bubble" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
+<span class="font-label-bold text-on-surface">Active Now</span>
+</div>
+</div>
+<!-- Headline -->
+<h2 class="font-h1 text-h1 text-on-surface mb-sm">Connect Instantly</h2>
+<p class="font-body-lg text-secondary mb-xl tracking-tight">Chat, Share, Earn</p>
+<!-- CTA Buttons -->
+<div class="w-full space-y-md mb-xl">
+<button class="w-full py-md bg-primary text-on-primary font-h3 rounded-xl shadow-[0_8px_20px_rgba(0,88,190,0.25)] active:scale-95 transition-transform duration-200">
+                Sign Up
+            </button>
+<button class="w-full py-md bg-transparent border-2 border-primary text-primary font-h3 rounded-xl hover:bg-primary/5 active:scale-95 transition-transform duration-200">
+                Log In
+            </button>
+</div>
+<!-- Features Grid (Asymmetric Bento Style) -->
+<div class="grid grid-cols-2 gap-md w-full">
+<div class="col-span-2 bg-surface-container-low p-lg rounded-[24px] flex flex-col items-start text-left relative overflow-hidden">
+<div class="relative z-10">
+<span class="material-symbols-outlined text-primary mb-sm" data-icon="encrypted">encrypted</span>
+<h3 class="font-h3 text-on-surface mb-xs">End-to-End Privacy</h3>
+<p class="font-body-md text-on-secondary-container">Elite encryption for every snap.</p>
+</div>
+<div class="absolute right-[-20px] bottom-[-20px] opacity-10">
+<span class="material-symbols-outlined text-[120px]" data-icon="security">security</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-md rounded-[24px] text-left flex flex-col justify-between">
+<span class="material-symbols-outlined text-tertiary mb-sm" data-icon="payments">payments</span>
+<div>
+<h3 class="font-label-bold text-on-surface">Earn Rewards</h3>
+<p class="text-[12px] text-on-secondary-variant">Get paid for engagement.</p>
+</div>
+</div>
+<div class="bg-surface-container-low p-md rounded-[24px] text-left flex flex-col justify-between">
+<span class="material-symbols-outlined text-[#F43F5E] mb-sm" data-icon="bolt">bolt</span>
+<div>
+<h3 class="font-label-bold text-on-surface">Sonic Speed</h3>
+<p class="text-[12px] text-on-secondary-variant">Global low-latency chat.</p>
+</div>
+</div>
+</div>
+<!-- Social Proof -->
+<div class="mt-xl flex flex-col items-center">
+<div class="flex -space-x-3 mb-sm">
+<img alt="User 1" class="w-10 h-10 rounded-full border-2 border-white object-cover" data-alt="Portrait of a smiling young woman with bright professional lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3EB-GoHQ7uXwKA0aJyCbN4OqIQW5zlP5uuSKndqfY_Z9315W7GlCScMXLDhZYhq2-5dB2SQJQdEzh1tJDdoOz2GvCvfOsFj1snsAciBSGc7eY6M1yIDnNBz17pvJ_U5_KRLn97vMkEiPWTfR2ei2AvTfcyVUCfiBgccPaC3_6Wq23McbU6oLh96NnpnWgac1jOh-W3EyTjp6F_CzIBUJbCLfjck82bUORhgn2b1J_D2k3gAGNjWJxl2z3_OQh3zHnfXh0AcRFZLA"/>
+<img alt="User 2" class="w-10 h-10 rounded-full border-2 border-white object-cover" data-alt="Portrait of a confident young man with clean background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4ia3bC083vSyPCDgtaFcQp0M_eZQLwH9SnsGS1pzpOPGCCAhYDLgDC6-mokc3TaFLgSODdzkYTmkYaOWbsG15ACWwS4G6yA3gRFOYCY18Gs2DSTmw7oq63d6Zlam4IihfzPtNNa2tZaXW2NpQSkO5RNA3raZ_3EVnP5PIhUZ4I4tU2cbCaHM2pL9AAUhNR3_pL_wc348iPTnp4flRFnsxiB0Doo_1arViUhtdLe1B4SSuOJKipjPSG7GA3ThVTMsVyKyYrbb53ic"/>
+<img alt="User 3" class="w-10 h-10 rounded-full border-2 border-white object-cover" data-alt="Portrait of a woman with vibrant hair and creative lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvDWLkLjXXjcAAt_W4TN-67uZgRHmgxTFwK2YyzMyMHFsScXLRC271sIoWlUeyLEYclnAENtezpG1Anb1RDN0zyc3G6lBNPzeHCNjLbqCMTFuPup8rqZuLBh4aUSXP4-cf172mUOJ4L6_8wfmCgSv4T-uLbEDTcGo9yVlt2FCqMC290IlST8GDUWACIlV7tRoYEsq8PYpJIUHJIXS0QRzqmIViCRw6DRbKIkbNDFvSpScPAIzaYoHWia2iWBHZOOnw6CO0LL7Okzk"/>
+<div class="w-10 h-10 rounded-full border-2 border-white bg-surface-container-high flex items-center justify-center font-label-bold text-primary">
+                    +10M
+                </div>
+</div>
+<p class="text-[12px] font-medium text-secondary">Join over 10 million snappers worldwide</p>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pt-3 pb-8 bg-white/80 backdrop-blur-2xl border-t border-white/10 rounded-t-3xl shadow-[0_-15px_35px_rgba(59,130,246,0.08)]">
+<a class="flex flex-col items-center justify-center text-slate-400 hover:text-blue-400 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="chat_bubble">chat_bubble</span>
+<span class="text-[11px] font-medium font-inter uppercase tracking-widest">Chats</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 hover:text-blue-400 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="auto_awesome">auto_awesome</span>
+<span class="text-[11px] font-medium font-inter uppercase tracking-widest">Stories</span>
+</a>
+<a class="flex flex-col items-center justify-center text-blue-600 scale-110 active:scale-90 transition-transform duration-150" href="#">
+<div class="bg-primary p-3 rounded-full shadow-lg shadow-primary/30 -mt-8 text-white">
+<span class="material-symbols-outlined" data-icon="photo_camera" style="font-variation-settings: 'FILL' 1;">photo_camera</span>
+</div>
+<span class="text-[11px] font-medium font-inter uppercase tracking-widest mt-1">Camera</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 hover:text-blue-400 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="group">group</span>
+<span class="text-[11px] font-medium font-inter uppercase tracking-widest">People</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 hover:text-blue-400 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+<span class="text-[11px] font-medium font-inter uppercase tracking-widest">Settings</span>
+</a>
+</nav>
+</body></html>

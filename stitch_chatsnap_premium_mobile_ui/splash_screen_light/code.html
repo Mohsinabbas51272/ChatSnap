@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed-variant": "#444749",
+                    "surface-container-high": "#e6e7f2",
+                    "tertiary-container": "#b75b00",
+                    "on-primary": "#ffffff",
+                    "surface-container-low": "#f2f3fd",
+                    "tertiary-fixed": "#ffdcc6",
+                    "surface-tint": "#005ac2",
+                    "tertiary": "#924700",
+                    "primary": "#0058be",
+                    "on-tertiary-fixed-variant": "#723600",
+                    "primary-fixed-dim": "#adc6ff",
+                    "on-tertiary-fixed": "#311400",
+                    "surface-container": "#ecedf7",
+                    "primary-fixed": "#d8e2ff",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-variant": "#e1e2ec",
+                    "error": "#ba1a1a",
+                    "on-background": "#191b23",
+                    "secondary": "#5c5f61",
+                    "on-secondary-container": "#626567",
+                    "secondary-fixed": "#e0e3e5",
+                    "on-primary-container": "#fefcff",
+                    "on-secondary": "#ffffff",
+                    "outline": "#727785",
+                    "on-error": "#ffffff",
+                    "surface-dim": "#d8d9e3",
+                    "secondary-fixed-dim": "#c4c7c9",
+                    "inverse-surface": "#2e3038",
+                    "on-primary-fixed-variant": "#004395",
+                    "on-surface": "#191b23",
+                    "inverse-on-surface": "#eff0fa",
+                    "outline-variant": "#c2c6d6",
+                    "error-container": "#ffdad6",
+                    "on-secondary-fixed": "#191c1e",
+                    "secondary-container": "#e0e3e5",
+                    "surface": "#f9f9ff",
+                    "on-surface-variant": "#424754",
+                    "background": "#f9f9ff",
+                    "on-error-container": "#93000a",
+                    "surface-container-highest": "#e1e2ec",
+                    "surface-bright": "#f9f9ff",
+                    "on-tertiary": "#ffffff",
+                    "inverse-primary": "#adc6ff",
+                    "primary-container": "#2170e4",
+                    "on-tertiary-container": "#fffbff",
+                    "on-primary-fixed": "#001a42",
+                    "tertiary-fixed-dim": "#ffb786"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "base": "4px",
+                    "sm": "8px",
+                    "xl": "32px",
+                    "gutter": "12px",
+                    "margin-edge": "20px",
+                    "xs": "4px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "h3": ["Inter"],
+                    "h1": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "body-md": ["Inter"],
+                    "h2": ["Inter"],
+                    "label-bold": ["Inter"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "h3": ["20px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "h1": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-caps": ["11px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "h2": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "label-bold": ["12px", {"lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-gradient {
+            background: linear-gradient(135deg, #2170e4 0%, #adc6ff 100%);
+        }
+        .soft-glow {
+            box-shadow: 0 0 50px 10px rgba(59, 130, 246, 0.15);
+        }
+        .logo-scale {
+            transform: scale(1.15);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background font-body-md text-on-background overflow-hidden h-screen w-screen flex items-center justify-center">
+<!-- Splash Screen Canvas -->
+<div class="relative w-full h-full flex items-center justify-center overflow-hidden">
+<!-- Subtle Ambient Background Gradient -->
+<div class="absolute inset-0 z-0 opacity-10" data-alt="Smooth gradient flowing from deep vibrant blue to soft light azure with subtle grain texture for a clean interface">
+<div class="w-full h-full glass-gradient"></div>
+</div>
+<!-- Decorative Floating Glass Elements for Depth -->
+<div class="absolute top-[10%] -left-20 w-80 h-80 bg-primary/5 rounded-full blur-[80px]"></div>
+<div class="absolute bottom-[10%] -right-20 w-96 h-96 bg-primary-fixed-dim/10 rounded-full blur-[100px]"></div>
+<!-- Main Identity Cluster -->
+<div class="relative z-10 flex flex-col items-center justify-center">
+<!-- Logo Icon with Scale Effect Feel & Glow -->
+<div class="relative mb-lg group">
+<!-- Outer Glow Ring -->
+<div class="absolute inset-0 bg-primary/20 blur-2xl rounded-full scale-150"></div>
+<!-- Logo Container -->
+<div class="relative w-28 h-28 glass-gradient rounded-[32px] flex items-center justify-center shadow-[0_20px_40px_rgba(33,112,228,0.3)] logo-scale border border-white/30 backdrop-blur-sm">
+<span class="material-symbols-outlined text-[56px] text-white" style="font-variation-settings: 'FILL' 1;">
+                        auto_awesome
+                    </span>
+</div>
+</div>
+<!-- Brand Typography -->
+<div class="text-center">
+<h1 class="font-h1 text-h1 text-primary-container tracking-tighter mb-xs">
+                    ChatSnap
+                </h1>
+<p class="font-label-caps text-label-caps text-outline uppercase tracking-[0.2em] opacity-60">
+                    Futuristic Serenity
+                </p>
+</div>
+</div>
+<!-- Bottom Loading / Legal Indicator -->
+<div class="absolute bottom-12 flex flex-col items-center gap-sm">
+<div class="flex gap-1.5">
+<div class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-primary/40"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-primary/20"></div>
+</div>
+<span class="font-label-bold text-label-bold text-secondary/40">
+                SECURED ENCRYPTION
+            </span>
+</div>
+</div>
+</body></html>

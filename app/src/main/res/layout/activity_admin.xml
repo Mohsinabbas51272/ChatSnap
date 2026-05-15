@@ -1,0 +1,509 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/windowBackground">
+
+    <include layout="@layout/layout_bubbles" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:navigationIcon="@android:drawable/ic_menu_revert"
+            app:title="Admin Control Panel">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginEnd="16dp"
+                android:text="ROOT"
+                android:textSize="10sp"
+                android:fontFamily="sans-serif-black"
+                android:textColor="?attr/colorPrimary" />
+        </com.google.android.material.appbar.MaterialToolbar>
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/adminTabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabMode="scrollable"
+            app:tabIndicatorColor="?attr/colorPrimary"
+            app:tabSelectedTextColor="?attr/colorPrimary"
+            app:tabTextAppearance="@style/TextAppearance.Material3.TitleSmall">
+            <com.google.android.material.tabs.TabItem android:text="Dashboard" />
+            <com.google.android.material.tabs.TabItem android:text="Users" />
+            <com.google.android.material.tabs.TabItem android:text="Finance" />
+            <com.google.android.material.tabs.TabItem android:text="Support" />
+            <com.google.android.material.tabs.TabItem android:text="Stories" />
+            <com.google.android.material.tabs.TabItem android:text="Reports" />
+            <com.google.android.material.tabs.TabItem android:text="Config" />
+        </com.google.android.material.tabs.TabLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <!-- Dashboard Tab -->
+            <ScrollView
+                android:id="@+id/layoutDashboardTab"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="visible">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_margin="4dp"
+                            app:cardCornerRadius="16dp"
+                            app:cardBackgroundColor="?attr/colorSurfaceVariant">
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                                android:orientation="vertical" android:padding="14dp" android:gravity="center">
+                                <TextView android:id="@+id/tvStatTotalUsers" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="0" android:textSize="28sp" android:textStyle="bold" android:textColor="?attr/colorPrimary"/>
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="Total Users" android:textSize="11sp" android:alpha="0.7"/>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_margin="4dp"
+                            app:cardCornerRadius="16dp"
+                            app:cardBackgroundColor="?attr/colorSurfaceVariant">
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                                android:orientation="vertical" android:padding="14dp" android:gravity="center">
+                                <TextView android:id="@+id/tvStatActiveToday" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="0" android:textSize="28sp" android:textStyle="bold" android:textColor="#34C759"/>
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="Active Today" android:textSize="11sp" android:alpha="0.7"/>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_margin="4dp"
+                            app:cardCornerRadius="16dp"
+                            app:cardBackgroundColor="?attr/colorSurfaceVariant">
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                                android:orientation="vertical" android:padding="14dp" android:gravity="center">
+                                <TextView android:id="@+id/tvStatTotalMessages" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="0" android:textSize="28sp" android:textStyle="bold" android:textColor="#FF9500"/>
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="Messages" android:textSize="11sp" android:alpha="0.7"/>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_margin="4dp"
+                            app:cardCornerRadius="16dp"
+                            app:cardBackgroundColor="?attr/colorSurfaceVariant">
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                                android:orientation="vertical" android:padding="14dp" android:gravity="center">
+                                <TextView android:id="@+id/tvStatTotalCoins" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="0" android:textSize="28sp" android:textStyle="bold" android:textColor="#FF3B30"/>
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="Coins in System" android:textSize="11sp" android:alpha="0.7"/>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="4dp">
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_margin="4dp"
+                            app:cardCornerRadius="16dp"
+                            app:cardBackgroundColor="?attr/colorSurfaceVariant">
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                                android:orientation="vertical" android:padding="14dp" android:gravity="center">
+                                <TextView android:id="@+id/tvStatPendingWithdrawals" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="0" android:textSize="28sp" android:textStyle="bold" android:textColor="#FF9500"/>
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="Pending Withdrawals" android:textSize="11sp" android:alpha="0.7"/>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_margin="4dp"
+                            app:cardCornerRadius="16dp"
+                            app:cardBackgroundColor="?attr/colorSurfaceVariant">
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                                android:orientation="vertical" android:padding="14dp" android:gravity="center">
+                                <TextView android:id="@+id/tvStatTotalStories" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="0" android:textSize="28sp" android:textStyle="bold" android:textColor="#AF52DE"/>
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="Active Stories" android:textSize="11sp" android:alpha="0.7"/>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Quick Actions"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="8dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnBroadcast"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="📢  Send Broadcast"
+                        app:icon="@android:drawable/ic_menu_send"
+                        style="@style/Widget.Material3.Button.TonalButton"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSetAnnouncement"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="📌  Set Announcement Banner"
+                        android:layout_marginTop="4dp"
+                        style="@style/Widget.Material3.Button.TonalButton"/>
+
+                </LinearLayout>
+            </ScrollView>
+
+            <!-- Users Tab -->
+            <LinearLayout
+                android:id="@+id/layoutUsersTab"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardBackgroundColor="?attr/colorSurfaceVariant">
+                    <EditText
+                        android:id="@+id/etUserSearch"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@android:color/transparent"
+                        android:hint="Search users by name/phone..."
+                        android:paddingHorizontal="16dp"
+                        android:textSize="14sp" />
+                </androidx.cardview.widget.CardView>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvAdminUsers"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingHorizontal="16dp" />
+            </LinearLayout>
+
+            <!-- Finance Tab -->
+            <LinearLayout
+                android:id="@+id/layoutFinanceTab"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvAdminWithdrawals"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="16dp" />
+            </LinearLayout>
+
+            <!-- Support Tab -->
+            <LinearLayout
+                android:id="@+id/layoutSupportTab"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvAdminSupport"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="16dp" />
+            </LinearLayout>
+
+            <!-- Stories Tab -->
+            <LinearLayout
+                android:id="@+id/layoutStoriesTab"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvAdminStories"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="16dp" />
+            </LinearLayout>
+
+            <!-- Reports Tab -->
+            <LinearLayout
+                android:id="@+id/layoutReportsTab"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvAdminReports"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="16dp" />
+            </LinearLayout>
+
+            <!-- Config Tab -->
+            <ScrollView
+                android:id="@+id/layoutConfigTab"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="💰 Economy Settings" android:textStyle="bold" android:textSize="16sp"
+                        android:layout_marginBottom="8dp"/>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp" app:cardCornerRadius="12dp"
+                        app:cardBackgroundColor="?attr/colorSurfaceVariant">
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:orientation="vertical" android:padding="16dp">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Coin to PKR Rate" android:textSize="14sp" android:textStyle="bold"/>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="How many coins = 1 PKR" android:textSize="12sp" android:alpha="0.6"/>
+                            <EditText android:id="@+id/etCoinRate" android:layout_width="match_parent" android:layout_height="48dp"
+                                android:hint="30" android:inputType="number" android:layout_marginTop="8dp"
+                                android:background="@drawable/edit_text_bg" android:paddingHorizontal="12dp"/>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp" app:cardCornerRadius="12dp"
+                        app:cardBackgroundColor="?attr/colorSurfaceVariant">
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:orientation="vertical" android:padding="16dp">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Minimum Withdrawal" android:textSize="14sp" android:textStyle="bold"/>
+                            <EditText android:id="@+id/etMinWithdrawal" android:layout_width="match_parent" android:layout_height="48dp"
+                                android:hint="300" android:inputType="number" android:layout_marginTop="8dp"
+                                android:background="@drawable/edit_text_bg" android:paddingHorizontal="12dp"/>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp" app:cardCornerRadius="12dp"
+                        app:cardBackgroundColor="?attr/colorSurfaceVariant">
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:orientation="vertical" android:padding="16dp">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Task Rewards (Coins)" android:textSize="14sp" android:textStyle="bold"/>
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                                android:orientation="horizontal" android:layout_marginTop="8dp">
+                                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                                    android:text="Daily Login" android:textSize="12sp"/>
+                                <EditText android:id="@+id/etRewardLogin" android:layout_width="80dp" android:layout_height="40dp"
+                                    android:hint="10" android:inputType="number" android:gravity="center"
+                                    android:background="@drawable/edit_text_bg"/>
+                            </LinearLayout>
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                                android:orientation="horizontal" android:layout_marginTop="4dp">
+                                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                                    android:text="View Stories" android:textSize="12sp"/>
+                                <EditText android:id="@+id/etRewardStory" android:layout_width="80dp" android:layout_height="40dp"
+                                    android:hint="5" android:inputType="number" android:gravity="center"
+                                    android:background="@drawable/edit_text_bg"/>
+                            </LinearLayout>
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                                android:orientation="horizontal" android:layout_marginTop="4dp">
+                                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                                    android:text="Send Messages" android:textSize="12sp"/>
+                                <EditText android:id="@+id/etRewardMessage" android:layout_width="80dp" android:layout_height="40dp"
+                                    android:hint="5" android:inputType="number" android:gravity="center"
+                                    android:background="@drawable/edit_text_bg"/>
+                            </LinearLayout>
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                                android:orientation="horizontal" android:layout_marginTop="4dp">
+                                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                                    android:text="Make a Call" android:textSize="12sp"/>
+                                <EditText android:id="@+id/etRewardCall" android:layout_width="80dp" android:layout_height="40dp"
+                                    android:hint="10" android:inputType="number" android:gravity="center"
+                                    android:background="@drawable/edit_text_bg"/>
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="⚙️ App Settings" android:textStyle="bold" android:textSize="16sp"
+                        android:layout_marginTop="16dp" android:layout_marginBottom="8dp"/>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp" app:cardCornerRadius="12dp"
+                        app:cardBackgroundColor="?attr/colorSurfaceVariant">
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:orientation="horizontal" android:padding="16dp" android:gravity="center_vertical">
+                            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                                android:orientation="vertical">
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="🔧 Maintenance Mode" android:textSize="14sp" android:textStyle="bold"/>
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="Disable app for all users" android:textSize="12sp" android:alpha="0.6"/>
+                            </LinearLayout>
+                            <com.google.android.material.materialswitch.MaterialSwitch
+                                android:id="@+id/switchMaintenance" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp" app:cardCornerRadius="12dp"
+                        app:cardBackgroundColor="?attr/colorSurfaceVariant">
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:orientation="horizontal" android:padding="16dp" android:gravity="center_vertical">
+                            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                                android:orientation="vertical">
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="💸 Freeze Withdrawals" android:textSize="14sp" android:textStyle="bold"/>
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="Temporarily disable all withdrawals" android:textSize="12sp" android:alpha="0.6"/>
+                            </LinearLayout>
+                            <com.google.android.material.materialswitch.MaterialSwitch
+                                android:id="@+id/switchFreezeWithdrawals" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp" app:cardCornerRadius="12dp"
+                        app:cardBackgroundColor="?attr/colorSurfaceVariant">
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:orientation="vertical" android:padding="16dp">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="🔑 Admin Password" android:textSize="14sp" android:textStyle="bold"/>
+                            <EditText android:id="@+id/etAdminPassword" android:layout_width="match_parent" android:layout_height="48dp"
+                                android:hint="Enter new password" android:inputType="textPassword" android:layout_marginTop="8dp"
+                                android:background="@drawable/edit_text_bg" android:paddingHorizontal="12dp"/>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSaveConfig"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="💾  Save All Settings"
+                        android:layout_marginTop="16dp"/>
+
+                </LinearLayout>
+            </ScrollView>
+
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- Admin Password Overlay -->
+    <LinearLayout
+        android:id="@+id/layoutAdminLock"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?android:attr/windowBackground"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="32dp"
+        android:visibility="visible">
+
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@android:drawable/ic_lock_idle_lock"
+            app:tint="?attr/colorPrimary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:fontFamily="sans-serif-black"
+            android:text="Restricted Access"
+            android:textSize="22sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:alpha="0.6"
+            android:text="Please enter the admin password to continue."
+            android:textSize="14sp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            app:passwordToggleEnabled="true"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etLockPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Password"
+                android:inputType="textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnUnlockAdmin"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="24dp"
+            android:text="Unlock Dashboard"
+            app:cornerRadius="16dp" />
+
+        <TextView
+            android:id="@+id/btnLockCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:padding="12dp"
+            android:text="Go Back"
+            android:textColor="?attr/colorPrimary"
+            android:textStyle="bold" />
+    </LinearLayout>
+</FrameLayout>

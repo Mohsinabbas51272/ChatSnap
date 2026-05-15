@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:paddingVertical="6dp"
+    android:paddingHorizontal="16dp">
+
+    <View
+        android:id="@+id/viewUnreadIndicator"
+        android:layout_width="3dp"
+        android:layout_height="0dp"
+        android:layout_marginVertical="12dp"
+        android:background="?attr/colorPrimary"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivPartnerProfile"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:padding="2dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_launcher_foreground"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/viewUnreadIndicator"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="0dp"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
+        app:strokeColor="?attr/colorOutlineVariant"
+        app:strokeWidth="1.5dp" />
+
+    <View
+        android:id="@+id/viewOnlineStatus"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:background="@drawable/bg_online_dot"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/ivPartnerProfile"
+        app:layout_constraintEnd_toEndOf="@id/ivPartnerProfile"
+        android:layout_margin="2dp" />
+
+    <TextView
+        android:id="@+id/tvPartnerName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-black"
+        android:maxLines="1"
+        android:text="Partner Name"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toStartOf="@+id/layoutMeta"
+        app:layout_constraintStart_toEndOf="@id/ivPartnerProfile"
+        app:layout_constraintTop_toTopOf="@id/ivPartnerProfile"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <LinearLayout
+        android:id="@+id/layoutMessageContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="@id/tvPartnerName"
+        app:layout_constraintStart_toStartOf="@id/tvPartnerName"
+        app:layout_constraintTop_toBottomOf="@id/tvPartnerName">
+
+        <ImageView
+            android:id="@+id/ivMessageStatus"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_marginEnd="4dp"
+            android:src="@drawable/ic_tick_double"
+            app:tint="?attr/colorPrimary"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/tvLastMessage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Tap to chat"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <!-- Meta Container: Time, Streak, and Unread Count -->
+    <LinearLayout
+        android:id="@+id/layoutMeta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="end"
+        app:layout_constraintTop_toTopOf="@id/tvPartnerName"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/tvTimestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2m"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/tvStreak"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="🔥 15"
+            android:textColor="?attr/colorTertiary"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif-black"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/tvUnreadCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/bg_unread_badge"
+            android:gravity="center"
+            android:minWidth="20dp"
+            android:minHeight="20dp"
+            android:paddingHorizontal="6dp"
+            android:text="1"
+            android:textColor="?attr/colorOnPrimary"
+            android:textSize="10sp"
+            android:fontFamily="sans-serif-black"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

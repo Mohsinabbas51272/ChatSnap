@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ChatSnap - Create Account</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#444749",
+                        "surface-container-high": "#e6e7f2",
+                        "tertiary-container": "#b75b00",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f2f3fd",
+                        "tertiary-fixed": "#ffdcc6",
+                        "surface-tint": "#005ac2",
+                        "tertiary": "#924700",
+                        "primary": "#0058be",
+                        "on-tertiary-fixed-variant": "#723600",
+                        "primary-fixed-dim": "#adc6ff",
+                        "on-tertiary-fixed": "#311400",
+                        "surface-container": "#ecedf7",
+                        "primary-fixed": "#d8e2ff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#e1e2ec",
+                        "error": "#ba1a1a",
+                        "on-background": "#191b23",
+                        "secondary": "#5c5f61",
+                        "on-secondary-container": "#626567",
+                        "secondary-fixed": "#e0e3e5",
+                        "on-primary-container": "#fefcff",
+                        "on-secondary": "#ffffff",
+                        "outline": "#727785",
+                        "on-error": "#ffffff",
+                        "surface-dim": "#d8d9e3",
+                        "secondary-fixed-dim": "#c4c7c9",
+                        "inverse-surface": "#2e3038",
+                        "on-primary-fixed-variant": "#004395",
+                        "on-surface": "#191b23",
+                        "inverse-on-surface": "#eff0fa",
+                        "outline-variant": "#c2c6d6",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#191c1e",
+                        "secondary-container": "#e0e3e5",
+                        "surface": "#f9f9ff",
+                        "on-surface-variant": "#424754",
+                        "background": "#f9f9ff",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e1e2ec",
+                        "surface-bright": "#f9f9ff",
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#adc6ff",
+                        "primary-container": "#2170e4",
+                        "on-tertiary-container": "#fffbff",
+                        "on-primary-fixed": "#001a42",
+                        "tertiary-fixed-dim": "#ffb786"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "base": "4px",
+                        "sm": "8px",
+                        "xl": "32px",
+                        "gutter": "12px",
+                        "margin-edge": "20px",
+                        "xs": "4px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "h3": ["Inter"],
+                        "h1": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "body-md": ["Inter"],
+                        "h2": ["Inter"],
+                        "label-bold": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "h3": ["20px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "h1": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-caps": ["11px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "h2": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "label-bold": ["12px", {"lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .ambient-shadow {
+            shadow-color: rgba(59, 130, 246, 0.08);
+            box-shadow: 0 30px 60px -12px rgba(59, 130, 246, 0.12);
+        }
+        .input-gradient-border:focus-within {
+            box-shadow: 0 0 0 2px rgba(33, 112, 228, 0.2);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e1e2ec;
+            border-radius: 10px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body-md text-on-surface min-h-screen flex flex-col items-center justify-center p-gutter">
+<!-- Background Decorative Elements -->
+<div class="fixed inset-0 overflow-hidden -z-10 pointer-events-none">
+<div class="absolute -top-1/4 -left-1/4 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px]"></div>
+<div class="absolute -bottom-1/4 -right-1/4 w-[500px] h-[500px] bg-tertiary-fixed-dim/10 rounded-full blur-[100px]"></div>
+</div>
+<main class="w-full max-w-[440px] flex flex-col items-center">
+<!-- Brand Header -->
+<div class="mb-xl text-center">
+<div class="inline-flex items-center justify-center p-sm bg-primary-container text-on-primary-container rounded-2xl mb-md shadow-lg shadow-primary-container/20">
+<span class="material-symbols-outlined text-[32px]" data-icon="photo_camera">photo_camera</span>
+</div>
+<h1 class="font-h1 text-h1 text-on-background tracking-tighter mb-xs">ChatSnap</h1>
+<p class="font-body-md text-secondary">Join the elite network of visual storytellers.</p>
+</div>
+<!-- Registration Card -->
+<div class="glass-card ambient-shadow w-full rounded-[32px] p-lg md:p-xl">
+<div class="mb-lg">
+<h2 class="font-h2 text-h2 text-on-surface mb-xs">Create Account</h2>
+<p class="font-body-md text-on-surface-variant">Step into futuristic serenity.</p>
+</div>
+<form class="space-y-md">
+<!-- Name Field -->
+<div class="space-y-base group">
+<label class="font-label-bold text-label-bold text-outline ml-sm">Full Name</label>
+<div class="relative flex items-center bg-secondary-container rounded-2xl transition-all duration-200 input-gradient-border">
+<span class="material-symbols-outlined absolute left-md text-outline" data-icon="person">person</span>
+<input class="w-full bg-transparent border-none focus:ring-0 py-md pl-[48px] pr-md text-on-surface placeholder:text-outline-variant font-body-md" placeholder="Cameron Williamson" type="text"/>
+</div>
+</div>
+<!-- Email Field -->
+<div class="space-y-base group">
+<label class="font-label-bold text-label-bold text-outline ml-sm">Email Address</label>
+<div class="relative flex items-center bg-secondary-container rounded-2xl transition-all duration-200 input-gradient-border">
+<span class="material-symbols-outlined absolute left-md text-outline" data-icon="alternate_email">alternate_email</span>
+<input class="w-full bg-transparent border-none focus:ring-0 py-md pl-[48px] pr-md text-on-surface placeholder:text-outline-variant font-body-md" placeholder="cameron.w@example.com" type="email"/>
+</div>
+</div>
+<!-- Phone Field -->
+<div class="space-y-base group">
+<label class="font-label-bold text-label-bold text-outline ml-sm">Phone Number</label>
+<div class="relative flex items-center bg-secondary-container rounded-2xl transition-all duration-200 input-gradient-border">
+<span class="material-symbols-outlined absolute left-md text-outline" data-icon="smartphone">smartphone</span>
+<input class="w-full bg-transparent border-none focus:ring-0 py-md pl-[48px] pr-md text-on-surface placeholder:text-outline-variant font-body-md" placeholder="+1 (555) 000-0000" type="tel"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-base group">
+<label class="font-label-bold text-label-bold text-outline ml-sm">Password</label>
+<div class="relative flex items-center bg-secondary-container rounded-2xl transition-all duration-200 input-gradient-border">
+<span class="material-symbols-outlined absolute left-md text-outline" data-icon="lock">lock</span>
+<input class="w-full bg-transparent border-none focus:ring-0 py-md pl-[48px] pr-12 text-on-surface placeholder:text-outline-variant font-body-md" placeholder="••••••••••••" type="password"/>
+<button class="absolute right-md text-outline hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+</div>
+</div>
+<!-- Terms -->
+<div class="flex items-start gap-sm pt-xs">
+<input class="mt-1 rounded-sm border-outline-variant text-primary focus:ring-primary-container" type="checkbox"/>
+<p class="font-label-bold text-[11px] text-on-surface-variant leading-relaxed">
+                        By signing up, you agree to our <a class="text-primary hover:underline" href="#">Terms of Service</a> and <a class="text-primary hover:underline" href="#">Privacy Policy</a>.
+                    </p>
+</div>
+<!-- Sign Up Button -->
+<button class="w-full bg-primary-container text-on-primary-container font-h3 text-h3 py-md rounded-2xl active:scale-[0.96] transition-all duration-200 shadow-xl shadow-primary-container/20 mt-md" type="submit">
+                    Sign Up
+                </button>
+</form>
+<div class="mt-lg flex items-center gap-md">
+<div class="h-[1px] flex-1 bg-surface-container-highest"></div>
+<span class="font-label-bold text-outline-variant text-xs uppercase tracking-widest">Or connect with</span>
+<div class="h-[1px] flex-1 bg-surface-container-highest"></div>
+</div>
+<div class="mt-lg flex gap-md">
+<button class="flex-1 flex justify-center items-center py-md rounded-2xl bg-white border border-surface-variant hover:bg-surface-container-low transition-colors active:scale-95 duration-150">
+<img alt="" class="w-5 h-5" data-alt="Google colorful letter G logo on a clean white background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAE0csyJFiFu88EJ5z2YcgnDdojNstuiL298DbPF2FcM6PF2EDDf0hve6tHxZqLx_QVQruLAxzPJ2aVdp6a3C2UBbYExattWkn0CJm9faUeX2X2nUg34SdzpodkUras_S358KpLHXMYx46fFspbwsAf62QXJVWr6NJIaQW-qeDcuARG5_VOxsNY8ifjJua9CKm19pEgzGAWKYYZm1O1xfgtuaJFKSovT0v6BJsY7MasOlspeZ2d8Er6BzijSFieK5tfGwnig1N939c"/>
+</button>
+<button class="flex-1 flex justify-center items-center py-md rounded-2xl bg-white border border-surface-variant hover:bg-surface-container-low transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined text-[#1877F2]" data-icon="facebook" style="font-variation-settings: 'FILL' 1;">social_leaderboard</span>
+</button>
+</div>
+</div>
+<!-- Footer Link -->
+<p class="mt-xl font-body-md text-on-surface-variant">
+            Already have an account? 
+            <a class="text-primary font-label-bold hover:underline ml-xs" href="#">Log In</a>
+</p>
+<!-- Aesthetic Imagery Component (Asymmetric Layout) -->
+<div class="w-full mt-xl grid grid-cols-12 gap-sm opacity-50">
+<div class="col-span-8 h-24 rounded-3xl overflow-hidden shadow-sm">
+<img alt="" class="w-full h-full object-cover" data-alt="Close up of high-end retro technology components and circuits in a clean blue and white aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDF5LIxQoRUw0phEBz59qVH4zOdG6USyUqLLEc_UqmWIm6KTn1XzR99geXi3qsYihvy2Ny-Aw4CLFWFPXpXkTQ0N9tkR3M7ZRR8k2pX5IjLftGATDhimA1N9-Uu9xblD_HcRuiKVGX6Cts9NVCU8qTH-lUwtyPcnq7WasBWLMGNlnoyzlY4CdAfPtj-wbFAPy7bwip0b39jbw-ir0ffiRCKKvhSj7FcX3CxmXUOLT0KhyAZqSa5K6vYrjg7ZMlTEagWA4BwvcWo59k"/>
+</div>
+<div class="col-span-4 h-24 rounded-3xl overflow-hidden shadow-sm">
+<div class="w-full h-full bg-gradient-to-br from-primary to-primary-container p-sm flex items-end">
+<span class="text-white font-label-caps text-[8px] leading-tight">PREMIUM EXPERIENCE SECURED</span>
+</div>
+</div>
+</div>
+</main>
+</body></html>

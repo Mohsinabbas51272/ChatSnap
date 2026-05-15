@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed-variant": "#444749",
+                    "surface-container-high": "#e6e7f2",
+                    "tertiary-container": "#b75b00",
+                    "on-primary": "#ffffff",
+                    "surface-container-low": "#f2f3fd",
+                    "tertiary-fixed": "#ffdcc6",
+                    "surface-tint": "#005ac2",
+                    "tertiary": "#924700",
+                    "primary": "#0058be",
+                    "on-tertiary-fixed-variant": "#723600",
+                    "primary-fixed-dim": "#adc6ff",
+                    "on-tertiary-fixed": "#311400",
+                    "surface-container": "#ecedf7",
+                    "primary-fixed": "#d8e2ff",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-variant": "#e1e2ec",
+                    "error": "#ba1a1a",
+                    "on-background": "#191b23",
+                    "secondary": "#5c5f61",
+                    "on-secondary-container": "#626567",
+                    "secondary-fixed": "#e0e3e5",
+                    "on-primary-container": "#fefcff",
+                    "on-secondary": "#ffffff",
+                    "outline": "#727785",
+                    "on-error": "#ffffff",
+                    "surface-dim": "#d8d9e3",
+                    "secondary-fixed-dim": "#c4c7c9",
+                    "inverse-surface": "#2e3038",
+                    "on-primary-fixed-variant": "#004395",
+                    "on-surface": "#191b23",
+                    "inverse-on-surface": "#eff0fa",
+                    "outline-variant": "#c2c6d6",
+                    "error-container": "#ffdad6",
+                    "on-secondary-fixed": "#191c1e",
+                    "secondary-container": "#e0e3e5",
+                    "surface": "#f9f9ff",
+                    "on-surface-variant": "#424754",
+                    "background": "#f9f9ff",
+                    "on-error-container": "#93000a",
+                    "surface-container-highest": "#e1e2ec",
+                    "surface-bright": "#f9f9ff",
+                    "on-tertiary": "#ffffff",
+                    "inverse-primary": "#adc6ff",
+                    "primary-container": "#2170e4",
+                    "on-tertiary-container": "#fffbff",
+                    "on-primary-fixed": "#001a42",
+                    "tertiary-fixed-dim": "#ffb786"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "base": "4px",
+                    "sm": "8px",
+                    "xl": "32px",
+                    "gutter": "12px",
+                    "margin-edge": "20px",
+                    "xs": "4px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "h3": ["Inter"],
+                    "h1": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "body-md": ["Inter"],
+                    "h2": ["Inter"],
+                    "label-bold": ["Inter"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "h3": ["20px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "h1": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-caps": ["11px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "h2": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "label-bold": ["12px", {"lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .story-gradient {
+            background: linear-gradient(45deg, #F43F5E, #3B82F6);
+            padding: 2px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body-md text-on-surface">
+<!-- Top AppBar - From Shared Components JSON -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-5 h-16 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-b border-white/20 dark:border-slate-800/50 shadow-[0_20px_40px_rgba(59,130,246,0.05)]">
+<div class="active:scale-95 transition-all duration-200 ease-out text-blue-500 dark:text-blue-400">
+<span class="material-symbols-outlined" data-icon="qr_code_scanner">qr_code_scanner</span>
+</div>
+<h1 class="text-xl font-black text-blue-600 dark:text-blue-400 tracking-tighter font-inter">ChatSnap</h1>
+<div class="active:scale-95 transition-all duration-200 ease-out text-blue-500 dark:text-blue-400">
+<span class="material-symbols-outlined" data-icon="qr_code_2">qr_code_2</span>
+</div>
+</header>
+<main class="pt-20 pb-32 px-margin-edge">
+<!-- Stories Section - Horizontal High-End Layout -->
+<section class="mb-lg">
+<div class="flex gap-md overflow-x-auto no-scrollbar py-2">
+<div class="flex-shrink-0 flex flex-col items-center gap-xs">
+<div class="relative w-16 h-16 rounded-full border-2 border-dashed border-outline-variant flex items-center justify-center bg-surface-container-low">
+<span class="material-symbols-outlined text-primary" data-icon="add">add</span>
+</div>
+<span class="font-label-bold text-[10px] text-on-surface-variant">Your Story</span>
+</div>
+<!-- Story Item -->
+<div class="flex-shrink-0 flex flex-col items-center gap-xs">
+<div class="w-16 h-16 rounded-full story-gradient p-[2px]">
+<div class="w-full h-full rounded-full border-2 border-surface overflow-hidden">
+<img alt="Avatar" class="w-full h-full object-cover" data-alt="portrait of a stylish young woman with neon city lights reflected on her face, cinematic high-end photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-1GG6XQZpkc4vLcXLJKsesnlMHRJ9d0Xtyp1mjsZNxVli9_wMBTe6hguCTnryeD_90HDjOaKq_hjfp2bucOKFLpK-8Z8mvKlTr5Vti7GB_STjzI0_cRLPLQITmxTrwNvcpkVvPA7UJdQ7Nk-LIDYJxsSl9EFvpDOw-g4BrWfPe6wa8fT9njQb_RhOhjwyzW_re6ebjqte0TxCzZnsJHVwQS4uEnY8akbFEhmtc7MPSfdNKe-uK1qkzBVBfhf1xcVAyJ0YbMVfUTw"/>
+</div>
+</div>
+<span class="font-label-bold text-[10px] text-on-surface">Elena</span>
+</div>
+<div class="flex-shrink-0 flex flex-col items-center gap-xs">
+<div class="w-16 h-16 rounded-full story-gradient p-[2px]">
+<div class="w-full h-full rounded-full border-2 border-surface overflow-hidden">
+<img alt="Avatar" class="w-full h-full object-cover" data-alt="close-up portrait of a young man with a slight smile in soft natural sunlight, professional headshot style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmjuDXDokFhxvZ3NB4FlLIqdeWAKIo-sSpJA7T6Jq8jB0kUI1FS1nggvbh49UgjHhbV04k75ZwcEqlk_NIn3auJVIks7lXz4osFJVaf85Nq8YW7uZirlrUen0mE9lKEvUoOVcZjc7kElENGYpPkhegaxSuM3lg1Ox694t4dEuqFaIOZpEfYZG90HTeO1c7G0yHlSwaqsdyMsp72aDtmisBYxZoj04um-iRPJTpNsRR37RrSWzPqxyRQReBn8ohBNeoSFjEk84W-xk"/>
+</div>
+</div>
+<span class="font-label-bold text-[10px] text-on-surface">Marcus</span>
+</div>
+<div class="flex-shrink-0 flex flex-col items-center gap-xs">
+<div class="w-16 h-16 rounded-full border-2 border-surface-variant p-[2px]">
+<div class="w-full h-full rounded-full border-2 border-surface overflow-hidden opacity-60">
+<img alt="Avatar" class="w-full h-full object-cover" data-alt="side profile of a woman laughing outdoors in a park with blurred greenery in the background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDb3f1Ysvokqs9GVg3r6P6On-Y3WOocIK7Xn6pJVf-Drm9rMCNpXIePql9yaZhXPG-6o9UFqopnNNdyIj2w1wX6JMJLJPsgNgbWJjFbjzoUltc0Kybl-XS3yj8WExFQTm7HVmf4L7n42wZy5lL_Gg0IhLoFER-RFHKc0YFkBcDQz067zRJlUYKSQZbTnGZ1mgsMH-sHLThoBcnLcJsYP1q_LMjD_i9IvzhyyxJriCtJim0GWEneWn0XUBo1j28ZjIy4bs7efzaFOGs"/>
+</div>
+</div>
+<span class="font-label-bold text-[10px] text-on-surface-variant">Sarah</span>
+</div>
+<div class="flex-shrink-0 flex flex-col items-center gap-xs">
+<div class="w-16 h-16 rounded-full story-gradient p-[2px]">
+<div class="w-full h-full rounded-full border-2 border-surface overflow-hidden">
+<img alt="Avatar" class="w-full h-full object-cover" data-alt="portrait of a man with sunglasses at the beach during sunset, vibrant orange and teal color grade" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFzMuGAhLGMermVYEZFDX0tA25W8nMj5MvXowCYv4YULYqDM4h7YmT1DqSXFhy0c9fyeKezLTfl01ayIEOTKBT44ktgSs0aQxo0QKuMxN4NL9OZ1Hrir732hA4lSsZ3-OmEJVXtyFBQspRYlnDJywk8hUtdlv7Nk6adIqxf3ARFoEBVzzfKcuq3eSM-q_jPVX7cQ_mJ3y24rR-2hFhV6MszitZpXnfeocHtwKyc2DkDSSi-hpy--MX3hYbdDupyDBh1V0l3FmCyWA"/>
+</div>
+</div>
+<span class="font-label-bold text-[10px] text-on-surface">David</span>
+</div>
+</div>
+</section>
+<!-- Segmented Tab Control -->
+<nav class="mb-lg glass-card rounded-xl p-1 flex items-center justify-between shadow-sm">
+<button class="flex-1 py-2 rounded-lg bg-primary-container text-on-primary-container font-label-bold text-[13px] shadow-sm transition-all duration-200">Chat</button>
+<button class="flex-1 py-2 rounded-lg text-on-surface-variant font-label-bold text-[13px] hover:bg-surface-container-low transition-colors duration-200">Group</button>
+<button class="flex-1 py-2 rounded-lg text-on-surface-variant font-label-bold text-[13px] hover:bg-surface-container-low transition-colors duration-200">Secret</button>
+</nav>
+<!-- Search Bar -->
+<div class="mb-lg relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant" data-icon="search">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-2xl py-3 pl-12 pr-4 text-body-md focus:ring-2 focus:ring-primary-container/20 transition-shadow" placeholder="Search conversations..." type="text"/>
+</div>
+<!-- Chat List - High Density List Items -->
+<div class="space-y-base">
+<!-- Active Chat Item -->
+<div class="group flex items-center gap-md p-md rounded-3xl hover:bg-white active:scale-[0.98] transition-all duration-200 cursor-pointer">
+<div class="relative flex-shrink-0">
+<img alt="Elena" class="w-14 h-14 rounded-2xl object-cover" data-alt="stylish portrait of a young woman" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIVBDQ5BbP3nTdlJcrKED5zCxRnYD5FsCF0TlaeOO7FqR4N1nrCm0es91rISHOYrz_Ko2bjUnRk8Fw-x6XKZr95O88xtpNxS_eJ-O9XoQisKuTIeglKF9v4uaFjK6wX8UlKo_nn-8Ezx_OMT8SoOTsBxxF0c2syB15Vu1FJMBvTf1-MK9Jio8rDpaShR6wxfMiG7XVan6nlv2C1-j5FmVnOS-CdHce32how8_P6Pg-U4s4vqZnFEUUPlud8Tux8EfJI0ynCl4j6lo"/>
+<div class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></div>
+</div>
+<div class="flex-1 min-w-0 border-b border-surface-container-low pb-base group-last:border-none">
+<div class="flex justify-between items-start mb-0.5">
+<h3 class="font-h3 text-body-lg text-on-surface truncate">Elena Fisher</h3>
+<span class="font-label-bold text-[10px] text-primary">12:45 PM</span>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-body-md text-on-surface font-semibold truncate max-w-[80%]">The renders for the new UI look amazing! 🔥</p>
+<div class="bg-primary px-1.5 py-0.5 rounded-full text-[10px] text-on-primary font-bold">2</div>
+</div>
+</div>
+</div>
+<!-- Chat Item -->
+<div class="group flex items-center gap-md p-md rounded-3xl hover:bg-white active:scale-[0.98] transition-all duration-200 cursor-pointer">
+<div class="relative flex-shrink-0">
+<img alt="Marcus" class="w-14 h-14 rounded-2xl object-cover" data-alt="professional portrait headshot of a man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuByp6HX049EzLIwznfl2Fjhx8OOtt3E3AdekoVI-g8tiVb-J75nXSLfv7k9cddw53NjyaUJ9nOnrC_Y6AF2eIIs61qpCYKH5khmyY3BYNgIBccukCtjDWJ2FbaEBDWXFde8PAA26nt2bazSEE8VGNgUc5r1pn0aNiVWfeE61wZ-nJlxX_hIsPojwcYdt_0FjrPN2XlWzXGkjnnPxueO7drKSPPtShbJqKjmliXnX1S6mOVD1zrhGDoRF4MlpAS--3EASGZp4JKfw5o"/>
+<div class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></div>
+</div>
+<div class="flex-1 min-w-0 border-b border-surface-container-low pb-base group-last:border-none">
+<div class="flex justify-between items-start mb-0.5">
+<h3 class="font-h3 text-body-lg text-on-surface truncate">Marcus Wright</h3>
+<span class="font-label-bold text-[10px] text-on-surface-variant">11:20 AM</span>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-body-md text-on-surface-variant truncate max-w-[80%]">Can we hop on a quick call? I have updates.</p>
+</div>
+</div>
+</div>
+<!-- Group Chat Mock (Bento-like visual) -->
+<div class="group flex items-center gap-md p-md rounded-3xl hover:bg-white active:scale-[0.98] transition-all duration-200 cursor-pointer">
+<div class="relative flex-shrink-0 grid grid-cols-2 gap-0.5 w-14 h-14 rounded-2xl overflow-hidden bg-surface-container-high">
+<img alt="User 1" class="w-full h-full object-cover" data-alt="avatar thumbnail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHFgxQWEC2NYp5s6YmZ2mHJ_zFF5Pszk0DKdIaeQXTxbZA8ubpvWbc5PxH8oIIDZUVGQxKAu_jX75hH2GCTrPpSYGzqsT1gX4cgrTq44N4Ti6aRoAeR80QE1jAFf1X7tEd5MI9S2VHLNsCrbj124NttX2SpCFW-Uc2FSgChIRpkDMDXMCXyhOhWndEItxa0hajwNE5x6dwydhJy3gZxZRLKkyLAp-sE-UvCSfMDa9RVELz2iY_2kslRNw-FRbXA86PaJ4r9cN0O5I"/>
+<img alt="User 2" class="w-full h-full object-cover" data-alt="avatar thumbnail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCn5Qb0wfH2yaUxHrvP1EaV7Yrs9OeMyCuSK-HWscH7_dAbW9QvXDDY4xGSiIjuooSaU8g29SzcQGQXXJggD745YUDuW8m98y9m4S3rEyvfMtWMBIIBklVKjSibdRwHgjWxExYiffROmQv0r0cIz66a_jWOF3-bypRmSM0FrIubDjOFyYtu9P_a-HFM_SGouqAj3keBXRNR2ppK0SYOhm1SzI1gFzpiipqWpwoEwXMu1Pf8TlofsJZ_v_WEOOOTdhWgnKdm-irCLYE"/>
+<img alt="User 3" class="w-full h-full object-cover" data-alt="avatar thumbnail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDj_voib-pSG0QZ9pFN899w8Cm3orEm00RKMnkGbhdGa0MAoEn4XnMc9OSko2OscDUM176Jd1XPeCAo03QEDe59GAYTuyyhQOEb3JTMAZGPJfU7jsbeJzX6_0848rlc-wb2OgkCfilSPKJ3K0qLhnMxod9GTuFevbotRNyeQUnF1Oe_yG78wpmulh7ZZsKH7jV1vCf2rSZI0SufLFeS2GBjfcsvGVce_WkktIcvLqjtMnDL9jvLxqWGjEHuWID_WO0a_rFFVUKemKA"/>
+<div class="bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">+12</div>
+</div>
+<div class="flex-1 min-w-0 border-b border-surface-container-low pb-base group-last:border-none">
+<div class="flex justify-between items-start mb-0.5">
+<h3 class="font-h3 text-body-lg text-on-surface truncate">Design Sprint Alpha</h3>
+<span class="font-label-bold text-[10px] text-on-surface-variant">Yesterday</span>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-body-md text-on-surface-variant truncate max-w-[80%]"><span class="text-primary font-semibold">Sarah:</span> Check the shared Figma link.</p>
+</div>
+</div>
+</div>
+<!-- More Items to demonstrate high density -->
+<div class="group flex items-center gap-md p-md rounded-3xl hover:bg-white active:scale-[0.98] transition-all duration-200 cursor-pointer">
+<div class="relative flex-shrink-0">
+<img alt="Ava" class="w-14 h-14 rounded-2xl object-cover" data-alt="portrait of a woman with red hair" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAI-W6A5E_Wnx8WH46q7jwqmeDNSRvZgdlW23oIBQaNoKaotZHSXlLpxN27zJLJKnrBLU7XErSVqjkUUpMk0ha6u3bogXnrCjmqCdaTtLmH-I10-kP5hD8g7KFFqJGYpZGL14nTC3exQxGaZ8B1sRLc5pvTronWiUqQXJ9TQp-I4Y0Kke-AWjUcJLuJUUFcwDF6wM4dv_u1wT2YSONgh_li56lVwe8cjJBSumbRDaTN3zzy7n3fCiPaG3SexW_G3TcgWWix8pCQIZ8"/>
+</div>
+<div class="flex-1 min-w-0 border-b border-surface-container-low pb-base group-last:border-none">
+<div class="flex justify-between items-start mb-0.5">
+<h3 class="font-h3 text-body-lg text-on-surface truncate">Ava Chen</h3>
+<span class="font-label-bold text-[10px] text-on-surface-variant">Tuesday</span>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-body-md text-on-surface-variant truncate max-w-[80%]">Sent an attachment (2.4MB)</p>
+<span class="material-symbols-outlined text-[16px] text-outline-variant" data-icon="attach_file">attach_file</span>
+</div>
+</div>
+</div>
+<div class="group flex items-center gap-md p-md rounded-3xl hover:bg-white active:scale-[0.98] transition-all duration-200 cursor-pointer">
+<div class="relative flex-shrink-0">
+<img alt="James" class="w-14 h-14 rounded-2xl object-cover" data-alt="portrait of a man in business attire" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4GQz1BlDSPK6FQ7Bdnx_b2AYT6mAMEAXFdGCQ2sdlFxUrcZaVHuD18pj1gy_EgosOIQz0JXEKhr9Es0PnUEsyg5E0QQEP_-IFgPaeGN2eA_-SRooBM_iDE0gvgntuSzuOuRLyw4XGrjwe1yObtM4j3CewoSwv8bfai2SKLPCHEXXR0sYu9KmtSZfuUK_LMlvWDyq5F7t4NDICTcrwVMmjZflP-CAyEcM3mYUevrLWqFCGWAbGA3EgCE4Du4F4D-_HioTutz7CSS0"/>
+</div>
+<div class="flex-1 min-w-0 border-b border-surface-container-low pb-base group-last:border-none">
+<div class="flex justify-between items-start mb-0.5">
+<h3 class="font-h3 text-body-lg text-on-surface truncate">James Morrison</h3>
+<span class="font-label-bold text-[10px] text-on-surface-variant">Monday</span>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-body-md text-on-surface-variant truncate max-w-[80%]">Voice message 0:42</p>
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="mic">mic</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed right-6 bottom-24 w-14 h-14 rounded-2xl bg-primary text-on-primary shadow-[0_15px_30px_rgba(0,88,190,0.3)] flex items-center justify-center active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined text-2xl" data-icon="edit">edit</span>
+</button>
+<!-- BottomNavBar - From Shared Components JSON -->
+<footer class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pt-3 pb-8 bg-white/80 dark:bg-slate-950/80 backdrop-blur-2xl border-t border-white/10 dark:border-slate-800/50 shadow-[0_-15px_35px_rgba(59,130,246,0.08)] rounded-t-3xl">
+<div class="flex flex-col items-center justify-center text-blue-600 dark:text-blue-400 scale-110 transition-transform active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="chat_bubble" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
+<span class="text-[11px] font-medium font-inter uppercase tracking-widest mt-1">Chats</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-600 hover:text-blue-400 active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+<span class="text-[11px] font-medium font-inter uppercase tracking-widest mt-1">Stories</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-600 hover:text-blue-400 active:scale-90 transition-transform duration-150">
+<div class="bg-primary text-white w-12 h-12 rounded-2xl flex items-center justify-center -mt-8 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined" data-icon="photo_camera">photo_camera</span>
+</div>
+<span class="text-[11px] font-medium font-inter uppercase tracking-widest mt-1">Camera</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-600 hover:text-blue-400 active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="text-[11px] font-medium font-inter uppercase tracking-widest mt-1">People</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-600 hover:text-blue-400 active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="text-[11px] font-medium font-inter uppercase tracking-widest mt-1">Settings</span>
+</div>
+</footer>
+</body></html>

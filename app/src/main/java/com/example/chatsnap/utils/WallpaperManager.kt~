@@ -1,0 +1,38 @@
+package com.example.chatsnap.utils
+
+import android.content.Context
+import android.graphics.Color
+
+object WallpaperManager {
+    private const val PREF_NAME = "wallpaper_prefs"
+    private const val KEY_WALLPAPER = "selected_wallpaper"
+
+    enum class ChatWallpaper(val colorCode: String, val name: String) {
+        DEFAULT("#f9f9ff", "Default"),
+        NIGHT_SKY("#1A1A2E", "Night Sky"),
+        FOREST("#0D2B22", "Forest Deep"),
+        SUNSET("#FFDEDE", "Warm Sunset"),
+        LAVENDER("#F3E5F5", "Lavender Mist"),
+        OCEAN("#E0F7FA", "Ocean Breeze")
+    }
+
+    fun setWallpaper(context: Context, wallpaper: ChatWallpaper) {
+        val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_WALLPAPER, wallpaper.name).apply()
+    }
+
+    fun getWallpaper(context: Context): ChatWallpaper {
+        val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        val name = prefs.getString(KEY_WALLPAPER, ChatWallpaper.DEFAULT.name)
+        return try {
+            ChatWallpaper.valueOf(name ?: ChatWallpaper.DEFAULT.name)
+        } catch (e: Exception) {
+            ChatWallpaper.DEFAULT
+        }
+    }
+
+    fun applyWallpaper(view: android.view.View) {
+        val wallpaper = getWallpaper(view.context)
+        view.setBackgroundColor(Color.parseColor(wallpaper.colorCode))
+    }
+}
