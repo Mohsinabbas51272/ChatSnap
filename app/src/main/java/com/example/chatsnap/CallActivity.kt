@@ -15,7 +15,7 @@ import io.agora.rtc2.video.VideoCanvas
 
 class CallActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCallBinding
-    private val appId = "fe650d5f0f0148dca03f84b4ec6f83e0"
+    private val appId = "c29f009d2f39474ba2bddddd18852949"
     private var channelName: String? = null
     private var mRtcEngine: RtcEngine? = null
     private var isMuted = false
@@ -46,6 +46,25 @@ class CallActivity : AppCompatActivity() {
         }
     }
 
+    private var callListener: com.google.firebase.firestore.ListenerRegistration? = null
+
+    private fun listenToCallStatus() {
+        val id = currentCallId ?: return
+        callListener = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+            .collection("calls").document(id)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null || snapshot == null || !snapshot.exists()) return@addSnapshotListener
+                val status = snapshot.getString("status")
+                if (status == "rejected") {
+                    Toast.makeText(this, "Call Declined", Toast.LENGTH_SHORT).show()
+                    finish()
+                } else if (status == "completed") {
+                    Toast.makeText(this, "Call Ended", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+            }
+    }
+
     private fun logCallToFirestore() {
         val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
         val callId = db.collection("calls").document().id
@@ -64,6 +83,21 @@ class CallActivity : AppCompatActivity() {
         )
         
         db.collection("calls").document(callId).set(logData)
+            .addOnSuccessListener {
+                listenToCallStatus()
+                val receiverId = intent.getStringExtra("receiverId")
+                val callerName = intent.getStringExtra("callerName") ?: "Someone"
+                val callType = intent.getStringExtra("callType") ?: "Voice"
+                if (receiverId != null) {
+                    com.example.chatsnap.utils.FcmNotificationSender.sendNotification(
+                        receiverId = receiverId,
+                        senderName = callerName,
+                        messageContent = "Incoming $callType Call... 📞",
+                        chatId = channelName ?: "",
+                        type = "CALL"
+                    )
+                }
+            }
         // Mark task as done for the caller immediately
         com.example.chatsnap.utils.TaskUtils.markTaskAsDone("TASK_CALL")
     }
@@ -92,6 +126,9 @@ class CallActivity : AppCompatActivity() {
         // Log call immediately if I'm the caller
         if (intent.getBooleanExtra("isCaller", false)) {
             logCallToFirestore()
+        } else {
+            currentCallId = intent.getStringExtra("callId")
+            listenToCallStatus()
         }
 
         binding.btnEndCall.setOnClickListener {
@@ -171,11 +208,12 @@ class CallActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        callListener?.remove()
         mRtcEngine?.stopPreview()
         mRtcEngine?.leaveChannel()
         RtcEngine.destroy()
         
-        // Mark call as completed if it was the initiator
+        // Mark call as completed in database
         currentCallId?.let { id ->
             com.google.firebase.firestore.FirebaseFirestore.getInstance()
                 .collection("calls").document(id).update("status", "completed")

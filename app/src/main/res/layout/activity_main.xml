@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?android:attr/windowBackground"
+    android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
     <include layout="@layout/layout_bubbles" />
@@ -168,6 +169,7 @@
                     android:layout_width="28dp"
                     android:layout_height="28dp"
                     android:padding="1dp"
+                    android:scaleType="centerCrop"
                     app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
                     app:strokeColor="?attr/colorOnPrimary"
                     app:strokeWidth="1dp" />

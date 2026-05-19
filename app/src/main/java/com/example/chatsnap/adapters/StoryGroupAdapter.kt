@@ -38,8 +38,8 @@ class StoryGroupAdapter(
         
         holder.binding.tvUserName.text = if (isMe) "My Story" else group.displayName.split(" ")[0]
         
-        // Show user photo or first story's preview
-        val photoUrl = if (!group.userPhoto.isNullOrEmpty()) group.userPhoto else group.stories.firstOrNull()?.mediaUrl
+        // Prioritize actual uploaded story media over the user's DP to show correct media thumbnail
+        val photoUrl = group.stories.lastOrNull()?.mediaUrl ?: group.userPhoto
         
         if (!photoUrl.isNullOrEmpty()) {
             if (photoUrl.startsWith("data:image") || photoUrl.length > 500) {

@@ -1,71 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="24dp"
-    android:background="?attr/colorSurface">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Create Poll"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="?android:attr/textColorPrimary"
-        android:layout_marginBottom="16dp" />
-
-    <EditText
-        android:id="@+id/etQuestion"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Ask a question"
-        android:padding="12dp"
-        android:textColor="?android:attr/textColorPrimary"
-        android:textColorHint="?android:attr/textColorSecondary"
-        android:background="@drawable/edit_text_bg"
-        android:layout_marginBottom="12dp" />
+    android:fillViewport="true">
 
     <LinearLayout
-        android:id="@+id/optionsContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:background="?attr/colorSurface">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Create Poll"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="?android:attr/textColorPrimary"
+            android:layout_marginBottom="16dp" />
 
         <EditText
+            android:id="@+id/etQuestion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Option 1"
+            android:hint="Ask a question"
             android:padding="12dp"
             android:textColor="?android:attr/textColorPrimary"
             android:textColorHint="?android:attr/textColorSecondary"
             android:background="@drawable/edit_text_bg"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="12dp" />
 
-        <EditText
+        <LinearLayout
+            android:id="@+id/optionsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Option 2"
-            android:padding="12dp"
-            android:textColor="?android:attr/textColorPrimary"
-            android:textColorHint="?android:attr/textColorSecondary"
-            android:background="@drawable/edit_text_bg"
-            android:layout_marginBottom="8dp" />
+            android:orientation="vertical">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Option 1"
+                android:padding="12dp"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textColorHint="?android:attr/textColorSecondary"
+                android:background="@drawable/edit_text_bg"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Option 2"
+                android:padding="12dp"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textColorHint="?android:attr/textColorSecondary"
+                android:background="@drawable/edit_text_bg"
+                android:layout_marginBottom="8dp" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddOption"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+ Add Option"
+            android:textAllCaps="false" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCreatePoll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create Poll"
+            android:layout_marginTop="16dp"
+            android:textAllCaps="false" />
     </LinearLayout>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnAddOption"
-        style="@style/Widget.Material3.Button.TextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="+ Add Option"
-        android:textAllCaps="false" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnCreatePoll"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Create Poll"
-        android:layout_marginTop="16dp"
-        android:textAllCaps="false" />
-</LinearLayout>
+</ScrollView>

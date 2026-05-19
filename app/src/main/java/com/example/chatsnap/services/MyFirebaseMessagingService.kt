@@ -25,7 +25,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     private fun updateTokenInFirestore(token: String) {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         FirebaseFirestore.getInstance().collection("users").document(uid)
-            .update("fcmToken", token)
+            .set(mapOf("fcmToken" to token), com.google.firebase.firestore.SetOptions.merge())
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
@@ -51,7 +51,12 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 channelId,
                 "Chat Notifications",
                 NotificationManager.IMPORTANCE_HIGH
-            )
+            ).apply {
+                description = "Real-time chat and call notifications"
+                enableLights(true)
+                enableVibration(true)
+                setShowBadge(true)
+            }
             notificationManager.createNotificationChannel(channel)
         }
 
@@ -76,11 +81,13 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         )
 
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_chat) // Ensure this exists
+            .setSmallIcon(R.drawable.ic_chat)
             .setContentTitle(title)
             .setContentText(body)
             .setAutoCancel(true)
+            .setDefaults(NotificationCompat.DEFAULT_ALL)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
             .setContentIntent(pendingIntent)
 
         notificationManager.notify(System.currentTimeMillis().toInt(), notificationBuilder.build())

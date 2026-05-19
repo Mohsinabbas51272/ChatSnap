@@ -12,6 +12,7 @@
         android:id="@+id/ivProfile"
         android:layout_width="56dp"
         android:layout_height="56dp"
+        android:scaleType="centerCrop"
         android:src="@drawable/ic_launcher_foreground"
         app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
         app:strokeColor="?attr/colorPrimary"

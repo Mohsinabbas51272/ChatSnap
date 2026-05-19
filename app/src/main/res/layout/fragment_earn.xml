@@ -168,14 +168,14 @@
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
-        <!-- Daily Quests -->
+        <!-- Daily Tasks -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="24dp"
             android:fontFamily="sans-serif-black"
-            android:text="DAILY QUESTS"
+            android:text="DAILY TASKS"
             android:textColor="?attr/colorPrimary"
             android:textSize="12sp"
             android:letterSpacing="0.1" />
@@ -191,6 +191,7 @@
             <include android:id="@+id/cardTask2" layout="@layout/item_quest" />
             <include android:id="@+id/cardTask3" layout="@layout/item_quest" />
             <include android:id="@+id/cardTask4" layout="@layout/item_quest" />
+            <include android:id="@+id/cardTask5" layout="@layout/item_quest" />
 
         </LinearLayout>
 

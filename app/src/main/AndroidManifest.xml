@@ -74,7 +74,8 @@
         <activity
             android:name=".ChatActivity"
             android:exported="false"
-            android:theme="@style/Theme.ChatSnap.NoActionBar" />
+            android:theme="@style/Theme.ChatSnap.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".StoryViewActivity"

@@ -445,9 +445,11 @@ class MainActivity : BaseActivity() {
                 AlertDialog.Builder(this)
                     .setTitle("Incoming Call")
                     .setMessage("${doc.getString("callerName")} is calling...")
+                    .setCancelable(false)
                     .setPositiveButton("Answer") { _, _ ->
-                        doc.reference.update("status", "completed")
+                        doc.reference.update("status", "answered")
                         val intent = Intent(this, CallActivity::class.java).apply {
+                            putExtra("callId", doc.id)
                             putExtra("callType", doc.getString("type"))
                             putExtra("receiverName", doc.getString("callerName"))
                             putExtra("channelName", doc.getString("channelName"))
@@ -455,7 +457,9 @@ class MainActivity : BaseActivity() {
                         }
                         startActivity(intent)
                     }
-                    .setNegativeButton("Decline") { _, _ -> doc.reference.update("status", "rejected") }
+                    .setNegativeButton("Decline") { _, _ -> 
+                        doc.reference.update("status", "rejected") 
+                    }
                     .show()
             }
     }
@@ -472,7 +476,7 @@ class MainActivity : BaseActivity() {
         val uid = auth.currentUser?.uid ?: return
         com.google.firebase.messaging.FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
             android.util.Log.d("FCM_TEST", "Token: $token")
-            firestore.collection("users").document(uid).update("fcmToken", token)
+            firestore.collection("users").document(uid).set(mapOf("fcmToken" to token), com.google.firebase.firestore.SetOptions.merge())
                 .addOnSuccessListener {
                     android.util.Log.d("FCM_TEST", "Token updated in Firestore")
                 }

@@ -133,6 +133,10 @@ class ChatActivity : BaseActivity() {
             handleSendAction()
         }
 
+        binding.btnEmoji.setOnClickListener {
+            showEmojiPickerDialog()
+        }
+
         binding.btnAttach.setOnClickListener { showAttachBottomSheet() }
         setupVoiceRecording()
         setupTextChangeListener()
@@ -146,6 +150,44 @@ class ChatActivity : BaseActivity() {
         binding.btnCancelMedia.setOnClickListener {
             clearPendingMedia()
         }
+    }
+
+    private fun showEmojiPickerDialog() {
+        val dialog = com.google.android.material.bottomsheet.BottomSheetDialog(this)
+        val sheetView = layoutInflater.inflate(R.layout.dialog_emoji_picker, null)
+        dialog.setContentView(sheetView)
+
+        val gridView = sheetView.findViewById<android.widget.GridView>(R.id.emojiGridView)
+        val emojis = listOf(
+            "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇", "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚", "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🤩", "🥳", "😏", "😒", "😞", "😔", "😟", "😕", "🙁", "☹️", "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😤", "😠", "😡", "🤬", "🤯", "😳", "🥵", "🥶", "😱", "😨", "😰", "😥", "😓", "🤗", "🤔", "🤭", "🤫", "🤥", "😶", "😐", "😑", "😬", "🙄", "😯", "😦", "😧", "😮", "😲", "🥱", "😴", "🤤", "😪", "😵", "🤐", "🥴", "🤢", "🤮", "🤧", "😷", "🤒", "🤕", "❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔", "❣️", "💕", "💞", "💓", "💗", "💖", "💘", "💝", "💟", "👍", "👎", "👌", "✊", "👊", "🤛", "🤜", "🤞", "✌️", "🤟", "🤘", "👈", "👉", "👆", "👇", "☝️", "👋", "🤚", "🖐️", "🖖", "✍️", "👏", "🙌", "👐", "🤲", "🙏", "💪", "🔥", "✨", "🎉", "💯", "⭐", "🌟", "💫", "💥", "🎈", "🎁", "🎂", "👑", "💎", "🌈", "☀️", "☁️", "🌧️", "❄️", "⚡"
+        )
+
+        val adapter = object : android.widget.BaseAdapter() {
+            override fun getCount(): Int = emojis.size
+            override fun getItem(position: Int): Any = emojis[position]
+            override fun getItemId(position: Int): Long = position.toLong()
+            override fun getView(position: Int, convertView: View?, parent: android.view.ViewGroup?): View {
+                val tv = (convertView as? android.widget.TextView) ?: android.widget.TextView(this@ChatActivity).apply {
+                    textSize = 28f
+                    gravity = android.view.Gravity.CENTER
+                    setPadding(8, 8, 8, 8)
+                    val outValue = android.util.TypedValue()
+                    theme.resolveAttribute(android.R.attr.selectableItemBackgroundBorderless, outValue, true)
+                    setBackgroundResource(outValue.resourceId)
+                }
+                tv.text = emojis[position]
+                return tv
+            }
+        }
+        
+        gridView.adapter = adapter
+        gridView.setOnItemClickListener { _, _, position, _ ->
+            val emoji = emojis[position]
+            binding.etMessage.append(emoji)
+            sheetView.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP)
+        }
+
+        dialog.show()
     }
 
     private fun handleSendAction() {
@@ -175,14 +217,31 @@ class ChatActivity : BaseActivity() {
             Toast.makeText(this, "Group calls coming soon", Toast.LENGTH_SHORT).show()
             return
         }
-        val intent = Intent(this, CallActivity::class.java).apply {
-            putExtra("callType", type)
-            putExtra("receiverId", receiverId)
-            putExtra("receiverName", receiverName)
-            putExtra("channelName", chatId)
-            putExtra("isCaller", true)
-        }
-        startActivity(intent)
+        val currentUid = auth.uid ?: return
+        db.collection("users").document(currentUid).get()
+            .addOnSuccessListener { userDoc ->
+                val callerName = userDoc.getString("name") ?: "A Friend"
+                val intent = Intent(this, CallActivity::class.java).apply {
+                    putExtra("callType", type)
+                    putExtra("receiverId", receiverId)
+                    putExtra("receiverName", receiverName)
+                    putExtra("callerName", callerName)
+                    putExtra("channelName", chatId)
+                    putExtra("isCaller", true)
+                }
+                startActivity(intent)
+            }
+            .addOnFailureListener {
+                val intent = Intent(this, CallActivity::class.java).apply {
+                    putExtra("callType", type)
+                    putExtra("receiverId", receiverId)
+                    putExtra("receiverName", receiverName)
+                    putExtra("callerName", "A Friend")
+                    putExtra("channelName", chatId)
+                    putExtra("isCaller", true)
+                }
+                startActivity(intent)
+            }
     }
 
     private fun showChatOptions(view: View) {
@@ -406,8 +465,15 @@ class ChatActivity : BaseActivity() {
         
         lifecycleScope.launch {
             try {
-                val inputStream = contentResolver.openInputStream(uri)
-                val bytes = inputStream?.readBytes() ?: throw Exception("Failed to read file")
+                val bytes = if (uri.scheme == "file" || uri.path?.startsWith("/") == true) {
+                    val path = uri.path ?: throw Exception("Invalid file path")
+                    java.io.File(path).readBytes()
+                } else {
+                    val inputStream = contentResolver.openInputStream(uri)
+                    val b = inputStream?.readBytes() ?: throw Exception("Failed to read file")
+                    inputStream.close()
+                    b
+                }
                 
                 if (type == "IMAGE" || type == "SNAP") {
                     var bitmap = android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
@@ -569,6 +635,18 @@ class ChatActivity : BaseActivity() {
                     // Only Snaps contribute to streaks as per requirements
                     if (type == "SNAP") {
                         updateStreak(receiverId!!)
+                    }
+                    // Dispatch Real-time FCM Notification
+                    db.collection("users").document(currentUid).get().addOnSuccessListener { userDoc ->
+                        val senderName = userDoc.getString("name") ?: "A Friend"
+                        val msgText = if (type == "SNAP" || isSnap) "Sent you a snap! 📸" else content
+                        com.example.chatsnap.utils.FcmNotificationSender.sendNotification(
+                            receiverId = receiverId!!,
+                            senderName = senderName,
+                            messageContent = msgText,
+                            chatId = chatId,
+                            type = "SINGLE"
+                        )
                     }
                 }
                 com.example.chatsnap.utils.TaskUtils.markTaskAsDone("TASK_MESSAGE")
@@ -762,7 +840,11 @@ class ChatActivity : BaseActivity() {
                 prepare()
                 start()
             }
-        } catch (e: Exception) { }
+            android.util.Log.d("VOICE_REC", "Recording started successfully. Path: $audioPath")
+        } catch (e: Exception) {
+            android.util.Log.e("VOICE_REC", "Failed to start voice recorder: ${e.message}", e)
+            Toast.makeText(this, "Mic Init Failed: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun stopRecording() {
@@ -771,7 +853,9 @@ class ChatActivity : BaseActivity() {
             mediaRecorder?.release()
             mediaRecorder = null
             audioPath?.let { uploadFile(Uri.fromFile(File(it)), "AUDIO") }
-        } catch (e: Exception) { }
+        } catch (e: Exception) {
+            android.util.Log.e("VOICE_REC", "Failed to stop/upload recording: ${e.message}", e)
+        }
     }
 
     private fun setupRecyclerView() {

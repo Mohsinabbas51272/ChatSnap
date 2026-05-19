@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/windowBackground">
+    android:background="?android:attr/windowBackground"
+    android:fitsSystemWindows="true">
 
     <include layout="@layout/layout_bubbles" />
 
@@ -277,7 +278,7 @@
                         android:layout_width="44dp"
                         android:layout_height="44dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
-                        android:src="@android:drawable/ic_menu_view"
+                        android:src="@drawable/ic_emoji"
                         app:tint="?android:attr/textColorSecondary" />
 
                     <EditText

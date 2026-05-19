@@ -24,6 +24,7 @@ class SettingsFragment : Fragment() {
     private var userListener: ListenerRegistration? = null
     private var friendsListener: ListenerRegistration? = null
     private var snapsListener: ListenerRegistration? = null
+    private var walletListener: ListenerRegistration? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -209,15 +210,22 @@ class SettingsFragment : Fragment() {
         
         friendsListener = firestore.collection("users").document(uid).collection("friends")
             .addSnapshotListener { snapshot, _ ->
-                if (_binding != null) {
-                    binding.tvStatFriends.text = snapshot?.size()?.toString() ?: "0"
-                }
+                // Friends list change listener
             }
 
         snapsListener = firestore.collection("messages").whereEqualTo("senderId", uid).whereEqualTo("type", "IMAGE")
             .addSnapshotListener { snapshot, _ ->
-                if (_binding != null) {
-                    binding.tvStatSnaps.text = snapshot?.size()?.toString() ?: "0"
+                // Snaps change listener
+            }
+
+        walletListener = firestore.collection("users").document(uid)
+            .collection("wallet").document("data")
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) return@addSnapshotListener
+                if (snapshot != null && snapshot.exists() && _binding != null) {
+                    val balance = snapshot.getLong("balance") ?: 0L
+                    binding.tvBalance.text = balance.toString()
+                    binding.tvBalancePkr.text = String.format("Est. PKR: %.2f", balance.toDouble() / 30.0)
                 }
             }
     }
@@ -254,7 +262,24 @@ class SettingsFragment : Fragment() {
                     binding.itemGhostMode.switchItem.isChecked = doc.getBoolean("ghostMode") ?: false
                     binding.itemGhostMode.tvItemValue.text = if (binding.itemGhostMode.switchItem.isChecked) "Stealth browsing active" else "Online status visible"
 
-                    // Admin UI hidden - access only via secret tap on Privacy Score
+                    // Admin UI check - dynamically show if user is admin, else keep hidden
+                    val isAdmin = doc.getBoolean("isAdmin") ?: false
+                    if (isAdmin) {
+                        binding.tvAdminHeader.visibility = View.VISIBLE
+                        binding.cardAdmin.visibility = View.VISIBLE
+                        
+                        binding.itemAdmin.apply {
+                            ivItemIcon.setImageResource(android.R.drawable.ic_menu_manage)
+                            tvItemTitle.text = "Admin Panel"
+                            tvItemValue.text = "Configure system & rewards"
+                            root.setOnClickListener {
+                                startActivity(Intent(requireContext(), AdminActivity::class.java))
+                            }
+                        }
+                    } else {
+                        binding.tvAdminHeader.visibility = View.GONE
+                        binding.cardAdmin.visibility = View.GONE
+                    }
                 }
             }
     }
@@ -320,9 +345,11 @@ class SettingsFragment : Fragment() {
         userListener?.remove()
         friendsListener?.remove()
         snapsListener?.remove()
+        walletListener?.remove()
         userListener = null
         friendsListener = null
         snapsListener = null
+        walletListener = null
     }
 
     override fun onStop() {

@@ -22,6 +22,7 @@ class CallsFragment : Fragment(), SearchableFragment {
     private lateinit var adapter: CallsAdapter
     private val callsList = mutableListOf<Call>()
     private var filterMode = "ALL"
+    private val followedFriends = mutableListOf<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,6 +40,21 @@ class CallsFragment : Fragment(), SearchableFragment {
         setupRecyclerView()
         setupTabs()
         loadCallHistory()
+        listenToFollowedFriends()
+    }
+
+    private fun listenToFollowedFriends() {
+        val uid = auth.currentUser?.uid ?: return
+        firestore.collection("users").document(uid)
+            .addSnapshotListener { doc, _ ->
+                if (doc != null && doc.exists()) {
+                    @Suppress("UNCHECKED_CAST")
+                    val friends = doc.get("friends") as? List<String> ?: emptyList()
+                    followedFriends.clear()
+                    followedFriends.addAll(friends)
+                    updateUI()
+                }
+            }
     }
 
     private fun setupTabs() {
@@ -53,19 +69,36 @@ class CallsFragment : Fragment(), SearchableFragment {
 
     private fun setupRecyclerView() {
         val uid = auth.currentUser?.uid ?: ""
-        adapter = CallsAdapter(emptyList(), uid) { call ->
+        adapter = CallsAdapter(emptyList(), uid, followedFriends) { call ->
             val partnerId = if (call.callerId == uid) call.receiverId else call.callerId
             val partnerName = if (call.callerId == uid) call.receiverName else call.callerName
             
-            val intent = Intent(requireContext(), CallActivity::class.java).apply {
-                putExtra("receiverId", partnerId)
-                putExtra("receiverName", partnerName)
-                putExtra("callType", call.type)
-                putExtra("isCaller", true)
-                val ids = listOf(uid, partnerId).sorted()
-                putExtra("channelName", "${ids[0]}_${ids[1]}")
-            }
-            startActivity(intent)
+            firestore.collection("users").document(uid).get()
+                .addOnSuccessListener { userDoc ->
+                    val callerName = userDoc.getString("name") ?: "A Friend"
+                    val intent = Intent(requireContext(), CallActivity::class.java).apply {
+                        putExtra("receiverId", partnerId)
+                        putExtra("receiverName", partnerName)
+                        putExtra("callerName", callerName)
+                        putExtra("callType", call.type)
+                        putExtra("isCaller", true)
+                        val ids = listOf(uid, partnerId).sorted()
+                        putExtra("channelName", "${ids[0]}_${ids[1]}")
+                    }
+                    startActivity(intent)
+                }
+                .addOnFailureListener {
+                    val intent = Intent(requireContext(), CallActivity::class.java).apply {
+                        putExtra("receiverId", partnerId)
+                        putExtra("receiverName", partnerName)
+                        putExtra("callerName", "A Friend")
+                        putExtra("callType", call.type)
+                        putExtra("isCaller", true)
+                        val ids = listOf(uid, partnerId).sorted()
+                        putExtra("channelName", "${ids[0]}_${ids[1]}")
+                    }
+                    startActivity(intent)
+                }
         }
         binding.rvCalls.layoutManager = LinearLayoutManager(requireContext())
         binding.rvCalls.adapter = adapter
@@ -102,7 +135,7 @@ class CallsFragment : Fragment(), SearchableFragment {
             } else true
         }.sortedByDescending { it.timestamp }
         
-        adapter.updateData(filtered)
+        adapter.updateData(filtered, followedFriends)
         binding.tvNoCalls.visibility = if (filtered.isEmpty()) View.VISIBLE else View.GONE
     }
 
@@ -113,7 +146,7 @@ class CallsFragment : Fragment(), SearchableFragment {
             (it.callerName.contains(query, true) || it.receiverName.contains(query, true)) &&
             (if (filterMode == "MISSED") it.receiverId == uid && it.status == "missed" else true)
         }.sortedByDescending { it.timestamp }
-        adapter.updateData(filtered)
+        adapter.updateData(filtered, followedFriends)
     }
 
     override fun onDestroyView() {
