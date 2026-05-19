@@ -15,7 +15,7 @@ import io.agora.rtc2.video.VideoCanvas
 
 class CallActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCallBinding
-    private val appId = "c29f009d2f39474ba2bddddd18852949"
+    private val appId = "46de926758a6412c86529258fde19b4a"
     private var channelName: String? = null
     private var mRtcEngine: RtcEngine? = null
     private var isMuted = false
@@ -25,6 +25,7 @@ class CallActivity : AppCompatActivity() {
     private val mRtcEventHandler = object : IRtcEngineEventHandler() {
         override fun onUserJoined(uid: Int, elapsed: Int) {
             runOnUiThread {
+                android.util.Log.d("AGORA_CALL", "Remote user joined: uid=$uid")
                 setupRemoteVideo(uid)
                 binding.tvCallStatus.text = "Connected"
             }
@@ -32,6 +33,7 @@ class CallActivity : AppCompatActivity() {
 
         override fun onUserOffline(uid: Int, reason: Int) {
             runOnUiThread {
+                android.util.Log.d("AGORA_CALL", "Remote user offline: uid=$uid reason=$reason")
                 binding.remoteVideoViewContainer.removeAllViews()
                 binding.tvCallStatus.text = "User Offline"
                 finish()
@@ -40,8 +42,56 @@ class CallActivity : AppCompatActivity() {
 
         override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
             runOnUiThread {
+                android.util.Log.d("AGORA_CALL", "✅ Joined channel '$channel' successfully! My uid=$uid")
                 binding.tvCallStatus.text = "Waiting for partner..."
                 com.example.chatsnap.utils.TaskUtils.markTaskAsDone("TASK_CALL")
+            }
+        }
+
+        override fun onError(err: Int) {
+            runOnUiThread {
+                android.util.Log.e("AGORA_CALL", "❌ Agora Error Code: $err")
+                val errorMsg = when (err) {
+                    1 -> "General Error"
+                    2 -> "Invalid Argument"
+                    3 -> "SDK Not Ready"
+                    4 -> "SDK Not Supported"
+                    5 -> "Request Rejected"
+                    7 -> "SDK Not Initialized"
+                    9 -> "No Permission"
+                    10 -> "API Call Timeout"
+                    17 -> "Join Channel Rejected"
+                    101 -> "Invalid App ID — Check your Agora App ID"
+                    102 -> "Invalid Channel Name"
+                    109 -> "Token Expired"
+                    110 -> "Invalid Token — Go to console.agora.io → Your Project → Set Security to 'APP ID only (Testing Mode)'"
+                    111 -> "Connection Interrupted"
+                    112 -> "Connection Lost"
+                    120 -> "Banned By Server"
+                    123 -> "Channel Banned"
+                    else -> "Error #$err"
+                }
+                android.util.Log.e("AGORA_CALL", "❌ Error: $errorMsg")
+                binding.tvCallStatus.text = "Error: $errorMsg"
+                Toast.makeText(this@CallActivity, "Call Error: $errorMsg", Toast.LENGTH_LONG).show()
+            }
+        }
+
+        override fun onConnectionStateChanged(state: Int, reason: Int) {
+            runOnUiThread {
+                val stateStr = when (state) {
+                    1 -> "Disconnected"
+                    2 -> "Connecting..."
+                    3 -> "Connected"
+                    4 -> "Reconnecting..."
+                    5 -> "Failed"
+                    else -> "State $state"
+                }
+                android.util.Log.d("AGORA_CALL", "Connection: $stateStr (reason=$reason)")
+                if (state == 5) {
+                    binding.tvCallStatus.text = "Connection Failed"
+                    Toast.makeText(this@CallActivity, "Connection failed. Check your Agora project settings.", Toast.LENGTH_LONG).show()
+                }
             }
         }
     }
@@ -114,6 +164,12 @@ class CallActivity : AppCompatActivity() {
         val receiverName = intent.getStringExtra("receiverName") ?: "Unknown"
         channelName = intent.getStringExtra("channelName")
 
+        android.util.Log.d("AGORA_CALL", "=== CALL ACTIVITY STARTED ===")
+        android.util.Log.d("AGORA_CALL", "App ID: $appId")
+        android.util.Log.d("AGORA_CALL", "Channel: $channelName")
+        android.util.Log.d("AGORA_CALL", "Call Type: $callType")
+        android.util.Log.d("AGORA_CALL", "isCaller: ${intent.getBooleanExtra("isCaller", false)}")
+
         binding.tvCallType.text = "$callType Call"
         binding.tvCallerName.text = receiverName
 
@@ -160,11 +216,19 @@ class CallActivity : AppCompatActivity() {
 
     private fun initializeAndJoinChannel(isVideo: Boolean) {
         try {
+            android.util.Log.d("AGORA_CALL", "Initializing Agora RTC Engine...")
+
             val config = RtcEngineConfig()
             config.mContext = baseContext
             config.mAppId = appId
             config.mEventHandler = mRtcEventHandler
             mRtcEngine = RtcEngine.create(config)
+
+            android.util.Log.d("AGORA_CALL", "RTC Engine created successfully")
+
+            // CRITICAL: Always enable audio for both voice and video calls
+            mRtcEngine?.enableAudio()
+            mRtcEngine?.setDefaultAudioRoutetoSpeakerphone(true)
 
             if (isVideo) {
                 mRtcEngine?.enableVideo()
@@ -193,9 +257,18 @@ class CallActivity : AppCompatActivity() {
                 autoSubscribeVideo = isVideo
             }
 
-            mRtcEngine?.joinChannel(null, channelName, 0, options)
+            android.util.Log.d("AGORA_CALL", "Joining channel: '$channelName' with token=null (APP ID mode)")
+            val result = mRtcEngine?.joinChannel(null, channelName, 0, options)
+            android.util.Log.d("AGORA_CALL", "joinChannel result: $result (0 = success, negative = error)")
+
+            if (result != null && result < 0) {
+                Toast.makeText(this, "Failed to join channel (error: $result)", Toast.LENGTH_LONG).show()
+                binding.tvCallStatus.text = "Join Failed: $result"
+            }
+
         } catch (e: Exception) {
-            Toast.makeText(this, "Engine Init Failed: ${e.message}", Toast.LENGTH_SHORT).show()
+            android.util.Log.e("AGORA_CALL", "Engine init FAILED: ${e.message}", e)
+            Toast.makeText(this, "Engine Init Failed: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
 
