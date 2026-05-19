@@ -184,9 +184,18 @@ class CallActivity : AppCompatActivity() {
                 binding.btnSwitchCamera.visibility = View.GONE
             }
 
-            mRtcEngine?.joinChannel(null, channelName, 0, ChannelMediaOptions())
+            val options = ChannelMediaOptions().apply {
+                channelProfile = Constants.CHANNEL_PROFILE_COMMUNICATION
+                clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
+                publishMicrophoneTrack = true
+                publishCameraTrack = isVideo
+                autoSubscribeAudio = true
+                autoSubscribeVideo = isVideo
+            }
+
+            mRtcEngine?.joinChannel(null, channelName, 0, options)
         } catch (e: Exception) {
-            Toast.makeText(this, "Engine Init Failed", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Engine Init Failed: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 

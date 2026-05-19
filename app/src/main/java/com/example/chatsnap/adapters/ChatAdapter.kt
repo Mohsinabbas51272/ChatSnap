@@ -35,6 +35,71 @@ class ChatAdapter(
     private val adminCache = mutableMapOf<String, Boolean>()
     private val db = FirebaseFirestore.getInstance()
 
+    private var mediaPlayer: android.media.MediaPlayer? = null
+    private var playingMessageId: String? = null
+    private var activePlayButton: android.widget.TextView? = null
+
+    private fun playAudio(message: Message, textView: android.widget.TextView) {
+        val mediaUrl = message.mediaUrl ?: return
+        val context = textView.context
+
+        if (playingMessageId == message.messageId) {
+            stopAudio()
+            return
+        }
+
+        stopAudio()
+
+        try {
+            if (!mediaUrl.startsWith("data:audio")) {
+                Toast.makeText(context, "Invalid audio format", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            val cleanBase64 = mediaUrl.substringAfter(",")
+            val decodedBytes = android.util.Base64.decode(cleanBase64, android.util.Base64.DEFAULT)
+            
+            val tempFile = java.io.File.createTempFile("temp_voice_", ".m4a", context.cacheDir)
+            tempFile.deleteOnExit()
+            java.io.FileOutputStream(tempFile).use { fos ->
+                fos.write(decodedBytes)
+            }
+
+            mediaPlayer = android.media.MediaPlayer().apply {
+                setDataSource(tempFile.absolutePath)
+                prepare()
+                start()
+                
+                playingMessageId = message.messageId
+                activePlayButton = textView
+                
+                textView.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_media_pause, 0, 0, 0)
+                textView.text = "Playing Voice Note... 🔊"
+                
+                setOnCompletionListener {
+                    stopAudio()
+                }
+            }
+        } catch (e: java.lang.Exception) {
+            Toast.makeText(context, "Failed to play voice note: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun stopAudio() {
+        try {
+            mediaPlayer?.stop()
+            mediaPlayer?.release()
+        } catch (e: java.lang.Exception) {}
+        mediaPlayer = null
+        
+        activePlayButton?.let { tv ->
+            tv.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_media_play, 0, 0, 0)
+            tv.text = "Voice Note • Tap to Play 🎙️"
+        }
+        activePlayButton = null
+        playingMessageId = null
+    }
+
     companion object {
         private const val VIEW_TYPE_SENT = 1
         private const val VIEW_TYPE_RECEIVED = 2
@@ -67,6 +132,11 @@ class ChatAdapter(
     }
 
     override fun getItemCount(): Int = messages.size
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        stopAudio()
+    }
 
     fun updateData(newMessages: List<Message>) {
         messages = newMessages
@@ -112,6 +182,16 @@ class ChatAdapter(
                 binding.ivMessageImage.imageTintList = ColorStateList.valueOf(Color.parseColor("#34B7F1"))
                 binding.tvMessage.text = "Location: ${message.latitude}, ${message.longitude}\nTap to view on Map"
                 binding.tvMessage.setTextColor(Color.parseColor("#34B7F1"))
+            } else if (message.type == "AUDIO") {
+                binding.ivMessageImage.visibility = View.GONE
+                if (playingMessageId == message.messageId) {
+                    binding.tvMessage.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_media_pause, 0, 0, 0)
+                    binding.tvMessage.text = "Playing Voice Note... 🔊"
+                } else {
+                    binding.tvMessage.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_media_play, 0, 0, 0)
+                    binding.tvMessage.text = "Voice Note • Tap to Play 🎙️"
+                }
+                binding.tvMessage.compoundDrawablePadding = 16
             } else {
                 binding.ivMessageImage.visibility = View.GONE
                 binding.tvMessage.text = if (message.isDeleted) "This message was deleted" else message.content
@@ -146,6 +226,8 @@ class ChatAdapter(
                     val uri = "geo:${message.latitude},${message.longitude}?q=${message.latitude},${message.longitude}"
                     val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(uri))
                     binding.root.context.startActivity(intent)
+                } else if (message.type == "AUDIO") {
+                    playAudio(message, binding.tvMessage)
                 }
             }
 
@@ -194,6 +276,16 @@ class ChatAdapter(
                 binding.ivMessageImage.imageTintList = ColorStateList.valueOf(Color.parseColor("#34B7F1"))
                 binding.tvMessage.text = "Location: ${message.latitude}, ${message.longitude}\nTap to view on Map"
                 binding.tvMessage.setTextColor(Color.parseColor("#34B7F1"))
+            } else if (message.type == "AUDIO") {
+                binding.ivMessageImage.visibility = View.GONE
+                if (playingMessageId == message.messageId) {
+                    binding.tvMessage.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_media_pause, 0, 0, 0)
+                    binding.tvMessage.text = "Playing Voice Note... 🔊"
+                } else {
+                    binding.tvMessage.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_media_play, 0, 0, 0)
+                    binding.tvMessage.text = "Voice Note • Tap to Play 🎙️"
+                }
+                binding.tvMessage.compoundDrawablePadding = 16
             } else {
                 binding.ivMessageImage.visibility = View.GONE
                 binding.tvMessage.text = if (message.isDeleted) "This message was deleted" else message.content
@@ -237,6 +329,8 @@ class ChatAdapter(
                     val uri = "geo:${message.latitude},${message.longitude}?q=${message.latitude},${message.longitude}"
                     val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(uri))
                     binding.root.context.startActivity(intent)
+                } else if (message.type == "AUDIO") {
+                    playAudio(message, binding.tvMessage)
                 }
             }
 
