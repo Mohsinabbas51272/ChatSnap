@@ -46,6 +46,7 @@
                 android:id="@+id/ivCallIcon"
                 android:layout_width="14dp"
                 android:layout_height="14dp"
+                app:tint="?attr/themeAccentColor"
                 android:src="@android:drawable/sym_call_outgoing" />
 
             <TextView
@@ -54,7 +55,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:text="Audio Call • Oct 24"
-                android:textColor="?android:attr/textColorSecondary"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>
@@ -68,7 +69,7 @@
         app:iconPadding="0dp"
         app:iconGravity="textStart"
         app:iconSize="20dp"
-        app:iconTint="?attr/colorPrimary"
+        app:iconTint="?attr/themeAccentColor"
         app:icon="@android:drawable/ic_menu_call"
         app:cornerRadius="12dp" />
 

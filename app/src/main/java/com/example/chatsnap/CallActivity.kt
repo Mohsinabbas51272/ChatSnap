@@ -28,6 +28,12 @@ class CallActivity : AppCompatActivity() {
                 android.util.Log.d("AGORA_CALL", "Remote user joined: uid=$uid")
                 setupRemoteVideo(uid)
                 binding.tvCallStatus.text = "Connected"
+
+                // Animate fade out of user info and status views once connected
+                binding.tvCallStatus.animate().alpha(0f).setDuration(500).withEndAction { binding.tvCallStatus.visibility = View.GONE }
+                binding.tvCallerName.animate().alpha(0f).setDuration(500).withEndAction { binding.tvCallerName.visibility = View.GONE }
+                binding.tvCallType.animate().alpha(0f).setDuration(500).withEndAction { binding.tvCallType.visibility = View.GONE }
+                binding.ivCallerProfile.animate().alpha(0f).setDuration(500).withEndAction { binding.ivCallerProfile.visibility = View.GONE }
             }
         }
 
@@ -154,6 +160,7 @@ class CallActivity : AppCompatActivity() {
 
     private var currentCallId: String? = null
 
+    @android.annotation.SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityCallBinding.inflate(layoutInflater)
@@ -206,6 +213,37 @@ class CallActivity : AppCompatActivity() {
 
         binding.btnSwitchCamera.setOnClickListener {
             mRtcEngine?.switchCamera()
+        }
+
+        // Smooth draggable listener for local camera view
+        var dX = 0f
+        var dY = 0f
+        binding.localVideoViewContainer.setOnTouchListener { view, event ->
+            when (event.action) {
+                android.view.MotionEvent.ACTION_DOWN -> {
+                    dX = view.x - event.rawX
+                    dY = view.y - event.rawY
+                    true
+                }
+                android.view.MotionEvent.ACTION_MOVE -> {
+                    val parent = view.parent as android.view.View
+                    val minX = 0f
+                    val maxX = parent.width - view.width.toFloat()
+                    val minY = 0f
+                    val maxY = parent.height - view.height.toFloat()
+
+                    var newX = event.rawX + dX
+                    var newY = event.rawY + dY
+
+                    newX = Math.max(minX, Math.min(maxX, newX))
+                    newY = Math.max(minY, Math.min(maxY, newY))
+
+                    view.x = newX
+                    view.y = newY
+                    true
+                }
+                else -> false
+            }
         }
     }
 

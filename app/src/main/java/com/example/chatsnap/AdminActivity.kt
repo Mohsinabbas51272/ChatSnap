@@ -73,8 +73,8 @@ class AdminActivity : BaseActivity() {
                         Toast.makeText(this, "Wrong Password!", Toast.LENGTH_SHORT).show()
                     }
                 }
-                .addOnFailureListener {
-                    Toast.makeText(this, "Error checking password", Toast.LENGTH_SHORT).show()
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
                 }
         }
 
@@ -131,9 +131,29 @@ class AdminActivity : BaseActivity() {
                 binding.tvStatTotalUsers.text = snap.size().toString()
                 val onlineCount = snap.documents.count { it.getBoolean("online") == true }
                 binding.tvStatActiveToday.text = onlineCount.toString()
-                // Total coins
+                // Calculate total coins from each user's wallet subcollection
                 var totalCoins = 0L
-                snap.documents.forEach { /* we'll calculate from wallets separately */ }
+                var pending = snap.size()
+                if (pending == 0) {
+                    binding.tvStatTotalCoins.text = "0"
+                }
+                for (userDoc in snap.documents) {
+                    firestore.collection("users").document(userDoc.id)
+                        .collection("wallet").document("data").get()
+                        .addOnSuccessListener { walletDoc ->
+                            totalCoins += walletDoc.getLong("balance") ?: 0L
+                            pending--
+                            if (pending <= 0) {
+                                binding.tvStatTotalCoins.text = totalCoins.toString()
+                            }
+                        }
+                        .addOnFailureListener {
+                            pending--
+                            if (pending <= 0) {
+                                binding.tvStatTotalCoins.text = totalCoins.toString()
+                            }
+                        }
+                }
             }
         }
         firestore.collection("messages").addSnapshotListener { snap, _ ->
@@ -461,9 +481,16 @@ class AdminActivity : BaseActivity() {
                 val adapter = object : androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
                     inner class VH(val tv: android.widget.TextView) : androidx.recyclerview.widget.RecyclerView.ViewHolder(tv)
                     override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder {
-                        val tv = android.widget.TextView(parent.context).apply { setPadding(32,24,32,24); textSize = 13f; setBackgroundResource(R.drawable.bg_setting_item)
+                        val tv = android.widget.TextView(parent.context).apply {
+                            setPadding(32,24,32,24); textSize = 13f; setBackgroundResource(R.drawable.bg_setting_item)
+                            // Resolve textColorPrimary from current theme for visibility across all themes
+                            val attrs = intArrayOf(android.R.attr.textColorPrimary)
+                            val ta = parent.context.obtainStyledAttributes(attrs)
+                            setTextColor(ta.getColor(0, 0xFF000000.toInt()))
+                            ta.recycle()
                             val lp = android.view.ViewGroup.MarginLayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT)
-                            lp.bottomMargin = 8; layoutParams = lp }
+                            lp.bottomMargin = 8; layoutParams = lp
+                        }
                         return VH(tv)
                     }
                     override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {

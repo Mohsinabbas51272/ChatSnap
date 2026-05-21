@@ -70,6 +70,7 @@
         <activity android:name=".CreateGroupActivity" />
         <activity android:name=".AdminActivity" />
         <activity android:name=".CallActivity" android:theme="@style/Theme.ChatSnap.NoActionBar" />
+        <activity android:name=".IncomingCallActivity" android:theme="@style/Theme.ChatSnap.NoActionBar" />
 
         <activity
             android:name=".ChatActivity"

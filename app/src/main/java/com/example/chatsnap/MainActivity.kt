@@ -442,26 +442,33 @@ class MainActivity : BaseActivity() {
             .addSnapshotListener { snapshot, e ->
                 if (e != null || snapshot == null || snapshot.isEmpty) return@addSnapshotListener
                 val doc = snapshot.documents[0]
-                AlertDialog.Builder(this)
-                    .setTitle("Incoming Call")
-                    .setMessage("${doc.getString("callerName")} is calling...")
-                    .setCancelable(false)
-                    .setPositiveButton("Answer") { _, _ ->
-                        doc.reference.update("status", "answered")
-                        val intent = Intent(this, CallActivity::class.java).apply {
-                            putExtra("callId", doc.id)
-                            putExtra("callType", doc.getString("type"))
-                            putExtra("receiverName", doc.getString("callerName"))
-                            putExtra("channelName", doc.getString("channelName"))
-                            putExtra("isCaller", false)
-                        }
-                        startActivity(intent)
+                val callerId = doc.getString("callerId") ?: ""
+                val callerName = doc.getString("callerName") ?: "Unknown"
+                val callType = doc.getString("type") ?: "Voice"
+                val channelName = doc.getString("channelName") ?: ""
+
+                // Fetch caller's profile photo, then launch IncomingCallActivity
+                firestore.collection("users").document(callerId).get()
+                    .addOnSuccessListener { userDoc ->
+                        val callerPhoto = userDoc.getString("profileImageUrl")
+                        launchIncomingCallScreen(doc.id, callerName, callType, channelName, callerPhoto)
                     }
-                    .setNegativeButton("Decline") { _, _ -> 
-                        doc.reference.update("status", "rejected") 
+                    .addOnFailureListener {
+                        launchIncomingCallScreen(doc.id, callerName, callType, channelName, null)
                     }
-                    .show()
             }
+    }
+
+    private fun launchIncomingCallScreen(callId: String, callerName: String, callType: String, channelName: String, callerPhoto: String?) {
+        val intent = Intent(this, IncomingCallActivity::class.java).apply {
+            putExtra("callId", callId)
+            putExtra("callerName", callerName)
+            putExtra("callType", callType)
+            putExtra("channelName", channelName)
+            putExtra("callerPhoto", callerPhoto)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+        }
+        startActivity(intent)
     }
 
     private fun requestNotificationPermission() {

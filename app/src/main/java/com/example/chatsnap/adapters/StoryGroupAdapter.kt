@@ -20,6 +20,7 @@ data class GroupedStory(
 
 class StoryGroupAdapter(
     private var groups: List<GroupedStory>,
+    private val onAddStoryClick: () -> Unit,
     private val onGroupClick: (GroupedStory) -> Unit
 ) : RecyclerView.Adapter<StoryGroupAdapter.ViewHolder>() {
 
@@ -70,7 +71,17 @@ class StoryGroupAdapter(
         // Show '+' icon only on user's own story circle
         holder.binding.ivAddStory.visibility = if (isMe) View.VISIBLE else View.GONE
         
-        holder.itemView.setOnClickListener { onGroupClick(group) }
+        holder.binding.ivAddStory.setOnClickListener {
+            onAddStoryClick()
+        }
+
+        holder.itemView.setOnClickListener {
+            if (isMe && group.stories.isEmpty()) {
+                onAddStoryClick()
+            } else {
+                onGroupClick(group)
+            }
+        }
     }
 
     override fun getItemCount() = groups.size

@@ -36,6 +36,9 @@ class StoriesFragment : Fragment(), SearchableFragment {
     private lateinit var discoverAdapter: HighlightAdapter
     private val storyGroups = mutableListOf<GroupedStory>()
     private val discoverItems = mutableListOf<com.example.chatsnap.models.Highlight>()
+    private var currentUserPhotoUrl: String? = null
+    private var currentUserDisplayName: String? = null
+    private var lastSnapshot: com.google.firebase.firestore.QuerySnapshot? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,9 +58,25 @@ class StoriesFragment : Fragment(), SearchableFragment {
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
 
+        fetchCurrentUserProfile()
         setupRecyclerView()
         listenForStories()
         loadDiscoverContent()
+    }
+
+    private fun fetchCurrentUserProfile() {
+        val currentUid = auth.currentUser?.uid ?: return
+        firestore.collection("users").document(currentUid).addSnapshotListener { document, error ->
+            if (error != null) {
+                android.util.Log.e("StoriesFragment", "Error fetching user profile: ${error.message}", error)
+                return@addSnapshotListener
+            }
+            if (document != null && document.exists()) {
+                currentUserPhotoUrl = document.getString("profileImageUrl")
+                currentUserDisplayName = document.getString("name")
+                lastSnapshot?.let { processStorySnapshot(it) }
+            }
+        }
     }
 
     private fun listenForStories() {
@@ -117,6 +136,7 @@ class StoriesFragment : Fragment(), SearchableFragment {
     }
 
     private fun processStorySnapshot(snapshot: com.google.firebase.firestore.QuerySnapshot) {
+        lastSnapshot = snapshot
         val twentyFourHoursAgo = Calendar.getInstance().apply { add(Calendar.HOUR, -24) }.time.time
         
         val allStories = mutableListOf<Story>()
@@ -157,8 +177,22 @@ class StoriesFragment : Fragment(), SearchableFragment {
             )
         }.sortedWith(compareByDescending<GroupedStory> { it.userId == currentUid }.thenByDescending { it.hasUnread })
 
+        val hasMyStory = grouped.any { it.userId == currentUid }
+        val finalGroups = if (!hasMyStory && currentUid.isNotEmpty()) {
+            val myGroup = GroupedStory(
+                userId = currentUid,
+                displayName = currentUserDisplayName ?: "My Story",
+                userPhoto = currentUserPhotoUrl,
+                stories = emptyList(),
+                hasUnread = false
+            )
+            listOf(myGroup) + grouped
+        } else {
+            grouped
+        }
+
         storyGroups.clear()
-        storyGroups.addAll(grouped)
+        storyGroups.addAll(finalGroups)
         if (_binding != null) {
             storyGroupAdapter.updateData(storyGroups)
         }
@@ -166,11 +200,17 @@ class StoriesFragment : Fragment(), SearchableFragment {
 
     private fun setupRecyclerView() {
         // Friends Stories Tray
-        storyGroupAdapter = StoryGroupAdapter(storyGroups) { group ->
-            val intent = Intent(requireContext(), StoryViewActivity::class.java)
-            intent.putExtra("USER_ID", group.userId)
-            startActivity(intent)
-        }
+        storyGroupAdapter = StoryGroupAdapter(
+            storyGroups,
+            onAddStoryClick = {
+                showMediaPickerOptions()
+            },
+            onGroupClick = { group ->
+                val intent = Intent(requireContext(), StoryViewActivity::class.java)
+                intent.putExtra("USER_ID", group.userId)
+                startActivity(intent)
+            }
+        )
         binding.rvStories.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.rvStories.adapter = storyGroupAdapter
 

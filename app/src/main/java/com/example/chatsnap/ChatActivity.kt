@@ -465,14 +465,14 @@ class ChatActivity : BaseActivity() {
         
         lifecycleScope.launch {
             try {
-                val bytes = if (uri.scheme == "file" || uri.path?.startsWith("/") == true) {
-                    val path = uri.path ?: throw Exception("Invalid file path")
-                    java.io.File(path).readBytes()
-                } else {
+                val bytes = if (uri.scheme == "content") {
                     val inputStream = contentResolver.openInputStream(uri)
                     val b = inputStream?.readBytes() ?: throw Exception("Failed to read file")
                     inputStream.close()
                     b
+                } else {
+                    val path = uri.path ?: throw Exception("Invalid file path")
+                    java.io.File(path).readBytes()
                 }
                 
                 if (type == "IMAGE" || type == "SNAP") {
