@@ -10,7 +10,7 @@ import com.example.chatsnap.models.Message
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
-class MediaGalleryActivity : AppCompatActivity() {
+class MediaGalleryActivity : BaseActivity() {
     private lateinit var binding: ActivityMediaGalleryBinding
     private lateinit var db: FirebaseFirestore
     private lateinit var adapter: MediaGalleryAdapter

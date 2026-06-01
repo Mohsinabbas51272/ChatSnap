@@ -10,7 +10,7 @@ object AnimUtils {
         view.animate()
             .alpha(1f)
             .translationY(0f)
-            .setDuration(600)
+            .setDuration(300)
             .setStartDelay(delay)
             .setInterpolator(AccelerateDecelerateInterpolator())
             .start()
@@ -33,7 +33,7 @@ object AnimUtils {
 
     fun animateStaggered(views: List<View>, startDelay: Long = 0) {
         views.forEachIndexed { index, view ->
-            fadeInAndSlideUp(view, startDelay + (index * 100))
+            fadeInAndSlideUp(view, startDelay + (index * 30))
         }
     }
 

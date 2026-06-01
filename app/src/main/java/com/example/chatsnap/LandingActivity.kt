@@ -6,7 +6,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.example.chatsnap.databinding.ActivityLandingBinding
 
-class LandingActivity : AppCompatActivity() {
+class LandingActivity : BaseActivity() {
     private lateinit var binding: ActivityLandingBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {

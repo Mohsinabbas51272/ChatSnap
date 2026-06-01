@@ -19,7 +19,7 @@ import com.example.chatsnap.databinding.ActivityIncomingCallBinding
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 
-class IncomingCallActivity : AppCompatActivity() {
+class IncomingCallActivity : BaseActivity() {
 
     private lateinit var binding: ActivityIncomingCallBinding
     private var callId: String? = null

@@ -7,7 +7,7 @@ import com.example.chatsnap.databinding.ActivityPrivacySettingsBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-class PrivacySettingsActivity : AppCompatActivity() {
+class PrivacySettingsActivity : BaseActivity() {
     private lateinit var binding: ActivityPrivacySettingsBinding
     private lateinit var firestore: FirebaseFirestore
     private lateinit var auth: FirebaseAuth

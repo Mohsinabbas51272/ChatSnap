@@ -39,6 +39,8 @@ import id.zelory.compressor.Compressor
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.io.File
+import android.os.Handler
+import android.os.Looper
 
 class ChatActivity : BaseActivity() {
 
@@ -58,6 +60,13 @@ class ChatActivity : BaseActivity() {
     private var mediaRecorder: MediaRecorder? = null
     private var audioPath: String? = null
     private var latestPhotoUri: Uri? = null
+
+    // Recording UI & state
+    private var isRecordingActive: Boolean = false
+    private var recordingHandler: Handler? = null
+    private var amplitudeRunnable: Runnable? = null
+    private var micDownX: Float = 0f
+    private var isCancelSlide: Boolean = false
 
     private var pendingMediaUri: Uri? = null
     private var pendingMediaType: String? = null
@@ -817,11 +826,74 @@ class ChatActivity : BaseActivity() {
     private fun setupVoiceRecording() {
         binding.btnMic.setOnTouchListener { _, event ->
             when (event.action) {
-                MotionEvent.ACTION_DOWN -> if (checkAudioPermissions()) startRecording() else requestAudioPermissions()
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> stopRecording()
+                MotionEvent.ACTION_DOWN -> {
+                    if (checkAudioPermissions()) {
+                        micDownX = event.rawX
+                        isCancelSlide = false
+                        startRecording()
+                        showRecordingOverlay()
+                    } else requestAudioPermissions()
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val deltaX = event.rawX - micDownX
+                    // if user slides left by more than 150px, mark as cancel
+                    if (deltaX < -150 && !isCancelSlide) {
+                        isCancelSlide = true
+                        binding.tvRecordingHint.text = "Release to cancel"
+                        binding.ivRecordingMic.setColorFilter(android.graphics.Color.RED)
+                    } else if (deltaX > -100 && isCancelSlide) {
+                        isCancelSlide = false
+                        binding.tvRecordingHint.text = "Slide left to cancel"
+                        binding.ivRecordingMic.clearColorFilter()
+                    }
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    stopRecording(send = !isCancelSlide)
+                    hideRecordingOverlay()
+                }
             }
             true
         }
+    }
+
+    private fun showRecordingOverlay() {
+        binding.recordingOverlay.visibility = View.VISIBLE
+        startAmplitudePolling()
+    }
+
+    private fun hideRecordingOverlay() {
+        binding.recordingOverlay.visibility = View.GONE
+        binding.ivRecordingMic.clearColorFilter()
+        binding.tvRecordingHint.text = "Slide left to cancel"
+        stopAmplitudePolling()
+    }
+
+    private fun startAmplitudePolling() {
+        if (recordingHandler != null) return
+        recordingHandler = Handler(Looper.getMainLooper())
+        amplitudeRunnable = object : Runnable {
+            override fun run() {
+                try {
+                    val amp = mediaRecorder?.maxAmplitude ?: 0
+                    // Map amplitude (0..32767) to scale 1.0..1.8
+                    val normalized = (amp / 32767f).coerceIn(0f, 1f)
+                    val scale = 1.0f + (normalized * 0.8f)
+                    binding.ivRecordingMic.scaleX = scale
+                    binding.ivRecordingMic.scaleY = scale
+                } catch (e: Exception) {
+                }
+                recordingHandler?.postDelayed(this, 120)
+            }
+        }
+        recordingHandler?.post(amplitudeRunnable!!)
+    }
+
+    private fun stopAmplitudePolling() {
+        amplitudeRunnable?.let { recordingHandler?.removeCallbacks(it) }
+        amplitudeRunnable = null
+        recordingHandler = null
+        binding.ivRecordingMic.scaleX = 1.0f
+        binding.ivRecordingMic.scaleY = 1.0f
     }
 
     private fun startRecording() {
@@ -841,20 +913,33 @@ class ChatActivity : BaseActivity() {
                 start()
             }
             android.util.Log.d("VOICE_REC", "Recording started successfully. Path: $audioPath")
+            isRecordingActive = true
+            startAmplitudePolling()
         } catch (e: Exception) {
             android.util.Log.e("VOICE_REC", "Failed to start voice recorder: ${e.message}", e)
             Toast.makeText(this, "Mic Init Failed: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun stopRecording() {
+    private fun stopRecording(send: Boolean = true) {
         try {
+            if (!isRecordingActive && mediaRecorder == null) return
             mediaRecorder?.stop()
             mediaRecorder?.release()
             mediaRecorder = null
-            audioPath?.let { uploadFile(Uri.fromFile(File(it)), "AUDIO") }
+            isRecordingActive = false
+            audioPath?.let {
+                if (send) {
+                    uploadFile(Uri.fromFile(File(it)), "AUDIO")
+                } else {
+                    try { File(it).delete() } catch (_: Exception) {}
+                }
+            }
+            audioPath = null
         } catch (e: Exception) {
             android.util.Log.e("VOICE_REC", "Failed to stop/upload recording: ${e.message}", e)
+        } finally {
+            stopAmplitudePolling()
         }
     }
 

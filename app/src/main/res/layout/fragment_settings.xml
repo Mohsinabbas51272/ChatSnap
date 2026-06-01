@@ -22,19 +22,19 @@
 
             <!-- Profile Avatar Section with Active Indicator -->
             <FrameLayout
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:layout_marginTop="16dp">
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_marginTop="12dp">
 
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/ivProfile"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="3dp"
+                    android:padding="2dp"
                     android:src="@drawable/ic_launcher_background"
                     app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
                     app:strokeColor="?attr/colorOutlineVariant"
-                    app:strokeWidth="2dp"
+                    app:strokeWidth="1.5dp"
                     android:scaleType="centerCrop" />
 
                 <!-- Online Active Indicator dot -->
@@ -52,11 +52,11 @@
                 android:id="@+id/tvUserName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="10dp"
                 android:fontFamily="sans-serif-black"
                 android:text="Alex Sterling"
                 android:textColor="?android:attr/textColorPrimary"
-                android:textSize="26sp"
+                android:textSize="18sp"
                 android:letterSpacing="-0.01" />
 
             <TextView
@@ -107,15 +107,15 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/fabEditAvatar"
                 android:layout_width="wrap_content"
-                android:layout_height="44dp"
-                android:layout_marginTop="16dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="12dp"
                 android:text="Edit Profile"
                 android:fontFamily="sans-serif-black"
-                android:textSize="13sp"
+                android:textSize="12sp"
                 android:textColor="#FFFFFF"
                 app:backgroundTint="#005DFF"
-                app:cornerRadius="22dp"
-                android:paddingHorizontal="24dp"
+                app:cornerRadius="18dp"
+                android:paddingHorizontal="18dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp" />
 
@@ -124,9 +124,9 @@
                 android:id="@+id/btnPrivacyScore"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
-                android:layout_marginBottom="28dp"
-                app:cardCornerRadius="28dp"
+                android:layout_marginTop="18dp"
+                android:layout_marginBottom="18dp"
+                app:cardCornerRadius="18dp"
                 app:cardElevation="0dp"
                 app:strokeWidth="1dp"
                 app:strokeColor="?attr/colorOutlineVariant"
@@ -137,7 +137,7 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="20dp">
+                    android:padding="12dp">
 
                     <TextView
                         android:id="@+id/lblTotalBalance"
@@ -166,7 +166,7 @@
                             android:fontFamily="sans-serif-black"
                             android:text="0"
                             android:textColor="?android:attr/textColorPrimary"
-                            android:textSize="32sp" />
+                            android:textSize="20sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -185,13 +185,13 @@
                         android:layout_marginTop="4dp"
                         android:text="PKR 0.00"
                         android:textColor="#34C759"
-                        android:textSize="12sp"
+                        android:textSize="11sp"
                         android:textStyle="bold" />
 
                     <!-- Wallet Icon Container -->
                     <FrameLayout
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentTop="true">
 
@@ -202,8 +202,8 @@
                             android:backgroundTint="#0E007AFF" />
 
                         <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
                             android:layout_gravity="center"
                             android:src="@android:drawable/ic_menu_crop"
                             app:tint="#007AFF" />
@@ -212,43 +212,22 @@
                     <!-- Mock Trend Chart bars matching screenshot -->
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="24dp"
+                        android:layout_height="18dp"
                         android:layout_below="@id/tvBalancePkr"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="12dp"
                         android:orientation="horizontal"
                         android:gravity="bottom">
 
                         <View
                             android:layout_width="0dp"
-                            android:layout_height="10dp"
+                            android:layout_height="18dp"
                             android:layout_weight="1"
                             android:layout_marginEnd="4dp"
                             android:background="@drawable/bg_green_chip"
                             android:backgroundTint="#508AB9E6" />
                         <View
                             android:layout_width="0dp"
-                            android:layout_height="14dp"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="4dp"
-                            android:background="@drawable/bg_green_chip"
-                            android:backgroundTint="#808AB9E6" />
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="12dp"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="4dp"
-                            android:background="@drawable/bg_green_chip"
-                            android:backgroundTint="#808AB9E6" />
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="22dp"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="4dp"
-                            android:background="@drawable/bg_green_chip"
-                            android:backgroundTint="#808AB9E6" />
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="16dp"
+                            android:layout_height="18dp"
                             android:layout_weight="1"
                             android:layout_marginEnd="4dp"
                             android:background="@drawable/bg_green_chip"
@@ -262,7 +241,28 @@
                             android:backgroundTint="#808AB9E6" />
                         <View
                             android:layout_width="0dp"
-                            android:layout_height="24dp"
+                            android:layout_height="18dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="4dp"
+                            android:background="@drawable/bg_green_chip"
+                            android:backgroundTint="#808AB9E6" />
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="18dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="4dp"
+                            android:background="@drawable/bg_green_chip"
+                            android:backgroundTint="#808AB9E6" />
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="18dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="4dp"
+                            android:background="@drawable/bg_green_chip"
+                            android:backgroundTint="#808AB9E6" />
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="18dp"
                             android:layout_weight="1"
                             android:background="@drawable/bg_green_chip"
                             android:backgroundTint="#FF8AB9E6" />

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black_bg">
+    android:background="?attr/colorPrimary">
 
     <!-- Animated Bubbles Background -->
     <include layout="@layout/layout_bubbles" />
@@ -40,7 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="ChatSnap"
-            android:textColor="@color/white"
+            android:textColor="?attr/colorOnPrimary"
             android:textSize="42sp"
             android:textStyle="bold"
             android:letterSpacing="-0.03" />
@@ -50,7 +50,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="CONNECT • SNAP • EARN"
-            android:textColor="#80FFFFFF"
+            android:textColor="?attr/colorOnPrimary"
+            android:alpha="0.6"
             android:textSize="12sp"
             android:letterSpacing="0.3"
             android:textAllCaps="true" />
@@ -70,14 +71,14 @@
         <ProgressBar
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_marginBottom="16dp"
-            android:indeterminateTint="#00B4C5" />
+            android:layout_marginBottom="16dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="FROM DEEPMIND LABS"
-            android:textColor="#40FFFFFF"
+            android:textColor="?attr/colorOnPrimary"
+            android:alpha="0.3"
             android:textSize="10sp"
             android:letterSpacing="0.2"
             android:textStyle="bold" />

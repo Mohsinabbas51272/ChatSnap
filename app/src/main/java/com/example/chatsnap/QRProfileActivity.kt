@@ -11,7 +11,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeEncoder
 
-class QRProfileActivity : AppCompatActivity() {
+class QRProfileActivity : BaseActivity() {
     private lateinit var binding: ActivityQrProfileBinding
     private lateinit var auth: FirebaseAuth
 

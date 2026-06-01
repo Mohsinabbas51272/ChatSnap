@@ -14,7 +14,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
-class WalletActivity : AppCompatActivity() {
+class WalletActivity : BaseActivity() {
     private lateinit var binding: ActivityWalletBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var firestore: FirebaseFirestore
@@ -56,7 +56,7 @@ class WalletActivity : AppCompatActivity() {
 
     private fun setupToolbar() {
         binding.toolbar.setNavigationOnClickListener {
-            onBackPressed()
+            finish()
         }
     }
 
@@ -101,7 +101,9 @@ class WalletActivity : AppCompatActivity() {
                             type = doc.getString("type") ?: "earn",
                             source = doc.getString("source"),
                             status = doc.getString("status"),
-                            timestamp = doc.getLong("timestamp") ?: System.currentTimeMillis()
+                            timestamp = doc.getLong("timestamp") ?: System.currentTimeMillis(),
+                            accountDetails = doc.getString("accountDetails"),
+                            referenceId = doc.getString("referenceId") ?: ""
                         )
                         transactions.add(tx)
                     }

@@ -11,7 +11,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 
-class QRScannerActivity : AppCompatActivity() {
+class QRScannerActivity : BaseActivity() {
     private lateinit var binding: ActivityQrScannerBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var firestore: FirebaseFirestore

@@ -39,8 +39,78 @@ class CallsFragment : Fragment(), SearchableFragment {
 
         setupRecyclerView()
         setupTabs()
+        setupClearButton()
         loadCallHistory()
         listenToFollowedFriends()
+    }
+
+    private fun setupClearButton() {
+        binding.btnClearCalls.setOnClickListener {
+            val uid = auth.currentUser?.uid ?: return@setOnClickListener
+            androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Clear Call History")
+                .setMessage("Are you sure you want to clear your call history? This will remove call entries where you are caller or receiver.")
+                .setPositiveButton("Clear") { _, _ -> clearCallHistory(uid) }
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
+    }
+
+    private fun clearCallHistory(uid: String) {
+        // Query for calls where callerId == uid or receiverId == uid
+        val callsRef = firestore.collection("calls")
+
+        // Fetch both sets then delete in batches
+        val toDelete = mutableListOf<com.google.firebase.firestore.DocumentReference>()
+
+        callsRef.whereEqualTo("callerId", uid).get()
+            .addOnSuccessListener { snap ->
+                snap.documents.forEach { toDelete.add(it.reference) }
+                callsRef.whereEqualTo("receiverId", uid).get()
+                    .addOnSuccessListener { snap2 ->
+                        snap2.documents.forEach { ref ->
+                            // avoid duplicates
+                            if (!toDelete.contains(ref.reference)) toDelete.add(ref.reference)
+                        }
+                        if (toDelete.isEmpty()) {
+                            androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                                .setMessage("No call history to clear.")
+                                .setPositiveButton("OK", null)
+                                .show()
+                            return@addOnSuccessListener
+                        }
+
+                        val chunks = toDelete.chunked(500)
+                        var completed = 0
+                        for (chunk in chunks) {
+                            val batch = firestore.batch()
+                            chunk.forEach { batch.delete(it) }
+                            batch.commit().addOnSuccessListener {
+                                completed++
+                                if (completed == chunks.size) {
+                                    androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                                        .setMessage("Call history cleared.")
+                                        .setPositiveButton("OK", null)
+                                        .show()
+                                    // refresh local list
+                                    callsList.clear()
+                                    updateUI()
+                                }
+                            }.addOnFailureListener { e ->
+                                androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                                    .setMessage("Failed to clear: ${e.message}")
+                                    .setPositiveButton("OK", null)
+                                    .show()
+                            }
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        android.util.Log.e("CALLS_CLEAR", "Failed to query receiver calls: ${e.message}")
+                    }
+            }
+            .addOnFailureListener { e ->
+                android.util.Log.e("CALLS_CLEAR", "Failed to query caller calls: ${e.message}")
+            }
     }
 
     private fun listenToFollowedFriends() {

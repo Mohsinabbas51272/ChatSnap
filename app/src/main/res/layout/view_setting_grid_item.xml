@@ -16,13 +16,13 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="vertical"
-        android:paddingVertical="24dp"
-        android:paddingHorizontal="16dp">
+        android:paddingVertical="12dp"
+        android:paddingHorizontal="12dp">
 
         <FrameLayout
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_marginBottom="12dp">
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginBottom="8dp">
 
             <View
                 android:id="@+id/viewIconBg"
@@ -33,8 +33,8 @@
 
             <ImageView
                 android:id="@+id/ivItemIcon"
-                android:layout_width="26dp"
-                android:layout_height="26dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_gravity="center"
                 android:src="@android:drawable/ic_menu_help"
                 app:tint="?attr/colorPrimary" />
@@ -47,7 +47,7 @@
             android:fontFamily="sans-serif-black"
             android:text="Title"
             android:textColor="?android:attr/textColorPrimary"
-            android:textSize="14sp"
+            android:textSize="13sp"
             android:textAlignment="center" />
 
         <TextView
@@ -57,7 +57,7 @@
             android:layout_marginTop="2dp"
             android:text="Subtitle"
             android:textColor="?android:attr/textColorSecondary"
-            android:textSize="11sp"
+            android:textSize="10sp"
             android:textAlignment="center"
             android:alpha="0.8" />
 

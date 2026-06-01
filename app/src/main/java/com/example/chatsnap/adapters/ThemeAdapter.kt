@@ -23,18 +23,18 @@ class ThemeAdapter(
         holder.binding.tvThemeName.text = theme.displayName
         
         val previewColor = when (theme) {
-            ThemeManager.AppTheme.DEFAULT -> android.graphics.Color.parseColor("#5C6BC0")
+            ThemeManager.AppTheme.DEFAULT -> android.graphics.Color.parseColor("#5908f7")
             ThemeManager.AppTheme.FULL_BLACK -> android.graphics.Color.BLACK
             ThemeManager.AppTheme.FULL_WHITE -> android.graphics.Color.WHITE
-            ThemeManager.AppTheme.EMERALD_GREEN -> android.graphics.Color.parseColor("#006064")
-            ThemeManager.AppTheme.SAKURA_PINK -> android.graphics.Color.parseColor("#F06292")
-            ThemeManager.AppTheme.NEON_PINK -> android.graphics.Color.parseColor("#FFB6C1")
-            ThemeManager.AppTheme.MAROON -> android.graphics.Color.parseColor("#7F2020")
-            ThemeManager.AppTheme.MAGENTA -> android.graphics.Color.parseColor("#00B4C5")
-            ThemeManager.AppTheme.TEAL -> android.graphics.Color.parseColor("#2FA084")
-            ThemeManager.AppTheme.CORAL -> android.graphics.Color.parseColor("#E36A6A")
+            ThemeManager.AppTheme.EMERALD_GREEN -> android.graphics.Color.parseColor("#008B5B")
+            ThemeManager.AppTheme.SAKURA_PINK -> android.graphics.Color.parseColor("#E05275")
+            ThemeManager.AppTheme.NEON_PINK -> android.graphics.Color.parseColor("#7012F2")
+            ThemeManager.AppTheme.MAROON -> android.graphics.Color.parseColor("#B8324C")
+            ThemeManager.AppTheme.MAGENTA -> android.graphics.Color.parseColor("#0086D6")
+            ThemeManager.AppTheme.TEAL -> android.graphics.Color.parseColor("#008E8E")
+            ThemeManager.AppTheme.CORAL -> android.graphics.Color.parseColor("#E55B44")
         }
-        holder.binding.viewColorPreview.setCardBackgroundColor(previewColor)
+        holder.binding.viewColorPreview.setBackgroundColor(previewColor)
         
         holder.itemView.setOnClickListener { onThemeSelected(theme) }
     }

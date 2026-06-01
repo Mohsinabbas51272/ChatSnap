@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.chatsnap.databinding.ActivityStaticContentBinding
 
-class StaticContentActivity : AppCompatActivity() {
+class StaticContentActivity : BaseActivity() {
     private lateinit var binding: ActivityStaticContentBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {

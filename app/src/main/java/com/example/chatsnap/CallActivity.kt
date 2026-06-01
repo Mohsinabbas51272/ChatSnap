@@ -1,6 +1,7 @@
 package com.example.chatsnap
 
 import android.Manifest
+import android.graphics.Color
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
@@ -13,7 +14,7 @@ import io.agora.rtc2.*
 import io.agora.rtc2.video.VideoEncoderConfiguration
 import io.agora.rtc2.video.VideoCanvas
 
-class CallActivity : AppCompatActivity() {
+class CallActivity : BaseActivity() {
     private lateinit var binding: ActivityCallBinding
     private val appId = "46de926758a6412c86529258fde19b4a"
     private var channelName: String? = null
@@ -28,12 +29,9 @@ class CallActivity : AppCompatActivity() {
                 android.util.Log.d("AGORA_CALL", "Remote user joined: uid=$uid")
                 setupRemoteVideo(uid)
                 binding.tvCallStatus.text = "Connected"
-
-                // Animate fade out of user info and status views once connected
+                // Only fade out the status label; keep caller name/profile visible
                 binding.tvCallStatus.animate().alpha(0f).setDuration(500).withEndAction { binding.tvCallStatus.visibility = View.GONE }
-                binding.tvCallerName.animate().alpha(0f).setDuration(500).withEndAction { binding.tvCallerName.visibility = View.GONE }
                 binding.tvCallType.animate().alpha(0f).setDuration(500).withEndAction { binding.tvCallType.visibility = View.GONE }
-                binding.ivCallerProfile.animate().alpha(0f).setDuration(500).withEndAction { binding.ivCallerProfile.visibility = View.GONE }
             }
         }
 
@@ -169,6 +167,7 @@ class CallActivity : AppCompatActivity() {
 
         val callType = intent.getStringExtra("callType") ?: "Voice"
         val receiverName = intent.getStringExtra("receiverName") ?: "Unknown"
+        val callTheme = intent.getStringExtra("callTheme") // optional: deep_sea_green, maroon_velvet, cyan_blush, teal_breeze, coral_soft
         channelName = intent.getStringExtra("channelName")
 
         android.util.Log.d("AGORA_CALL", "=== CALL ACTIVITY STARTED ===")
@@ -179,6 +178,8 @@ class CallActivity : AppCompatActivity() {
 
         binding.tvCallType.text = "$callType Call"
         binding.tvCallerName.text = receiverName
+
+        applyCallTheme(callTheme)
 
         if (checkPermissions()) {
             initializeAndJoinChannel(callType == "Video")
@@ -344,6 +345,63 @@ class CallActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 22 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             initializeAndJoinChannel(intent.getStringExtra("callType") == "Video")
+        }
+    }
+
+    private fun applyCallTheme(theme: String?) {
+        val root = binding.root
+        val accent: Int
+        val background: Int
+        val controlsBg: Int
+        when (theme) {
+            "deep_sea_green" -> {
+                background = Color.parseColor("#042F2B")
+                accent = Color.parseColor("#00C48C")
+                controlsBg = Color.parseColor("#06423F")
+            }
+            "maroon_velvet" -> {
+                background = Color.parseColor("#2C0A0F")
+                accent = Color.parseColor("#C0392B")
+                controlsBg = Color.parseColor("#3E1317")
+            }
+            "cyan_blush" -> {
+                background = Color.parseColor("#072A30")
+                accent = Color.parseColor("#4DD0E1")
+                controlsBg = Color.parseColor("#08353A")
+            }
+            "teal_breeze" -> {
+                background = Color.parseColor("#003A3A")
+                accent = Color.parseColor("#1ABC9C")
+                controlsBg = Color.parseColor("#064B48")
+            }
+            "coral_soft" -> {
+                background = Color.parseColor("#3A1F1A")
+                accent = Color.parseColor("#FF7F50")
+                controlsBg = Color.parseColor("#4A2B26")
+            }
+            else -> {
+                // default dark
+                background = Color.parseColor("#1A1A1A")
+                accent = Color.parseColor("#00BCD4")
+                controlsBg = Color.parseColor("#2A2A2A")
+            }
+        }
+
+        try {
+            root.setBackgroundColor(background)
+            binding.tvCallerName.setTextColor(Color.WHITE)
+            binding.tvCallType.setTextColor(Color.WHITE)
+            binding.tvCallStatus.setTextColor(Color.LTGRAY)
+
+            binding.btnEndCall.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#FF3B30"))
+            binding.btnMute.backgroundTintList = android.content.res.ColorStateList.valueOf(controlsBg)
+            binding.btnToggleCamera.backgroundTintList = android.content.res.ColorStateList.valueOf(controlsBg)
+            binding.btnSwitchCamera.backgroundTintList = android.content.res.ColorStateList.valueOf(controlsBg)
+
+            // apply accent to caller profile border or overlay if present
+            binding.ivCallerProfile.strokeColor = android.content.res.ColorStateList.valueOf(accent)
+        } catch (e: Exception) {
+            android.util.Log.e("CALL_THEME", "Failed to apply theme: ${e.message}")
         }
     }
 }

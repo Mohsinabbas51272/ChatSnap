@@ -323,4 +323,45 @@
         </LinearLayout>
     </LinearLayout>
 
+    <!-- Recording overlay shown while user holds mic -->
+    <FrameLayout
+        android:id="@+id/recordingOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:clickable="false"
+        android:focusable="false">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#80000000" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_gravity="center"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/ivRecordingMic"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:src="@android:drawable/ic_btn_speak_now"
+                android:tint="?attr/themeAccentColor"
+                android:contentDescription="Recording" />
+
+            <TextView
+                android:id="@+id/tvRecordingHint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Slide left to cancel"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </FrameLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

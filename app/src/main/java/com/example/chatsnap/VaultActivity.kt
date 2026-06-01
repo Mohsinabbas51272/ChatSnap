@@ -10,7 +10,7 @@ import com.example.chatsnap.models.Message
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-class VaultActivity : AppCompatActivity() {
+class VaultActivity : BaseActivity() {
     private lateinit var binding: ActivityVaultBinding
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()

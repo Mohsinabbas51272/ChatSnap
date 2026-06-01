@@ -8,16 +8,16 @@ object ThemeManager {
     private const val KEY_THEME = "selected_theme"
 
     enum class AppTheme(val styleRes: Int, val displayName: String, val price: Int) {
-        DEFAULT(R.style.Theme_ChatSnap, "Royal Indigo (Default)", 0),
-        FULL_BLACK(R.style.Theme_ChatSnap_FullBlack, "Full Black", 0),
-        FULL_WHITE(R.style.Theme_ChatSnap_FullWhite, "Full White", 0),
-        EMERALD_GREEN(R.style.Theme_ChatSnap_EmeraldGreen, "Deep Sea Green", 0),
-        SAKURA_PINK(R.style.Theme_ChatSnap_SakuraPink, "Sakura Pink", 0),
-        NEON_PINK(R.style.Theme_ChatSnap_NeonPink, "Light Pink", 0),
-        MAROON(R.style.Theme_ChatSnap_Maroon, "Maroon Velvet", 0),
-        MAGENTA(R.style.Theme_ChatSnap_Magenta, "Cyan Blast", 0),
-        TEAL(R.style.Theme_ChatSnap_Teal, "Teal Breeze", 0),
-        CORAL(R.style.Theme_ChatSnap_Coral, "Coral Soft", 0)
+        DEFAULT(R.style.Theme_ChatSnap, "Electric Purple (Default)", 0),
+        FULL_BLACK(R.style.Theme_ChatSnap_FullBlack, "Full Black (Dark)", 0),
+        FULL_WHITE(R.style.Theme_ChatSnap_FullWhite, "Full White (Light)", 0),
+        EMERALD_GREEN(R.style.Theme_ChatSnap_EmeraldGreen, "Sage & Mint (Light)", 0),
+        SAKURA_PINK(R.style.Theme_ChatSnap_SakuraPink, "Sakura Rose (Light)", 0),
+        NEON_PINK(R.style.Theme_ChatSnap_NeonPink, "Lavender Mist (Light)", 0),
+        MAROON(R.style.Theme_ChatSnap_Maroon, "Burgundy Velvet (Light)", 0),
+        MAGENTA(R.style.Theme_ChatSnap_Magenta, "Ocean Sky (Light)", 0),
+        TEAL(R.style.Theme_ChatSnap_Teal, "Teal Ice (Light)", 0),
+        CORAL(R.style.Theme_ChatSnap_Coral, "Coral Sunset (Light)", 0)
     }
 
     fun setTheme(context: Context, theme: AppTheme) {

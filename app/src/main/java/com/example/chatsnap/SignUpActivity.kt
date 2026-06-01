@@ -8,7 +8,7 @@ import com.example.chatsnap.databinding.ActivitySignupBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-class SignUpActivity : AppCompatActivity() {
+class SignUpActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySignupBinding
     private lateinit var auth: FirebaseAuth

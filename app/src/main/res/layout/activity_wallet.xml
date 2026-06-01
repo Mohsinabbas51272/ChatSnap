@@ -93,7 +93,8 @@
                     android:paddingHorizontal="12dp"
                     android:paddingVertical="4dp"
                     android:text="Est. PKR: 0.00"
-                    android:textColor="#34C759"
+                    android:textColor="?attr/colorOnPrimary"
+                    android:backgroundTint="?attr/themeAccentColor"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -164,7 +165,7 @@
                             android:layout_weight="1"
                             android:checked="true"
                             android:text="Easypaisa"
-                            android:buttonTint="@color/primary" />
+                            android:buttonTint="?attr/themeAccentColor" />
 
                         <RadioButton
                             android:id="@+id/rbJazzCash"
@@ -172,7 +173,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="JazzCash"
-                            android:buttonTint="@color/primary" />
+                            android:buttonTint="?attr/themeAccentColor" />
                     </RadioGroup>
 
                     <TextView
@@ -220,7 +221,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
                         android:layout_marginTop="24dp"
-                        android:backgroundTint="@color/primary"
+                        android:backgroundTint="?attr/themeAccentColor"
                         android:text="Submit Request"
                         android:textAllCaps="false"
                         android:textColor="#FFFFFF"

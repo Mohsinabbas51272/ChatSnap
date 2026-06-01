@@ -9,7 +9,7 @@ import com.example.chatsnap.models.SupportRequest
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-class SupportRequestActivity : AppCompatActivity() {
+class SupportRequestActivity : BaseActivity() {
     private lateinit var binding: ActivitySupportRequestBinding
     private lateinit var firestore: FirebaseFirestore
     private lateinit var auth: FirebaseAuth

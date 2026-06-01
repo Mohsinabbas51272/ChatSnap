@@ -11,7 +11,7 @@ import com.example.chatsnap.models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-class CreateGroupActivity : AppCompatActivity() {
+class CreateGroupActivity : BaseActivity() {
     private lateinit var binding: ActivityCreateGroupBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore

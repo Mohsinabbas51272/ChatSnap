@@ -10,7 +10,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
-class SupportRepliesActivity : AppCompatActivity() {
+class SupportRepliesActivity : BaseActivity() {
     private lateinit var binding: ActivitySupportRepliesBinding
     private lateinit var firestore: FirebaseFirestore
     private lateinit var auth: FirebaseAuth

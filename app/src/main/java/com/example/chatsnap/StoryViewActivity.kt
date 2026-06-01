@@ -20,7 +20,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.Calendar
 
-class StoryViewActivity : AppCompatActivity() {
+class StoryViewActivity : BaseActivity() {
     private lateinit var binding: ActivityStoryViewBinding
     private lateinit var firestore: FirebaseFirestore
     private lateinit var auth: FirebaseAuth

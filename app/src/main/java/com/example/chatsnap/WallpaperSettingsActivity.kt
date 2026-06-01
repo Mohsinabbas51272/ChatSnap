@@ -11,13 +11,17 @@ import coil.load
 import com.example.chatsnap.databinding.ActivityWallpaperSettingsBinding
 import com.example.chatsnap.utils.WallpaperManager
 
-class WallpaperSettingsActivity : AppCompatActivity() {
+class WallpaperSettingsActivity : BaseActivity() {
     private lateinit var binding: ActivityWallpaperSettingsBinding
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val data: Intent? = result.data
             data?.data?.let { uri ->
+                try {
+                    // Persist permission so the app can load the URI later
+                    contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                } catch (_: Exception) {}
                 saveWallpaper(uri.toString())
             }
         }
@@ -33,8 +37,12 @@ class WallpaperSettingsActivity : AppCompatActivity() {
         loadCurrentWallpaper()
 
         binding.btnPickGallery.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK)
-            intent.type = "image/*"
+            // Use ACTION_OPEN_DOCUMENT to allow persistable permissions for long-term access
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "image/*"
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+            }
             pickImageLauncher.launch(intent)
         }
 
