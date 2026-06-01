@@ -3,6 +3,8 @@
     <style name="Base.Theme.ChatSnap" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="android:popupBackground">?attr/colorSurface</item>
+        <item name="android:itemBackground">?attr/colorSurface</item>
     </style>
 
     <style name="ShapeAppearance.Circle" parent="ShapeAppearance.MaterialComponents.SmallComponent">

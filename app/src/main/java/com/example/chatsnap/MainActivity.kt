@@ -78,6 +78,10 @@ class MainActivity : BaseActivity() {
             toggleSearchHeader()
         }
 
+        binding.btnClearCallsHeader.setOnClickListener {
+            (currentFragment as? CallsFragment)?.showClearCallsDialog()
+        }
+
         binding.btnMainFab.setOnClickListener {
             handleFabClick()
         }
@@ -395,6 +399,7 @@ class MainActivity : BaseActivity() {
         currentFragment = fragment
         
         binding.btnSearch.visibility = if (fragment is EarnFragment || fragment is SettingsFragment) View.GONE else View.VISIBLE
+        binding.btnClearCallsHeader.visibility = if (fragment is CallsFragment) View.VISIBLE else View.GONE
 
         when (fragment) {
             is ChatsFragment -> {

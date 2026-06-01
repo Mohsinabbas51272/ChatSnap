@@ -131,6 +131,7 @@ class ChatActivity : BaseActivity() {
             val intent = Intent(this, MediaGalleryActivity::class.java)
             intent.putExtra("chatId", chatId)
             intent.putExtra("partnerName", receiverName)
+            intent.putExtra("isGroup", isGroup)
             startActivity(intent)
         }
         markMessagesAsRead()
@@ -254,25 +255,66 @@ class ChatActivity : BaseActivity() {
     }
 
     private fun showChatOptions(view: View) {
-        val popup = android.widget.PopupMenu(this, view)
+        val popup = androidx.appcompat.widget.PopupMenu(this, view)
         popup.menu.add("Clear History")
         if (isGroup) {
             popup.menu.add("Group Info")
-        } else {
-            popup.menu.add("Hide Chat (Secret)")
-            popup.menu.add("Block User")
-        }
-        
-        popup.setOnMenuItemClickListener { item ->
-            when (item.title) {
-                "Clear History" -> clearChat()
-                "Group Info" -> showGroupInfo()
-                "Hide Chat (Secret)" -> hideChat()
-                "Block User" -> blockUser()
+            popup.setOnMenuItemClickListener { item ->
+                when (item.title) {
+                    "Clear History" -> clearChat()
+                    "Group Info" -> showGroupInfo()
+                }
+                true
             }
-            true
+            popup.show()
+        } else {
+            val currentUid = auth.uid ?: return
+            db.collection("secretConversations").document("${currentUid}_${receiverId}").get()
+                .addOnSuccessListener { doc ->
+                    val isHidden = doc.exists()
+                    if (isHidden) {
+                        popup.menu.add("Unhide Chat")
+                    } else {
+                        popup.menu.add("Hide Chat (Secret)")
+                    }
+                    popup.menu.add("Block User")
+                    popup.setOnMenuItemClickListener { item ->
+                        when (item.title) {
+                            "Clear History" -> clearChat()
+                            "Hide Chat (Secret)" -> hideChat()
+                            "Unhide Chat" -> unhideChat()
+                            "Block User" -> blockUser()
+                        }
+                        true
+                    }
+                    popup.show()
+                }
+                .addOnFailureListener {
+                    popup.menu.add("Hide Chat (Secret)")
+                    popup.menu.add("Block User")
+                    popup.setOnMenuItemClickListener { item ->
+                        when (item.title) {
+                            "Clear History" -> clearChat()
+                            "Hide Chat (Secret)" -> hideChat()
+                            "Block User" -> blockUser()
+                        }
+                        true
+                    }
+                    popup.show()
+                }
         }
-        popup.show()
+    }
+
+    private fun unhideChat() {
+        val uid = auth.currentUser?.uid ?: return
+        val partnerId = receiverId ?: return
+        db.collection("secretConversations").document("${uid}_${partnerId}").delete()
+            .addOnSuccessListener {
+                Toast.makeText(this, "Chat unhidden from Secret tab", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Failed to unhide: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 
     private fun showGroupInfo() {
@@ -535,7 +577,13 @@ class ChatActivity : BaseActivity() {
                         return@launch
                     }
                     val base64 = android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT)
-                    sendMessage("File: ${getFileName(uri)}", type, "data:application/octet-stream;base64,$base64")
+                    val mimeType = if (uri.scheme == "content") {
+                        contentResolver.getType(uri) ?: "application/octet-stream"
+                    } else {
+                        val ext = android.webkit.MimeTypeMap.getFileExtensionFromUrl(uri.toString())
+                        android.webkit.MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext) ?: "application/octet-stream"
+                    }
+                    sendMessage("File: ${getFileName(uri)}", type, "data:$mimeType;base64,$base64")
                 }
                 
                 binding.progressBar.visibility = View.GONE
@@ -1130,7 +1178,7 @@ class ChatActivity : BaseActivity() {
 
     private fun setupTextChangeListener() {
         binding.btnSend.setOnLongClickListener {
-            val popup = android.widget.PopupMenu(this, it)
+            val popup = androidx.appcompat.widget.PopupMenu(this, it)
             popup.menu.add("Normal")
             popup.menu.add("Shout (Shake)")
             popup.menu.add("Whisper (Fade)")

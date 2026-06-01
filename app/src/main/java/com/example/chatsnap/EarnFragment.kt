@@ -24,6 +24,7 @@ class EarnFragment : Fragment() {
     private var rewardStory = 15L // Send snaps
     private var rewardMessage = 20L // Referral
     private var rewardCall = 30L // See ads
+    private var rewardInvite = 25L // Invite Friends
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,6 +59,7 @@ class EarnFragment : Fragment() {
                 rewardStory = doc.getLong("rewardStory") ?: 15L
                 rewardMessage = doc.getLong("rewardMessage") ?: 20L
                 rewardCall = doc.getLong("rewardCall") ?: 30L
+                rewardInvite = doc.getLong("rewardInvite") ?: 25L
             }
             setupQuests()
         }.addOnFailureListener { setupQuests() }
@@ -77,7 +79,7 @@ class EarnFragment : Fragment() {
         binding.cardTask4.tvQuestReward.text = "+$rewardCall Coins"
 
         binding.cardTask5.tvQuestTitle.text = "Share link to invite and big earn"
-        binding.cardTask5.tvQuestReward.text = "+25 Coins"
+        binding.cardTask5.tvQuestReward.text = "+$rewardInvite Coins"
     }
 
     private fun loadWalletData() {
@@ -145,7 +147,7 @@ class EarnFragment : Fragment() {
 
                     updateButtonStatus(binding.cardTask5.btnClaim, task5Claimed, task5Done, "Share Link",
                         onActionClick = { shareReferralLink() },
-                        onClaimClick = { claimTask("Share Link & Earn", "lastTask5Date", 25L, binding.cardTask5.btnClaim) }
+                        onClaimClick = { claimTask("Share Link & Earn", "lastTask5Date", rewardInvite, binding.cardTask5.btnClaim) }
                     )
                     
                     // Calculate today's earnings
@@ -154,7 +156,7 @@ class EarnFragment : Fragment() {
                     if (task2Claimed) todayEarnings += rewardStory
                     if (task3Claimed) todayEarnings += rewardMessage
                     if (task4Claimed) todayEarnings += rewardCall
-                    if (task5Claimed) todayEarnings += 25L
+                    if (task5Claimed) todayEarnings += rewardInvite
                     binding.tvTodayEarned.text = "+$todayEarnings"
                 }
             }

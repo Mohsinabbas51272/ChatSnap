@@ -20,104 +20,106 @@
             android:paddingBottom="100dp"
             android:gravity="center_horizontal">
 
-            <!-- Profile Avatar Section with Active Indicator -->
-            <FrameLayout
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                android:layout_marginTop="12dp">
-
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/ivProfile"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="2dp"
-                    android:src="@drawable/ic_launcher_background"
-                    app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
-                    app:strokeColor="?attr/colorOutlineVariant"
-                    app:strokeWidth="1.5dp"
-                    android:scaleType="centerCrop" />
-
-                <!-- Online Active Indicator dot -->
-                <View
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:layout_gravity="bottom|end"
-                    android:layout_marginEnd="6dp"
-                    android:layout_marginBottom="6dp"
-                    android:background="@drawable/bg_icon_circle"
-                    android:backgroundTint="#34C759" />
-            </FrameLayout>
-
-            <TextView
-                android:id="@+id/tvUserName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:fontFamily="sans-serif-black"
-                android:text="Alex Sterling"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="18sp"
-                android:letterSpacing="-0.01" />
-
-            <TextView
-                android:id="@+id/tvUserPhone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="@alex_digital_nomad"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="14sp"
-                android:alpha="0.8" />
-
-            <!-- Badges Row -->
+            <!-- Redesigned Horizontal Profile Header -->
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
                 android:orientation="horizontal"
-                android:gravity="center">
+                android:gravity="center_vertical"
+                android:paddingVertical="12dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <!-- Profile Pic with active indicator inside FrameLayout -->
+                <FrameLayout
+                    android:layout_width="64dp"
+                    android:layout_height="64dp">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/ivProfile"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="2dp"
+                        android:src="@drawable/ic_launcher_background"
+                        app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
+                        app:strokeColor="?attr/colorOutlineVariant"
+                        app:strokeWidth="1.5dp"
+                        android:scaleType="centerCrop" />
+
+                    <!-- Online Active Indicator dot -->
+                    <View
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:layout_gravity="bottom|end"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:background="@drawable/bg_icon_circle"
+                        android:backgroundTint="#34C759" />
+                </FrameLayout>
+
+                <!-- Name / Status / Phone Number inside vertical layout -->
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_green_chip"
-                    android:backgroundTint="#0E007AFF"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="4dp"
-                    android:text="SNAP+ MEMBER"
-                    android:textColor="#007AFF"
-                    android:textSize="10sp"
-                    android:textStyle="bold"
+                    android:layout_weight="1"
+                    android:layout_marginStart="16dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvUserName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-black"
+                        android:text="Alex Sterling"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tvUserAbout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Status: Available"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:textSize="12sp"
+                        android:ellipsize="end"
+                        android:maxLines="1" />
+
+                    <TextView
+                        android:id="@+id/tvUserPhone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Phone number"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:textSize="12sp"
+                        android:alpha="0.8" />
+                </LinearLayout>
+
+                <!-- ImageButton QR Code -->
+                <ImageButton
+                    android:id="@+id/btnQrCode"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_qr"
+                    app:tint="?attr/colorOnSurface"
+                    android:contentDescription="QR Code"
                     android:layout_marginEnd="8dp" />
 
-                <TextView
+                <!-- MaterialButton Edit -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/fabEditAvatar"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_green_chip"
-                    android:backgroundTint="#0A000000"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="4dp"
-                    android:text="VERIFIED CREATOR"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="10sp"
-                    android:textStyle="bold" />
+                    android:layout_height="40dp"
+                    android:text="Edit"
+                    android:fontFamily="sans-serif-black"
+                    android:textSize="12sp"
+                    android:textColor="#FFFFFF"
+                    app:backgroundTint="#005DFF"
+                    app:cornerRadius="18dp"
+                    android:paddingHorizontal="14dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp" />
             </LinearLayout>
-
-            <!-- Edit Profile Button (binds to fabEditAvatar) -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/fabEditAvatar"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginTop="12dp"
-                android:text="Edit Profile"
-                android:fontFamily="sans-serif-black"
-                android:textSize="12sp"
-                android:textColor="#FFFFFF"
-                app:backgroundTint="#005DFF"
-                app:cornerRadius="18dp"
-                android:paddingHorizontal="18dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp" />
 
             <!-- Total Balance Card -->
             <com.google.android.material.card.MaterialCardView

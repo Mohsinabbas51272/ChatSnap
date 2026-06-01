@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorSurface"
+        app:liftOnScroll="false"
         app:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
@@ -165,7 +166,8 @@
                             android:layout_weight="1"
                             android:checked="true"
                             android:text="Easypaisa"
-                            android:buttonTint="?attr/themeAccentColor" />
+                            android:textColor="?android:attr/textColorPrimary"
+                            android:buttonTint="#22C55E" />
 
                         <RadioButton
                             android:id="@+id/rbJazzCash"
@@ -173,7 +175,8 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="JazzCash"
-                            android:buttonTint="?attr/themeAccentColor" />
+                            android:textColor="?android:attr/textColorPrimary"
+                            android:buttonTint="#F59E0B" />
                     </RadioGroup>
 
                     <TextView

@@ -23,18 +23,20 @@ class MediaGalleryActivity : BaseActivity() {
         db = FirebaseFirestore.getInstance()
         val chatId = intent.getStringExtra("chatId") ?: ""
         val partnerName = intent.getStringExtra("partnerName") ?: "Media"
+        val isGroup = intent.getBooleanExtra("isGroup", false)
 
         binding.toolbar.title = "Shared with $partnerName"
         binding.toolbar.setNavigationOnClickListener { finish() }
 
         setupRecyclerView()
-        loadMedia(chatId)
+        loadMedia(chatId, isGroup)
     }
 
     private fun setupRecyclerView() {
         adapter = MediaGalleryAdapter(emptyList()) { message ->
             val intent = Intent(this, MediaViewerActivity::class.java)
-            intent.putExtra("mediaUrl", message.content)
+            val url = if (message.mediaUrl.isNullOrEmpty()) message.content else message.mediaUrl
+            intent.putExtra("mediaUrl", url)
             intent.putExtra("mediaType", message.type)
             startActivity(intent)
         }
@@ -42,18 +44,29 @@ class MediaGalleryActivity : BaseActivity() {
         binding.rvMediaGallery.adapter = adapter
     }
 
-    private fun loadMedia(chatId: String) {
+    private fun loadMedia(chatId: String, isGroup: Boolean) {
         if (chatId.isEmpty()) return
 
-        db.collection("messages")
+        val collectionName = if (isGroup) "groupMessages" else "messages"
+        db.collection(collectionName)
             .whereEqualTo("conversationId", chatId)
-            .whereIn("type", listOf("IMAGE", "VIDEO", "SNAP"))
-            .orderBy("timestamp", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, _ ->
                 if (snapshot != null) {
-                    val mediaList = snapshot.toObjects(Message::class.java)
-                    adapter.updateData(mediaList)
+                    val allMsgs = snapshot.toObjects(Message::class.java)
+                    val mediaTypes = setOf("IMAGE", "VIDEO", "SNAP", "DOCUMENT")
+                    val filtered = allMsgs.filter { it.type in mediaTypes && !it.isDeleted }
+                        .sortedByDescending { getTimestampLong(it.timestamp) }
+                    adapter.updateData(filtered)
                 }
             }
+    }
+
+    private fun getTimestampLong(timestamp: Any?): Long {
+        return when (timestamp) {
+            is com.google.firebase.Timestamp -> timestamp.toDate().time
+            is Long -> timestamp
+            is Map<*, *> -> (timestamp["seconds"] as? Long ?: 0L) * 1000
+            else -> 0L
+        }
     }
 }

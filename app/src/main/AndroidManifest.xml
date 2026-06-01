@@ -50,12 +50,14 @@
         <activity
             android:name=".LoginActivity"
             android:exported="false"
-            android:theme="@style/Theme.ChatSnap.NoActionBar" />
+            android:theme="@style/Theme.ChatSnap.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".SignUpActivity"
             android:exported="false"
-            android:theme="@style/Theme.ChatSnap.NoActionBar" />
+            android:theme="@style/Theme.ChatSnap.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".ProfileSetupActivity"
@@ -101,7 +103,8 @@
         <activity
             android:name=".SupportRequestActivity"
             android:exported="false"
-            android:theme="@style/Theme.ChatSnap.NoActionBar" />
+            android:theme="@style/Theme.ChatSnap.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".SupportRepliesActivity"

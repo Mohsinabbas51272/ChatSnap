@@ -39,6 +39,8 @@
         <item name="chatBubbleSentTextColor">@color/black</item>
         <item name="chatBubbleReceivedTextColor">@color/black</item>
         <item name="themeAccentColor">@color/primary</item>
+        <item name="android:popupBackground">?attr/colorSurface</item>
+        <item name="android:itemBackground">?attr/colorSurface</item>
 
         <item name="editTextStyle">@style/Widget.Material3.TextInputEditText.OutlinedBox</item>
         <item name="textInputStyle">@style/Widget.Material3.TextInputLayout.OutlinedBox</item>

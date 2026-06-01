@@ -94,6 +94,31 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+                <!-- Friend Requests -->
+                <LinearLayout
+                    android:id="@+id/layoutRequests"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_marginBottom="24dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginBottom="12dp"
+                        android:fontFamily="sans-serif-black"
+                        android:text="NEW REQUESTS"
+                        android:textColor="?attr/colorPrimary"
+                        android:textSize="12sp"
+                        android:letterSpacing="0.1" />
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvRequests"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false" />
+                </LinearLayout>
+
                 <!-- Top Friends Horizontal -->
                 <LinearLayout
                     android:id="@+id/layoutTopFriends"
@@ -232,30 +257,7 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Friend Requests -->
-                <LinearLayout
-                    android:id="@+id/layoutRequests"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone"
-                    android:layout_marginBottom="24dp">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginBottom="12dp"
-                        android:fontFamily="sans-serif-black"
-                        android:text="NEW REQUESTS"
-                        android:textColor="?attr/colorPrimary"
-                        android:textSize="12sp"
-                        android:letterSpacing="0.1" />
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rvRequests"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:nestedScrollingEnabled="false" />
-                </LinearLayout>
+
 
                 <TextView
                     android:layout_width="wrap_content"

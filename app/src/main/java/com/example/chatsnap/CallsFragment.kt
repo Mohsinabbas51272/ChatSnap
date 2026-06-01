@@ -45,15 +45,17 @@ class CallsFragment : Fragment(), SearchableFragment {
     }
 
     private fun setupClearButton() {
-        binding.btnClearCalls.setOnClickListener {
-            val uid = auth.currentUser?.uid ?: return@setOnClickListener
-            androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setTitle("Clear Call History")
-                .setMessage("Are you sure you want to clear your call history? This will remove call entries where you are caller or receiver.")
-                .setPositiveButton("Clear") { _, _ -> clearCallHistory(uid) }
-                .setNegativeButton("Cancel", null)
-                .show()
-        }
+        // Clear button is now in the main header, invoked via showClearCallsDialog()
+    }
+
+    fun showClearCallsDialog() {
+        val uid = auth.currentUser?.uid ?: return
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("Clear Call History")
+            .setMessage("Are you sure you want to clear your call history? This will remove call entries where you are caller or receiver.")
+            .setPositiveButton("Clear") { _, _ -> clearCallHistory(uid) }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun clearCallHistory(uid: String) {

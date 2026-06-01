@@ -64,6 +64,10 @@ class SettingsFragment : Fragment() {
             startActivity(Intent(requireContext(), ProfileSetupActivity::class.java))
         }
 
+        binding.btnQrCode.setOnClickListener {
+            startActivity(Intent(requireContext(), QRProfileActivity::class.java))
+        }
+
         binding.btnPrivacyScore.setOnClickListener { handleAdminTap() }
         // Also attach to children just in case they consume the click
         binding.btnPrivacyScore.getChildAt(0).setOnClickListener { handleAdminTap() }
@@ -241,6 +245,7 @@ class SettingsFragment : Fragment() {
                 if (_binding != null) {
                     binding.tvUserName.text = doc.getString("name") ?: "User"
                     binding.tvUserPhone.text = doc.getString("phone") ?: "No Phone"
+                    binding.tvUserAbout.text = doc.getString("status") ?: "Status: Available"
                     
                     val imageUrl = doc.getString("profileImageUrl")
                     if (!imageUrl.isNullOrEmpty()) {

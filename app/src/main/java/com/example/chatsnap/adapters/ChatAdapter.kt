@@ -192,6 +192,10 @@ class ChatAdapter(
                     binding.tvMessage.text = "Voice Note • Tap to Play 🎙️"
                 }
                 binding.tvMessage.compoundDrawablePadding = 16
+            } else if (message.type == "DOCUMENT") {
+                binding.ivMessageImage.visibility = View.GONE
+                binding.tvMessage.text = if (message.isDeleted) "This message was deleted" else "📄 ${message.content}\n(Tap to Open)"
+                binding.tvMessage.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
             } else {
                 binding.ivMessageImage.visibility = View.GONE
                 binding.tvMessage.text = if (message.isDeleted) "This message was deleted" else message.content
@@ -222,7 +226,9 @@ class ChatAdapter(
 
             binding.root.setOnClickListener {
                 if (isMedia || isSnap) onMediaClick(message)
-                else if (message.type == "LOCATION") {
+                else if (message.type == "DOCUMENT") {
+                    openDocument(message, binding.root.context)
+                } else if (message.type == "LOCATION") {
                     val uri = "geo:${message.latitude},${message.longitude}?q=${message.latitude},${message.longitude}"
                     val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(uri))
                     binding.root.context.startActivity(intent)
@@ -286,6 +292,10 @@ class ChatAdapter(
                     binding.tvMessage.text = "Voice Note • Tap to Play 🎙️"
                 }
                 binding.tvMessage.compoundDrawablePadding = 16
+            } else if (message.type == "DOCUMENT") {
+                binding.ivMessageImage.visibility = View.GONE
+                binding.tvMessage.text = if (message.isDeleted) "This message was deleted" else "📄 ${message.content}\n(Tap to Open)"
+                binding.tvMessage.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
             } else {
                 binding.ivMessageImage.visibility = View.GONE
                 binding.tvMessage.text = if (message.isDeleted) "This message was deleted" else message.content
@@ -325,7 +335,9 @@ class ChatAdapter(
 
             binding.root.setOnClickListener {
                 if (isMedia || isSnap) onMediaClick(message)
-                else if (message.type == "LOCATION") {
+                else if (message.type == "DOCUMENT") {
+                    openDocument(message, binding.root.context)
+                } else if (message.type == "LOCATION") {
                     val uri = "geo:${message.latitude},${message.longitude}?q=${message.latitude},${message.longitude}"
                     val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(uri))
                     binding.root.context.startActivity(intent)
@@ -555,6 +567,31 @@ class ChatAdapter(
                 view.translationX = 0f
                 view.translationY = 0f
             }
+        }
+    }
+    private fun openDocument(message: Message, context: android.content.Context) {
+        val mediaUrl = message.mediaUrl ?: return
+        try {
+            val mimeType = mediaUrl.substringBefore(";base64,").substringAfter("data:")
+            val cleanBase64 = mediaUrl.substringAfter(",")
+            val decodedBytes = android.util.Base64.decode(cleanBase64, android.util.Base64.DEFAULT)
+            
+            val rawName = message.content.removePrefix("File:").trim()
+            val fileName = if (rawName.isEmpty()) "document" else rawName
+            val tempFile = java.io.File(context.cacheDir, fileName)
+            java.io.FileOutputStream(tempFile).use { fos ->
+                fos.write(decodedBytes)
+            }
+            
+            val uri = androidx.core.content.FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", tempFile)
+            val intent = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, mimeType)
+                addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(context, "Failed to open document: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 }

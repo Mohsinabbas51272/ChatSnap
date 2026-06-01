@@ -179,6 +179,7 @@ class AdminActivity : BaseActivity() {
                 binding.etRewardStory.setText((doc.getLong("rewardStory") ?: 5L).toString())
                 binding.etRewardMessage.setText((doc.getLong("rewardMessage") ?: 5L).toString())
                 binding.etRewardCall.setText((doc.getLong("rewardCall") ?: 10L).toString())
+                binding.etRewardInvite.setText((doc.getLong("rewardInvite") ?: 25L).toString())
                 binding.switchMaintenance.isChecked = doc.getBoolean("maintenanceMode") ?: false
                 binding.switchFreezeWithdrawals.isChecked = doc.getBoolean("freezeWithdrawals") ?: false
             }
@@ -193,6 +194,7 @@ class AdminActivity : BaseActivity() {
             "rewardStory" to (binding.etRewardStory.text.toString().toLongOrNull() ?: 5L),
             "rewardMessage" to (binding.etRewardMessage.text.toString().toLongOrNull() ?: 5L),
             "rewardCall" to (binding.etRewardCall.text.toString().toLongOrNull() ?: 10L),
+            "rewardInvite" to (binding.etRewardInvite.text.toString().toLongOrNull() ?: 25L),
             "maintenanceMode" to binding.switchMaintenance.isChecked,
             "freezeWithdrawals" to binding.switchFreezeWithdrawals.isChecked
         )
@@ -355,10 +357,10 @@ class AdminActivity : BaseActivity() {
             val balance = walletDoc.getLong("balance") ?: 0L
             firestore.collection("users").document(user.uid).collection("friends").get().addOnSuccessListener { friendsSnap ->
                 val friendsCount = friendsSnap.size()
-                val isVerified = user.isBlocked != true // placeholder
                 firestore.collection("users").document(user.uid).get().addOnSuccessListener { fullDoc ->
                     val verified = fullDoc.getBoolean("isVerified") ?: false
                     val muted = fullDoc.getBoolean("isMuted") ?: false
+                    val blocked = fullDoc.getBoolean("isBlocked") ?: false
                     val msg = """
                         👤 Name: ${user.name}
                         📧 Email: ${user.email}
@@ -367,10 +369,29 @@ class AdminActivity : BaseActivity() {
                         👥 Friends: $friendsCount
                         ✅ Verified: ${if (verified) "Yes" else "No"}
                         🔇 Muted: ${if (muted) "Yes" else "No"}
-                        🚫 Blocked: ${if (user.isBlocked == true) "Yes" else "No"}
+                        🚫 Blocked: ${if (blocked) "Yes" else "No"}
                         🟢 Online: ${if (user.online) "Yes" else "No"}
                     """.trimIndent()
-                    android.app.AlertDialog.Builder(this).setTitle("User Profile").setMessage(msg).setPositiveButton("Close", null).show()
+
+                    val blockBtnText = if (blocked) "Unblock" else "Block"
+                    val muteBtnText = if (muted) "Unmute" else "Mute"
+
+                    android.app.AlertDialog.Builder(this)
+                        .setTitle("User Profile")
+                        .setMessage(msg)
+                        .setPositiveButton("Close", null)
+                        .setNeutralButton(muteBtnText) { _, _ ->
+                            if (muted) {
+                                firestore.collection("users").document(user.uid).update("isMuted", false, "muteExpiry", 0L)
+                                    .addOnSuccessListener { Toast.makeText(this, "User unmuted", Toast.LENGTH_SHORT).show() }
+                            } else {
+                                showMuteDialog(user)
+                            }
+                        }
+                        .setNegativeButton(blockBtnText) { _, _ ->
+                            toggleBlockUser(user)
+                        }
+                        .show()
                 }
             }
         }
@@ -512,15 +533,24 @@ class AdminActivity : BaseActivity() {
         val docId = report["docId"] as? String ?: return
         val reportedUserId = report["reportedUserId"] as? String
         android.app.AlertDialog.Builder(this).setTitle("Report Action")
-            .setItems(arrayOf("Dismiss Report", "Delete Reported Message", "Mute Reporter's Target", "Block Reported User")) { _, which ->
+            .setItems(arrayOf("Dismiss Report", "Delete Reported Message", "Mute Reported User", "Block Reported User")) { _, which ->
                 when (which) {
-                    0 -> firestore.collection("reports").document(docId).update("status", "dismissed")
-                    1 -> { val msgId = report["messageId"] as? String; if (msgId != null) firestore.collection("messages").document(msgId).update("isDeleted", true)
-                        firestore.collection("reports").document(docId).update("status", "actioned") }
-                    2 -> if (reportedUserId != null) { firestore.collection("users").document(reportedUserId).update("isMuted", true, "muteExpiry", System.currentTimeMillis() + 24*60*60*1000L)
-                        firestore.collection("reports").document(docId).update("status", "actioned") }
-                    3 -> if (reportedUserId != null) { firestore.collection("users").document(reportedUserId).update("isBlocked", true)
-                        firestore.collection("reports").document(docId).update("status", "actioned") }
+                    0 -> {
+                        firestore.collection("reports").document(docId).delete()
+                    }
+                    1 -> {
+                        val msgId = report["messageId"] as? String
+                        if (msgId != null) firestore.collection("messages").document(msgId).update("isDeleted", true)
+                        firestore.collection("reports").document(docId).delete()
+                    }
+                    2 -> {
+                        if (reportedUserId != null) firestore.collection("users").document(reportedUserId).update("isMuted", true, "muteExpiry", System.currentTimeMillis() + 24*60*60*1000L)
+                        firestore.collection("reports").document(docId).delete()
+                    }
+                    3 -> {
+                        if (reportedUserId != null) firestore.collection("users").document(reportedUserId).update("isBlocked", true)
+                        firestore.collection("reports").document(docId).delete()
+                    }
                 }
                 Toast.makeText(this, "Action taken!", Toast.LENGTH_SHORT).show()
             }.show()

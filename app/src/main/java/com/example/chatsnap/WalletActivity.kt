@@ -155,12 +155,20 @@ class WalletActivity : BaseActivity() {
             "Withdraw",
             "Cancel",
             onPositive = {
-                performWithdrawal(amount, accountDetails)
+                binding.btnSubmitRequest.isEnabled = false
+                firestore.collection("users").document(uid).get()
+                    .addOnSuccessListener { doc ->
+                        val realName = doc.getString("name") ?: "User"
+                        performWithdrawal(amount, accountDetails, realName)
+                    }
+                    .addOnFailureListener {
+                        performWithdrawal(amount, accountDetails, "User")
+                    }
             }
         )
     }
 
-    private fun performWithdrawal(amount: Int, accountDetails: String) {
+    private fun performWithdrawal(amount: Int, accountDetails: String, userDisplayName: String) {
         val uid = auth.currentUser?.uid ?: return
         binding.btnSubmitRequest.isEnabled = false
         
@@ -190,7 +198,6 @@ class WalletActivity : BaseActivity() {
             )
             transaction.set(txRef, txData)
 
-            val userDisplayName = auth.currentUser?.displayName ?: "User"
             val globalWithdrawRef = firestore.collection("withdrawals").document(txRef.id)
             val globalData = hashMapOf(
                 "id" to txRef.id,

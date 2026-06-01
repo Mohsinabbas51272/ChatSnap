@@ -82,12 +82,11 @@ class ChatsFragment : Fragment(), SearchableFragment {
     // ═══════════════════════════════════════════
     private fun loadBroadcasts() {
         firestore.collection("broadcasts")
-            .whereEqualTo("isActive", true)
             .orderBy("timestamp", Query.Direction.DESCENDING)
-            .limit(1)
+            .limit(10)
             .addSnapshotListener { snapshot, _ ->
                 if (_binding == null) return@addSnapshotListener
-                val latest = snapshot?.documents?.firstOrNull()
+                val latest = snapshot?.documents?.firstOrNull { it.getBoolean("isActive") == true }
                 if (latest != null) {
                     val broadcastId = latest.getString("broadcastId") ?: latest.id
                     val content = latest.getString("content") ?: ""

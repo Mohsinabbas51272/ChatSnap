@@ -43,6 +43,7 @@ class PeopleFragment : Fragment(), SearchableFragment {
     }
 
     private lateinit var friendsAdapter: UserAdapter
+    private lateinit var allFriendsAdapter: UserAdapter
     private lateinit var squadsAdapter: UserAdapter
     private var friendsList: List<String> = emptyList()
     private var phoneContactsSet: Set<String> = emptySet()
@@ -96,6 +97,13 @@ class PeopleFragment : Fragment(), SearchableFragment {
         )
         binding.rvTopFriends.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.rvTopFriends.adapter = friendsAdapter
+
+        allFriendsAdapter = UserAdapter(emptyList(), mapOf(), horizontal = false,
+            onAddClick = { },
+            onChatClick = { friend -> navigateToChat(friend.uid, friend.name) }
+        )
+        binding.rvFriends.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvFriends.adapter = allFriendsAdapter
 
         squadsAdapter = UserAdapter(emptyList(), mapOf(), horizontal = true,
             onAddClick = { },
@@ -194,11 +202,13 @@ class PeopleFragment : Fragment(), SearchableFragment {
         sentRequests.forEach { map[it] = "SENT" }
         userAdapter.updateStatus(map)
         friendsAdapter.updateStatus(map)
+        allFriendsAdapter.updateStatus(map)
     }
 
     private fun loadFriendsData(ids: List<String>) {
         if (ids.isEmpty()) {
             friendsAdapter.updateData(emptyList(), getStatusMap())
+            allFriendsAdapter.updateData(emptyList(), getStatusMap())
             binding.layoutTopFriends.visibility = View.GONE
             return
         }
@@ -206,6 +216,11 @@ class PeopleFragment : Fragment(), SearchableFragment {
             if (_binding != null) {
                 val users = snapshot.toObjects(User::class.java)
                 friendsAdapter.updateData(users, getStatusMap(), friendsList)
+                
+                // Sort all friends alphabetically ascending by name
+                val sortedUsers = users.sortedBy { it.name.lowercase() }
+                allFriendsAdapter.updateData(sortedUsers, getStatusMap(), friendsList)
+                
                 binding.layoutTopFriends.visibility = View.VISIBLE
             }
         }

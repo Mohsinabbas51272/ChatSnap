@@ -23,22 +23,31 @@ class MediaGalleryAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mediaList[position]
         
-        val url = item.content // For IMAGE/VIDEO types, content is usually the URL or base64
-        
-        if (url.startsWith("data:image")) {
-            val cleanBase64 = url.substringAfter(",")
-            val decodedString = android.util.Base64.decode(cleanBase64, android.util.Base64.DEFAULT)
-            val bitmap = android.graphics.BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-            holder.binding.ivMedia.setImageBitmap(bitmap)
+        if (item.type == "DOCUMENT") {
+            holder.binding.ivMedia.setImageResource(android.R.drawable.ic_menu_save)
+            holder.binding.ivVideoIcon.visibility = View.GONE
+            holder.binding.ivSnapIcon.visibility = View.GONE
         } else {
-            holder.binding.ivMedia.load(url) {
-                crossfade(true)
-                placeholder(android.R.drawable.progress_indeterminate_horizontal)
+            val url = if (item.mediaUrl.isNullOrEmpty()) item.content else item.mediaUrl
+            
+            if (url.startsWith("data:image") || url.contains(";base64,")) {
+                try {
+                    val cleanBase64 = url.substringAfter(",")
+                    val decodedString = android.util.Base64.decode(cleanBase64, android.util.Base64.DEFAULT)
+                    val bitmap = android.graphics.BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                    holder.binding.ivMedia.setImageBitmap(bitmap)
+                } catch (e: Exception) {
+                    holder.binding.ivMedia.setImageResource(android.R.drawable.ic_menu_gallery)
+                }
+            } else {
+                holder.binding.ivMedia.load(url) {
+                    crossfade(true)
+                    placeholder(android.R.drawable.progress_indeterminate_horizontal)
+                }
             }
+            holder.binding.ivVideoIcon.visibility = if (item.type == "VIDEO") View.VISIBLE else View.GONE
+            holder.binding.ivSnapIcon.visibility = if (item.type == "SNAP") View.VISIBLE else View.GONE
         }
-
-        holder.binding.ivVideoIcon.visibility = if (item.type == "VIDEO") View.VISIBLE else View.GONE
-        holder.binding.ivSnapIcon.visibility = if (item.type == "SNAP") View.VISIBLE else View.GONE
 
         holder.binding.root.setOnClickListener { onItemClick(item) }
     }

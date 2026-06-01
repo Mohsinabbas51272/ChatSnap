@@ -53,10 +53,12 @@ class AppLockActivity : BaseActivity() {
             biometricPrompt.authenticate(promptInfo)
         }
 
-        // Auto-show biometric if available
+        // Auto-show biometric if available (post-layout for reliable display)
         if (isBiometricAvailable()) {
             binding.btnBiometric.visibility = View.VISIBLE
-            biometricPrompt.authenticate(promptInfo)
+            window.decorView.post {
+                biometricPrompt.authenticate(promptInfo)
+            }
         } else {
             binding.btnBiometric.visibility = View.GONE
         }
@@ -98,8 +100,9 @@ class AppLockActivity : BaseActivity() {
         }
     }
 
+    @Suppress("DEPRECATION")
     override fun onBackPressed() {
-        // Prevent going back to skip lock
-        finishAffinity()
+        // Minimize app instead of killing process to keep lock active
+        moveTaskToBack(true)
     }
 }
