@@ -32,11 +32,27 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         super.onMessageReceived(remoteMessage)
         android.util.Log.d("FCM_TEST", "Message received from: ${remoteMessage.from}")
 
+        val senderId = remoteMessage.data["senderId"]
+        val currentUid = FirebaseAuth.getInstance().currentUser?.uid
+        if (senderId != null && senderId == currentUid) {
+            android.util.Log.d("FCM_TEST", "Self message notification received, ignoring.")
+            return
+        }
+
         val title = remoteMessage.notification?.title ?: remoteMessage.data["title"] ?: "New Message"
-        val body = remoteMessage.notification?.body ?: remoteMessage.data["body"] ?: "Check your messages"
+        val rawBody = remoteMessage.notification?.body ?: remoteMessage.data["body"] ?: "Check your messages"
         val type = remoteMessage.data["type"]
         val chatId = remoteMessage.data["chatId"]
-        val senderId = remoteMessage.data["senderId"]
+
+        val body = if (type != "CALL") {
+            if (rawBody.lowercase().contains("snap")) {
+                "send you snap"
+            } else {
+                "send you chat"
+            }
+        } else {
+            rawBody
+        }
 
         android.util.Log.d("FCM_TEST", "Title: $title, Body: $body")
         showNotification(title, body, chatId, senderId, type)

@@ -51,6 +51,7 @@ class SettingsFragment : Fragment() {
             binding.itemNotifications.root,
             binding.itemGhostMode.root,
             binding.itemVault.root,
+            binding.itemDownloader.root,
             binding.itemAppLock.root,
             binding.itemTheme.root,
             binding.itemWallpaper.root,
@@ -132,6 +133,16 @@ class SettingsFragment : Fragment() {
             tvItemValue.text = "Private locked media"
             root.setOnClickListener { 
                 startActivity(Intent(requireContext(), VaultActivity::class.java))
+            }
+        }
+
+        // Media Downloader
+        binding.itemDownloader.apply {
+            ivItemIcon.setImageResource(android.R.drawable.stat_sys_download)
+            tvItemTitle.text = "Media Downloader"
+            tvItemValue.text = "Download videos & audio via yt-dlp"
+            root.setOnClickListener { 
+                startActivity(Intent(requireContext(), DownloaderActivity::class.java))
             }
         }
 

@@ -40,6 +40,10 @@ object FcmNotificationSender {
         type: String = "SINGLE"
     ) {
         val currentUid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        if (receiverId == currentUid) {
+            Log.d(TAG, "Self-notification check: receiverId is current user. Skipping.")
+            return
+        }
         val db = FirebaseFirestore.getInstance()
 
         // 1. Fetch recipient's FCM device token

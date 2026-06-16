@@ -20,6 +20,10 @@ android {
         
         // Optimization: Limit resources for debug builds
         resourceConfigurations += listOf("en", "xxhdpi")
+
+        ndk {
+            abiFilters.addAll(setOf("x86", "x86_64", "armeabi-v7a", "arm64-v8a"))
+        }
     }
 
     buildTypes {
@@ -59,6 +63,12 @@ android {
         renderScript = false
         shaders = false
         resValues = false
+    }
+
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
     }
 }
 
@@ -102,6 +112,11 @@ dependencies {
 
     // Agora for Video/Audio Calls
     implementation(libs.agora.rtc)
+
+    // YoutubeDL Downloader
+    implementation(libs.youtubedl.android)
+    implementation(libs.youtubedl.ffmpeg)
+    implementation(libs.youtubedl.aria2c)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

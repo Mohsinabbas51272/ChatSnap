@@ -302,6 +302,10 @@
                 <include
                     android:id="@+id/itemVault"
                     layout="@layout/view_setting_item" />
+
+                <include
+                    android:id="@+id/itemDownloader"
+                    layout="@layout/view_setting_item" />
             </LinearLayout>
 
             <!-- General Settings Header -->

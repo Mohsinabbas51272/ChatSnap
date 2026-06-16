@@ -6,6 +6,12 @@ import com.example.chatsnap.utils.ThemeManager
 
 abstract class BaseActivity : AppCompatActivity() {
     private var maintenanceListener: com.google.firebase.firestore.ListenerRegistration? = null
+    private var sessionListener: com.google.firebase.firestore.ListenerRegistration? = null
+
+    companion object {
+        @Volatile
+        private var isSignOutPending = false
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         ThemeManager.applyTheme(this)
@@ -34,16 +40,19 @@ abstract class BaseActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         updateUserPresence(true)
+        checkSessionCommon()
     }
 
     override fun onPause() {
         super.onPause()
         updateUserPresence(false)
+        sessionListener?.remove()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         maintenanceListener?.remove()
+        sessionListener?.remove()
     }
 
     protected fun animateView(view: android.view.View) {
@@ -66,6 +75,57 @@ abstract class BaseActivity : AppCompatActivity() {
         com.google.firebase.firestore.FirebaseFirestore.getInstance()
             .collection("users").document(uid)
             .update(updates)
+    }
+
+    private fun checkSessionCommon() {
+        val currentClassName = this::class.java.simpleName
+        val bypassList = setOf("LoginActivity", "SignUpActivity", "SplashActivity", "LandingActivity", "AdminActivity")
+        if (currentClassName in bypassList) return
+
+        val auth = com.google.firebase.auth.FirebaseAuth.getInstance()
+        val currentUid = auth.currentUser?.uid ?: return
+
+        // 1. If local session ID is empty/null, initialize it
+        val localSessionId = com.example.chatsnap.utils.SessionManager.getLocalSessionId(this)
+        if (localSessionId.isNullOrEmpty()) {
+            val newSessionId = java.util.UUID.randomUUID().toString()
+            com.example.chatsnap.utils.SessionManager.saveLocalSessionId(this, newSessionId)
+            com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("users").document(currentUid)
+                .update("sessionId", newSessionId)
+        }
+
+        // 2. Listen for session ID changes in Firestore
+        sessionListener?.remove()
+        sessionListener = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+            .collection("users").document(currentUid)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null || snapshot == null || !snapshot.exists()) return@addSnapshotListener
+                
+                val firestoreSessionId = snapshot.getString("sessionId")
+                val currentLocalSessionId = com.example.chatsnap.utils.SessionManager.getLocalSessionId(this)
+                
+                if (firestoreSessionId != null && currentLocalSessionId != null && firestoreSessionId != currentLocalSessionId) {
+                    if (!isSignOutPending) {
+                        isSignOutPending = true
+                        auth.signOut()
+                        com.example.chatsnap.utils.SessionManager.clearLocalSessionId(this)
+                        
+                        android.widget.Toast.makeText(
+                            this,
+                            "Your account has been logged in on another device.",
+                            android.widget.Toast.LENGTH_LONG
+                        ).show()
+                        
+                        val intent = android.content.Intent(this, LoginActivity::class.java).apply {
+                            addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        }
+                        startActivity(intent)
+                        finishAffinity()
+                        isSignOutPending = false
+                    }
+                }
+            }
     }
 
     private fun checkMaintenanceModeCommon() {

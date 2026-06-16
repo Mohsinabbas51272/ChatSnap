@@ -162,15 +162,19 @@ class LoginActivity : BaseActivity() {
                     }
 
                     val isCompleted = document.getBoolean("profileCompleted") ?: false
-                    if (isCompleted) {
-                        startActivity(Intent(this, MainActivity::class.java))
-                    } else {
-                        startActivity(Intent(this, ProfileSetupActivity::class.java))
+                    com.example.chatsnap.utils.SessionManager.startNewSession(this, userId) {
+                        if (isCompleted) {
+                            startActivity(Intent(this, MainActivity::class.java))
+                        } else {
+                            startActivity(Intent(this, ProfileSetupActivity::class.java))
+                        }
+                        finish()
                     }
-                    finish()
                 } else {
-                    startActivity(Intent(this, ProfileSetupActivity::class.java))
-                    finish()
+                    com.example.chatsnap.utils.SessionManager.startNewSession(this, userId) {
+                        startActivity(Intent(this, ProfileSetupActivity::class.java))
+                        finish()
+                    }
                 }
             }
             .addOnFailureListener { e ->

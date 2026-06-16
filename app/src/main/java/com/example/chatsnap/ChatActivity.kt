@@ -693,17 +693,19 @@ class ChatActivity : BaseActivity() {
                     if (type == "SNAP") {
                         updateStreak(receiverId!!)
                     }
-                    // Dispatch Real-time FCM Notification
-                    db.collection("users").document(currentUid).get().addOnSuccessListener { userDoc ->
-                        val senderName = userDoc.getString("name") ?: "A Friend"
-                        val msgText = if (type == "SNAP" || isSnap) "Sent you a snap! 📸" else content
-                        com.example.chatsnap.utils.FcmNotificationSender.sendNotification(
-                            receiverId = receiverId!!,
-                            senderName = senderName,
-                            messageContent = msgText,
-                            chatId = chatId,
-                            type = "SINGLE"
-                        )
+                    if (receiverId != currentUid) {
+                        // Dispatch Real-time FCM Notification
+                        db.collection("users").document(currentUid).get().addOnSuccessListener { userDoc ->
+                            val senderName = userDoc.getString("name") ?: "A Friend"
+                            val msgText = if (type == "SNAP" || isSnap) "send you snap" else "send you chat"
+                            com.example.chatsnap.utils.FcmNotificationSender.sendNotification(
+                                receiverId = receiverId!!,
+                                senderName = senderName,
+                                messageContent = msgText,
+                                chatId = chatId,
+                                type = "SINGLE"
+                            )
+                        }
                     }
                 }
                 com.example.chatsnap.utils.TaskUtils.markTaskAsDone("TASK_MESSAGE")

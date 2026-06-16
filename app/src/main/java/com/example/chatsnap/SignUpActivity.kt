@@ -46,15 +46,18 @@ class SignUpActivity : BaseActivity() {
                             "friends" to arrayListOf<String>()
                         )
 
-                        userId?.let {
-                            firestore.collection("users").document(it).set(userMap)
+                        userId?.let { uid ->
+                            firestore.collection("users").document(uid).set(userMap)
                                 .addOnSuccessListener {
                                     com.example.chatsnap.utils.ToastUtils.showToast(this, "Account Created Successfully")
-                                    // Navigate to Profile Setup after successful signup
-                                    val intent = Intent(this, ProfileSetupActivity::class.java)
-                                    intent.putExtra("name", name)
-                                    startActivity(intent)
-                                    finish()
+                                    // Start a session
+                                    com.example.chatsnap.utils.SessionManager.startNewSession(this, uid) {
+                                        // Navigate to Profile Setup after successful signup
+                                        val intent = Intent(this, ProfileSetupActivity::class.java)
+                                        intent.putExtra("name", name)
+                                        startActivity(intent)
+                                        finish()
+                                    }
                                 }
                                 .addOnFailureListener { e ->
                                     com.example.chatsnap.utils.ToastUtils.showToast(this, "Failed to save user data: ${e.message}")
