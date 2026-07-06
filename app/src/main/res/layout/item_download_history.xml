@@ -17,16 +17,24 @@
         android:padding="12dp"
         android:gravity="center_vertical">
 
-        <!-- Status icon -->
-        <ImageView
-            android:id="@+id/ivHistoryIcon"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:src="@android:drawable/stat_sys_download_done"
-            app:tint="#34C759"
-            android:contentDescription="Status" />
+        <!-- Left: Video Thumbnail -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="64dp"
+            android:layout_height="48dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="?attr/colorOutlineVariant">
 
-        <!-- Info column -->
+            <ImageView
+                android:id="@+id/ivHistoryThumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@android:drawable/ic_menu_gallery" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Middle: Info column -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -50,7 +58,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="3dp">
+                android:layout_marginTop="3dp"
+                android:gravity="center_vertical">
 
                 <!-- Format badge -->
                 <TextView
@@ -67,6 +76,16 @@
                     android:text=" • "
                     android:textColor="?android:attr/textColorSecondary"
                     android:textSize="10sp" />
+
+                <!-- Tiny status indicator indicator -->
+                <ImageView
+                    android:id="@+id/ivHistoryIcon"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_marginEnd="4dp"
+                    android:src="@android:drawable/stat_sys_download_done"
+                    app:tint="#34C759"
+                    android:contentDescription="Status Indicator" />
 
                 <TextView
                     android:id="@+id/tvHistoryStatus"
@@ -94,7 +113,7 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Delete button -->
+        <!-- Right: Delete button -->
         <ImageButton
             android:id="@+id/btnDeleteHistory"
             android:layout_width="28dp"

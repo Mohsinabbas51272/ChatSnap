@@ -14,5 +14,12 @@ data class User(
     val lastStatusUpdate: Long? = null,
     val isBlocked: Boolean? = false,
     val isAdmin: Boolean = false,
-    val online: Boolean = false
+    val online: Boolean = false,
+    val following: List<String> = emptyList(),
+    val followers: List<String> = emptyList(),
+    val isVerified: Boolean = false,
+    val sessionId: String? = null,
+    val lastSeen: Long? = null,
+    val fcmToken: String? = null,
+    val selectedTheme: String? = null
 )

@@ -400,6 +400,13 @@ class ChatActivity : BaseActivity() {
         bottomSheetBinding.btnLocation.setOnClickListener { sendLocation(); dialog.dismiss() }
         bottomSheetBinding.btnDocument.setOnClickListener { pickDocument.launch(arrayOf("*/*")); dialog.dismiss() }
         bottomSheetBinding.btnPoll.setOnClickListener { showPollDialog(); dialog.dismiss() }
+        bottomSheetBinding.btnScanDocument.setOnClickListener {
+            val intent = Intent(this, com.example.chatsnap.scanner.ui.DocumentScannerActivity::class.java).apply {
+                putExtra("launched_from_chat", true)
+            }
+            scanDocumentLauncher.launch(intent)
+            dialog.dismiss()
+        }
         
         dialog.show()
     }
@@ -446,6 +453,16 @@ class ChatActivity : BaseActivity() {
 
     private val pickDocument = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let { uploadFile(it, "DOCUMENT") }
+    }
+
+    private val scanDocumentLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK && result.data != null) {
+            val uriString = result.data?.getStringExtra("scanned_file_uri")
+            val type = result.data?.getStringExtra("scanned_file_type") ?: "DOCUMENT"
+            if (uriString != null) {
+                uploadFile(Uri.parse(uriString), type)
+            }
+        }
     }
 
     private fun sendLocation() {

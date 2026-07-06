@@ -2,4 +2,5 @@
 <paths>
     <external-path name="my_images" path="Android/data/com.example.chatsnap/files/Pictures" />
     <external-cache-path name="my_cache" path="." />
+    <external-files-path name="my_documents" path="Documents" />
 </paths>

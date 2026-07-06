@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/windowBackground">
+
+    <!-- Top Toolbar -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorSurface"
+        android:elevation="4dp"
+        app:title="Document Scanner"
+        app:titleTextColor="?attr/colorOnSurface"
+        app:navigationIcon="@android:drawable/ic_menu_close_clear_cancel"
+        app:navigationIconTint="?attr/colorOnSurface"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- 1. DASHBOARD VIEW -->
+    <LinearLayout
+        android:id="@+id/layoutDashboard"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center"
+        android:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Choose Scan Mode"
+            android:textSize="22sp"
+            android:fontFamily="sans-serif-black"
+            android:textColor="?attr/colorOnSurface"
+            android:layout_marginBottom="32dp" />
+
+        <!-- Smart Scanner Card (ML Kit) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardSmartScan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1.5dp"
+            app:strokeColor="?attr/colorPrimary"
+            app:cardBackgroundColor="?attr/colorSurfaceVariant"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@android:drawable/ic_menu_camera"
+                        app:tint="?attr/colorPrimary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:text="Smart ML Scanner"
+                        android:textSize="18sp"
+                        android:fontFamily="sans-serif-black"
+                        android:textColor="?attr/colorOnSurface" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Fully automated scanning with auto edge-detection, perspective alignment, and ML enhancement filters. Best for fast scanning."
+                    android:textSize="13sp"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:layout_marginBottom="16dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSmartScan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Launch Smart Scan"
+                    app:cornerRadius="16dp"
+                    app:icon="@android:drawable/ic_menu_send" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Custom Manual Scanner Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardManualScan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="?attr/colorOutlineVariant"
+            app:cardBackgroundColor="?attr/colorSurface"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@android:drawable/ic_menu_crop"
+                        app:tint="?attr/colorSecondary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:text="Manual Custom Scanner"
+                        android:textSize="18sp"
+                        android:fontFamily="sans-serif-black"
+                        android:textColor="?attr/colorOnSurface" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Capture using CameraX or select from Gallery, followed by a manual crop editor where you can drag document corners."
+                    android:textSize="13sp"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:layout_marginBottom="16dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnManualScan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Open Custom Camera"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    app:cornerRadius="16dp"
+                    app:icon="@android:drawable/ic_menu_gallery" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+    <!-- 2. CAMERAX VIEWFINDER VIEW -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutCamera"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.camera.view.PreviewView
+            android:id="@+id/viewFinder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- Camera Top Control Bar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:padding="16dp"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageButton
+                android:id="@+id/btnFlashToggle"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_icon_circle"
+                android:backgroundTint="#80000000"
+                android:src="@android:drawable/ic_lock_power_off"
+                app:tint="#FFFFFF"
+                android:contentDescription="Toggle Flash" />
+        </LinearLayout>
+
+        <!-- Camera Bottom Action Bar -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:background="#99000000"
+            android:paddingHorizontal="24dp"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <!-- Gallery Button -->
+            <ImageButton
+                android:id="@+id/btnGalleryPicker"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_icon_circle"
+                android:backgroundTint="#40FFFFFF"
+                android:src="@android:drawable/ic_menu_gallery"
+                app:tint="#FFFFFF"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:contentDescription="Pick Gallery" />
+
+            <!-- Capture Button Outer Ring -->
+            <FrameLayout
+                android:id="@+id/btnCapture"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:background="@drawable/bg_icon_circle"
+                android:backgroundTint="#FFFFFF"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <!-- Capture Button Inner Circle -->
+                <View
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/bg_icon_circle"
+                    android:backgroundTint="#808080" />
+            </FrameLayout>
+
+            <!-- Close Button -->
+            <ImageButton
+                android:id="@+id/btnCancelCamera"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_icon_circle"
+                android:backgroundTint="#40FFFFFF"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                app:tint="#FFFFFF"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:contentDescription="Cancel Camera" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- 3. CROP SCREEN VIEW -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutCrop"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- Image Container -->
+        <FrameLayout
+            android:id="@+id/cropContainer"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="#121212"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/cropActionBar">
+
+            <!-- Original captured image -->
+            <ImageView
+                android:id="@+id/ivCropBackground"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitCenter" />
+
+            <!-- Custom draggable crop points view overlay -->
+            <com.example.chatsnap.scanner.ui.CropOverlayView
+                android:id="@+id/cropOverlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
+
+        <!-- Crop Action Bar -->
+        <LinearLayout
+            android:id="@+id/cropActionBar"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:paddingHorizontal="16dp"
+            android:background="?attr/colorSurface"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCancelCrop"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Retake"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:textColor="?attr/colorError" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAutoCrop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Auto Detect"
+                android:layout_marginHorizontal="8dp"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                app:icon="@android:drawable/ic_menu_crop" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnWarpNext"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Warp"
+                app:icon="@android:drawable/ic_menu_send" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- 4. PREVIEW SCREEN VIEW -->
+    <include
+        android:id="@+id/layoutPreviewInclude"
+        layout="@layout/preview_scan"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

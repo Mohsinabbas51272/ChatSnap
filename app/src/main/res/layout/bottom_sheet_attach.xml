@@ -164,5 +164,29 @@
                 android:layout_marginTop="4dp" />
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/btnScanDocument"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:layout_marginTop="16dp">
+            <com.google.android.material.imageview.ShapeableImageView
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:padding="12dp"
+                android:src="@android:drawable/ic_menu_crop"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
+                android:background="#009688"
+                app:tint="#FFFFFF" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Scan"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
     </GridLayout>
 </LinearLayout>

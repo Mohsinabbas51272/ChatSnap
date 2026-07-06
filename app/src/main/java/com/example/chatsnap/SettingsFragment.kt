@@ -52,6 +52,8 @@ class SettingsFragment : Fragment() {
             binding.itemGhostMode.root,
             binding.itemVault.root,
             binding.itemDownloader.root,
+            binding.itemScanner.root,
+            binding.itemNotes.root,
             binding.itemAppLock.root,
             binding.itemTheme.root,
             binding.itemWallpaper.root,
@@ -143,6 +145,26 @@ class SettingsFragment : Fragment() {
             tvItemValue.text = "Download videos & audio via yt-dlp"
             root.setOnClickListener { 
                 startActivity(Intent(requireContext(), DownloaderActivity::class.java))
+            }
+        }
+
+        // Document Scanner
+        binding.itemScanner.apply {
+            ivItemIcon.setImageResource(android.R.drawable.ic_menu_crop)
+            tvItemTitle.text = "Document Scanner"
+            tvItemValue.text = "Scan, warp & export to PDF offline"
+            root.setOnClickListener { 
+                startActivity(Intent(requireContext(), com.example.chatsnap.scanner.ui.DocumentScannerActivity::class.java))
+            }
+        }
+
+        // Notes Module
+        binding.itemNotes.apply {
+            ivItemIcon.setImageResource(android.R.drawable.ic_menu_edit)
+            tvItemTitle.text = "My Notes"
+            tvItemValue.text = "Manage offline notes, checklists & scans"
+            root.setOnClickListener { 
+                startActivity(Intent(requireContext(), com.example.chatsnap.notes.ui.NotesActivity::class.java))
             }
         }
 

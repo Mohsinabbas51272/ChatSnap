@@ -366,6 +366,7 @@ class MainActivity : BaseActivity() {
         binding.navPeople.setOnClickListener { navigateTo(PeopleFragment(), "Contacts", it as ImageButton) }
         binding.navEarn.setOnClickListener { navigateTo(EarnFragment(), "Earn", it as ImageButton) }
         binding.navSettings.setOnClickListener { navigateTo(SettingsFragment(), "Settings", it as ImageButton) }
+        binding.navAuraFeed.setOnClickListener { navigateTo(AuraFeedFragment(), "AuraFeed", it as ImageButton) }
     }
 
     private fun navigateTo(fragment: Fragment, title: String, button: ImageButton) {
@@ -375,7 +376,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun updateNavUI(activeButton: ImageButton) {
-        val allButtons = listOf(binding.navChats, binding.navStories, binding.navCalls, binding.navPeople, binding.navEarn, binding.navSettings)
+        val allButtons = listOf(binding.navChats, binding.navStories, binding.navCalls, binding.navPeople, binding.navEarn, binding.navSettings, binding.navAuraFeed)
         val typedValue = TypedValue()
         
         // Use R.attr.colorOnPrimary to resolve the theme attribute correctly
@@ -397,9 +398,44 @@ class MainActivity : BaseActivity() {
     private fun loadFragment(fragment: Fragment, title: String) {
         binding.tvHeaderTitle.text = title
         currentFragment = fragment
-        
-        binding.btnSearch.visibility = if (fragment is EarnFragment || fragment is SettingsFragment) View.GONE else View.VISIBLE
+
+        val isAura = fragment is AuraFeedFragment
+
+        // Header: hide completely for AuraFeed
+        binding.appBarLayout.visibility = if (isAura) View.GONE else View.VISIBLE
+
+        binding.btnSearch.visibility = if (fragment is EarnFragment || fragment is SettingsFragment || isAura) View.GONE else View.VISIBLE
         binding.btnClearCallsHeader.visibility = if (fragment is CallsFragment) View.VISIBLE else View.GONE
+
+        // Manage CoordinatorLayout behavior and system windows fitting for immersive mode
+        val params = binding.mainContentLayout.layoutParams as? androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams
+        if (isAura) {
+            params?.behavior = null
+            binding.main.fitsSystemWindows = false
+        } else {
+            params?.behavior = com.google.android.material.appbar.AppBarLayout.ScrollingViewBehavior()
+            binding.main.fitsSystemWindows = true
+        }
+        binding.mainContentLayout.layoutParams = params
+        binding.main.requestApplyInsets()
+        binding.mainContentLayout.requestLayout()
+
+        // Footer bottom nav: slide out/in with animation
+        if (isAura) {
+            binding.cvFloatingMenu.animate()
+                .translationY(binding.cvFloatingMenu.height.toFloat() + 48f)
+                .alpha(0f)
+                .setDuration(280)
+                .withEndAction { binding.cvFloatingMenu.visibility = View.GONE }
+                .start()
+        } else {
+            binding.cvFloatingMenu.visibility = View.VISIBLE
+            binding.cvFloatingMenu.animate()
+                .translationY(0f)
+                .alpha(1f)
+                .setDuration(280)
+                .start()
+        }
 
         when (fragment) {
             is ChatsFragment -> {

@@ -185,18 +185,6 @@
                         android:background="@drawable/bg_input_field"
                         android:paddingHorizontal="12dp" />
 
-                    <!-- Playlist toggle option -->
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/swPlaylist"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="Download Entire Playlist"
-                        android:textSize="13sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textColor="?android:attr/textColorPrimary"
-                        android:checked="false" />
-
                     <!-- Max concurrent downloads setter -->
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -234,6 +222,25 @@
                         android:fontFamily="sans-serif-black"
                         app:backgroundTint="?attr/colorPrimary"
                         app:cornerRadius="24dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp" />
+
+                    <!-- Import links from text file button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnImportFile"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="8dp"
+                        android:text="Import Links from File"
+                        android:textColor="?attr/colorPrimary"
+                        android:textSize="14sp"
+                        android:fontFamily="sans-serif-black"
+                        app:cornerRadius="24dp"
+                        app:strokeColor="?attr/colorPrimary"
+                        app:icon="@android:drawable/ic_menu_add"
+                        app:iconSize="20dp"
+                        app:iconTint="?attr/colorPrimary"
                         android:insetTop="0dp"
                         android:insetBottom="0dp" />
 

@@ -15,5 +15,6 @@ data class DownloadHistoryEntity(
     val fileSize: String?,
     val status: String, // "COMPLETED", "FAILED", "CANCELLED"
     val errorMessage: String? = null,
+    val thumbnailUrl: String? = null,
     val timestamp: Long = System.currentTimeMillis()
 )

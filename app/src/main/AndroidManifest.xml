@@ -127,6 +127,22 @@
         <activity android:name=".StaticContentActivity" android:theme="@style/Theme.ChatSnap.NoActionBar" />
         <activity android:name=".VaultActivity" android:theme="@style/Theme.ChatSnap.NoActionBar" />
         <activity android:name=".DownloaderActivity" android:theme="@style/Theme.ChatSnap.NoActionBar" />
+        <activity
+            android:name=".scanner.ui.DocumentScannerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.ChatSnap.NoActionBar" />
+
+        <activity
+            android:name=".notes.ui.NotesActivity"
+            android:exported="false"
+            android:theme="@style/Theme.ChatSnap.NoActionBar" />
+
+        <activity
+            android:name=".notes.ui.NoteEditorActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.ChatSnap.NoActionBar" />
 
         <service
             android:name=".services.DownloadService"

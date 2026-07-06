@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
+
+    <!-- Video Player View -->
+    <com.google.android.exoplayer2.ui.PlayerView
+        android:id="@+id/playerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:use_controller="false"
+        app:resize_mode="fill"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Bottom Vignette Gradient Overlay -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:background="@drawable/bg_top_gradient"
+        android:rotation="180"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!-- Play/Pause Gesture Overlay -->
+    <View
+        android:id="@+id/gestureOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent" />
+
+    <!-- Big Center Play Icon (Action Feedback) -->
+    <ImageView
+        android:id="@+id/ivBigPlayPause"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@android:drawable/ic_media_play"
+        android:visibility="gone"
+        app:tint="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Left/Bottom Video Info Panel -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="80dp"
+        android:layout_marginBottom="24dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/pbVideo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/tvCreatorName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="\@username"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-black" />
+
+        <TextView
+            android:id="@+id/tvCaption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Video caption goes here #hashtag #vibes"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:maxLines="3"
+            android:ellipsize="end" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@android:drawable/ic_menu_slideshow"
+                app:tint="@android:color/white" />
+
+            <TextView
+                android:id="@+id/tvMusicName"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="Original Sound - Creator"
+                android:textColor="@android:color/white"
+                android:textSize="13sp"
+                android:singleLine="true"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:scrollHorizontally="true"
+                android:fontFamily="sans-serif-medium" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Right Side Floating Actions Stack -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="32dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Creator Profile Card -->
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivCreatorAvatar"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_launcher_foreground"
+                android:scaleType="centerCrop"
+                app:strokeColor="@android:color/white"
+                app:strokeWidth="1.5dp"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle" />
+
+            <!-- Follow Button Badge -->
+            <ImageView
+                android:id="@+id/ivFollowBadge"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="-4dp"
+                android:background="@drawable/bg_bubble_circle"
+                android:backgroundTint="?attr/colorPrimary"
+                android:src="@android:drawable/ic_input_add"
+                android:padding="2dp"
+                app:tint="@android:color/white" />
+        </FrameLayout>
+
+        <!-- Like Button -->
+        <ImageButton
+            android:id="@+id/btnLike"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/btn_star_big_off"
+            app:tint="@android:color/white"
+            android:contentDescription="Like" />
+
+        <TextView
+            android:id="@+id/tvLikeCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-4dp"
+            android:layout_marginBottom="12dp"
+            android:text="0"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif-bold" />
+
+        <!-- Comment Button -->
+        <ImageButton
+            android:id="@+id/btnComment"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_chat"
+            app:tint="@android:color/white"
+            android:contentDescription="Comment" />
+
+        <TextView
+            android:id="@+id/tvCommentCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-4dp"
+            android:layout_marginBottom="12dp"
+            android:text="0"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif-bold" />
+
+        <!-- Save Button -->
+        <ImageButton
+            android:id="@+id/btnSave"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_save"
+            app:tint="@android:color/white"
+            android:contentDescription="Save" />
+
+        <TextView
+            android:id="@+id/tvSaveCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-4dp"
+            android:layout_marginBottom="12dp"
+            android:text="0"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif-bold" />
+
+        <!-- Share Button -->
+        <ImageButton
+            android:id="@+id/btnShare"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_share"
+            app:tint="@android:color/white"
+            android:contentDescription="Share" />
+
+        <TextView
+            android:id="@+id/tvShareCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-4dp"
+            android:layout_marginBottom="12dp"
+            android:text="0"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif-bold" />
+
+        <!-- Options / Edit-Delete Button for Creator -->
+        <ImageButton
+            android:id="@+id/btnOptions"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_manage"
+            android:visibility="gone"
+            app:tint="@android:color/white"
+            android:contentDescription="Delete Video" />
+    </LinearLayout>
+
+    <!-- Bottom Playback Progress Bar -->
+    <ProgressBar
+        android:id="@+id/pbVideo"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:max="100"
+        android:progress="0"
+        android:progressTint="?attr/colorPrimary"
+        android:progressBackgroundTint="#33FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

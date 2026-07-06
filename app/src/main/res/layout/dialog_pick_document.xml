@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!-- Header Title -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Attach Scanned Document"
+        android:textSize="18sp"
+        android:fontFamily="sans-serif-black"
+        android:textColor="?attr/colorOnSurface"
+        android:layout_marginBottom="4dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select a scanned PDF or JPEG from the ChatSnap Document Scanner folder below:"
+        android:textSize="12sp"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:layout_marginBottom="16dp" />
+
+    <!-- List of Scans -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvScannedDocs"
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:scrollbars="vertical"
+        android:clipToPadding="false"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Fallback Empty State inside Dialog -->
+    <TextView
+        android:id="@+id/tvNoScannedDocs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="32dp"
+        android:text="No scanned documents found.\nUse the Document Scanner first!"
+        android:textSize="13sp"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:visibility="gone"
+        android:layout_marginBottom="16dp" />
+
+    <!-- System File Picker Alternative Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSystemFilePicker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choose from Device Files"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        app:cornerRadius="12dp"
+        app:icon="@android:drawable/ic_menu_gallery" />
+
+</LinearLayout>

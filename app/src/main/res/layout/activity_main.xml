@@ -117,6 +117,7 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <LinearLayout
+        android:id="@+id/mainContentLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -145,7 +146,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/cvFloatingMenu"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -243,13 +244,14 @@
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:padding="4dp"
-                android:weightSum="6">
+                android:weightSum="7">
 
                 <ImageButton android:id="@+id/navChats" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:src="@drawable/ic_chat" android:background="@android:color/transparent" android:contentDescription="Chats" />
                 <ImageButton android:id="@+id/navStories" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:src="@drawable/ic_stories" android:background="@android:color/transparent" android:contentDescription="Stories" />
                 <ImageButton android:id="@+id/navCalls" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:src="@android:drawable/ic_menu_call" android:background="@android:color/transparent" android:contentDescription="Calls" />
                 <ImageButton android:id="@+id/navPeople" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:src="@drawable/ic_people" android:background="@android:color/transparent" android:contentDescription="People" />
                 <ImageButton android:id="@+id/navEarn" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:src="@drawable/ic_history" android:background="@android:color/transparent" android:contentDescription="Earn" />
+                <ImageButton android:id="@+id/navAuraFeed" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:src="@drawable/ic_aura_feed" android:background="@android:color/transparent" android:contentDescription="AuraFeed" />
                 <ImageButton android:id="@+id/navSettings" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:src="@drawable/ic_settings" android:background="@android:color/transparent" android:contentDescription="Settings" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
