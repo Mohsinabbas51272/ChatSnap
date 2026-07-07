@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_bottom_sheet"
+    android:padding="20dp">
+
+    <!-- Bottom Sheet Indicator Drag Line -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:background="#DDDDDD"
+        android:layout_marginBottom="20dp" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:id="@+id/tvSheetTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Detected Videos"
+            android:textSize="18sp"
+            android:fontFamily="sans-serif-black"
+            android:textColor="?android:attr/textColorPrimary" />
+
+        <CheckBox
+            android:id="@+id/cbSelectAll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:text="Select All"
+            android:textSize="13sp"
+            android:fontFamily="sans-serif-medium"
+            android:buttonTint="?attr/colorPrimary" />
+    </RelativeLayout>
+
+    <!-- List of Videos -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvDetectedVideos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxHeight="320dp"
+        android:scrollbars="vertical"
+        android:layout_marginBottom="20dp" />
+
+    <!-- Action Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnDownloadSelected"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:text="Download Selected (0)"
+        android:textSize="15sp"
+        android:fontFamily="sans-serif-black"
+        android:textColor="@android:color/white"
+        app:backgroundTint="?attr/colorPrimary"
+        app:cornerRadius="12dp"
+        app:elevation="2dp" />
+
+</LinearLayout>

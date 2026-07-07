@@ -314,6 +314,10 @@
                 <include
                     android:id="@+id/itemNotes"
                     layout="@layout/view_setting_item" />
+
+                <include
+                    android:id="@+id/itemWebDownloader"
+                    layout="@layout/view_setting_item" />
             </LinearLayout>
 
             <!-- General Settings Header -->

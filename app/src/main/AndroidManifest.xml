@@ -127,6 +127,7 @@
         <activity android:name=".StaticContentActivity" android:theme="@style/Theme.ChatSnap.NoActionBar" />
         <activity android:name=".VaultActivity" android:theme="@style/Theme.ChatSnap.NoActionBar" />
         <activity android:name=".DownloaderActivity" android:theme="@style/Theme.ChatSnap.NoActionBar" />
+        <activity android:name=".WebVideoDownloaderActivity" android:theme="@style/Theme.ChatSnap.NoActionBar" android:hardwareAccelerated="true" />
         <activity
             android:name=".scanner.ui.DocumentScannerActivity"
             android:exported="false"

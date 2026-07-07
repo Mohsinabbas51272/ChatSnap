@@ -216,6 +216,11 @@ class DownloaderActivity : BaseActivity() {
             fetchPlaylistAndHandleQueue()
         }
 
+        binding.cvWebDownloader.setOnClickListener {
+            val intent = Intent(this, WebVideoDownloaderActivity::class.java)
+            startActivity(intent)
+        }
+
         // Import links from text file
         binding.btnImportFile.setOnClickListener {
             if (!engineReady) {

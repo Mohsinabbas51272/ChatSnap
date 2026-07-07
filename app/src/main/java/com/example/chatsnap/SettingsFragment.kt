@@ -54,6 +54,7 @@ class SettingsFragment : Fragment() {
             binding.itemDownloader.root,
             binding.itemScanner.root,
             binding.itemNotes.root,
+            binding.itemWebDownloader.root,
             binding.itemAppLock.root,
             binding.itemTheme.root,
             binding.itemWallpaper.root,
@@ -165,6 +166,16 @@ class SettingsFragment : Fragment() {
             tvItemValue.text = "Manage offline notes, checklists & scans"
             root.setOnClickListener { 
                 startActivity(Intent(requireContext(), com.example.chatsnap.notes.ui.NotesActivity::class.java))
+            }
+        }
+
+        // Web Video Downloader
+        binding.itemWebDownloader.apply {
+            ivItemIcon.setImageResource(android.R.drawable.stat_sys_download)
+            tvItemTitle.text = "Web Video Downloader"
+            tvItemValue.text = "Download videos from TikTok, Instagram, X & WhatsApp"
+            root.setOnClickListener { 
+                startActivity(Intent(requireContext(), WebVideoDownloaderActivity::class.java))
             }
         }
 
