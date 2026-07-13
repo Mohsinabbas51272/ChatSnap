@@ -2,6 +2,8 @@ package com.example.chatsnap
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaRecorder
@@ -22,12 +24,16 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import coil.load
 import com.example.chatsnap.adapters.ChatAdapter
 import com.example.chatsnap.databinding.ActivityChatBinding
 import com.example.chatsnap.databinding.BottomSheetAttachBinding
 import com.example.chatsnap.databinding.DialogCreatePollBinding
 import com.example.chatsnap.models.Message
+import com.example.chatsnap.services.ScheduledMessageWorker
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.auth.FirebaseAuth
@@ -37,8 +43,11 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.storage.FirebaseStorage
 import id.zelory.compressor.Compressor
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.tasks.await
 import java.io.File
+import java.util.Calendar
+import java.util.concurrent.TimeUnit
 import android.os.Handler
 import android.os.Looper
 
@@ -70,6 +79,12 @@ class ChatActivity : BaseActivity() {
 
     private var pendingMediaUri: Uri? = null
     private var pendingMediaType: String? = null
+
+    private var scheduledAttachedUri: Uri? = null
+    private var scheduledAttachedType: String? = null
+    private var scheduledAttachedMime: String? = null
+    private var scheduledAttachedName: String? = null
+    private var scheduledDialogText: String = ""
     
     private var groupAdminId: String? = null
     private var groupMemberIds: List<String> = emptyList()
@@ -79,9 +94,31 @@ class ChatActivity : BaseActivity() {
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
         
+        // Capture keyboard height for responsive emoji picker
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
+            val imeVisible = insets.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime())
+            if (imeVisible) {
+                val imeHeight = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime()).bottom
+                if (imeHeight > 0) {
+                    getSharedPreferences("app_prefs", MODE_PRIVATE).edit().putInt("keyboard_height", imeHeight).apply()
+                }
+            }
+            insets
+        }
+
         if (!setupData()) return
         setupUI()
         setupListeners()
+        startScheduledMessageWorker()
+    }
+
+    private fun startScheduledMessageWorker() {
+        val workRequest = PeriodicWorkRequestBuilder<ScheduledMessageWorker>(15, TimeUnit.MINUTES).build()
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "ScheduledMessages",
+            ExistingPeriodicWorkPolicy.KEEP,
+            workRequest
+        )
     }
 
     private fun setupData(): Boolean {
@@ -136,6 +173,36 @@ class ChatActivity : BaseActivity() {
         }
         markMessagesAsRead()
         com.example.chatsnap.utils.WallpaperManager.applyWallpaper(binding.ivChatWallpaper)
+
+        // Handle shared content from ShareReceiverActivity
+        handleIncomingSharedContent()
+    }
+
+    private fun handleIncomingSharedContent() {
+        val sharedText = intent.getStringExtra("shared_text")
+        val sharedUriStr = intent.getStringExtra("shared_uri")
+        val sharedMime = intent.getStringExtra("shared_mime")
+
+        if (sharedText != null) {
+            binding.etMessage.setText(sharedText)
+            binding.etMessage.setSelection(sharedText.length)
+        }
+
+        if (sharedUriStr != null) {
+            val uri = Uri.parse(sharedUriStr)
+            val mime = sharedMime ?: contentResolver.getType(uri) ?: ""
+            val type = when {
+                mime.startsWith("image/") -> "IMAGE"
+                mime.startsWith("video/") -> "VIDEO"
+                mime.startsWith("audio/") -> "AUDIO"
+                else -> "DOCUMENT"
+            }
+            if (type == "IMAGE" || type == "VIDEO") {
+                showMediaPreview(uri, type)
+            } else {
+                uploadFile(uri, type)
+            }
+        }
     }
 
     private fun setupListeners() {
@@ -160,12 +227,36 @@ class ChatActivity : BaseActivity() {
         binding.btnCancelMedia.setOnClickListener {
             clearPendingMedia()
         }
+
+        binding.btnAiAssistant.setOnClickListener {
+            val draft = binding.etMessage.text.toString().trim()
+            val intent = Intent(this, AiChatActivity::class.java).apply {
+                putExtra("draft_text", draft)
+            }
+            aiChatLauncher.launch(intent)
+        }
     }
 
     private fun showEmojiPickerDialog() {
+        // Hide soft keyboard first
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+        currentFocus?.let { imm.hideSoftInputFromWindow(it.windowToken, 0) }
+
         val dialog = com.google.android.material.bottomsheet.BottomSheetDialog(this)
         val sheetView = layoutInflater.inflate(R.layout.dialog_emoji_picker, null)
         dialog.setContentView(sheetView)
+
+        // Make it expanded immediately
+        dialog.behavior.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
+
+        val storedHeight = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("keyboard_height", 0)
+        if (storedHeight > 0) {
+            sheetView.post {
+                val params = sheetView.layoutParams
+                params.height = storedHeight
+                sheetView.layoutParams = params
+            }
+        }
 
         val gridView = sheetView.findViewById<android.widget.GridView>(R.id.emojiGridView)
         val emojis = listOf(
@@ -230,6 +321,7 @@ class ChatActivity : BaseActivity() {
         val currentUid = auth.uid ?: return
         db.collection("users").document(currentUid).get()
             .addOnSuccessListener { userDoc ->
+                if (isFinishing || isDestroyed) return@addOnSuccessListener
                 val callerName = userDoc.getString("name") ?: "A Friend"
                 val intent = Intent(this, CallActivity::class.java).apply {
                     putExtra("callType", type)
@@ -242,6 +334,7 @@ class ChatActivity : BaseActivity() {
                 startActivity(intent)
             }
             .addOnFailureListener {
+                if (isFinishing || isDestroyed) return@addOnFailureListener
                 val intent = Intent(this, CallActivity::class.java).apply {
                     putExtra("callType", type)
                     putExtra("receiverId", receiverId)
@@ -257,11 +350,13 @@ class ChatActivity : BaseActivity() {
     private fun showChatOptions(view: View) {
         val popup = androidx.appcompat.widget.PopupMenu(this, view)
         popup.menu.add("Clear History")
+        popup.menu.add("Schedule Message")
         if (isGroup) {
             popup.menu.add("Group Info")
             popup.setOnMenuItemClickListener { item ->
                 when (item.title) {
                     "Clear History" -> clearChat()
+                    "Schedule Message" -> showScheduleMessageDialog()
                     "Group Info" -> showGroupInfo()
                 }
                 true
@@ -271,6 +366,7 @@ class ChatActivity : BaseActivity() {
             val currentUid = auth.uid ?: return
             db.collection("secretConversations").document("${currentUid}_${receiverId}").get()
                 .addOnSuccessListener { doc ->
+                    if (isFinishing || isDestroyed) return@addOnSuccessListener
                     val isHidden = doc.exists()
                     if (isHidden) {
                         popup.menu.add("Unhide Chat")
@@ -281,6 +377,7 @@ class ChatActivity : BaseActivity() {
                     popup.setOnMenuItemClickListener { item ->
                         when (item.title) {
                             "Clear History" -> clearChat()
+                            "Schedule Message" -> showScheduleMessageDialog()
                             "Hide Chat (Secret)" -> hideChat()
                             "Unhide Chat" -> unhideChat()
                             "Block User" -> blockUser()
@@ -290,11 +387,13 @@ class ChatActivity : BaseActivity() {
                     popup.show()
                 }
                 .addOnFailureListener {
+                    if (isFinishing || isDestroyed) return@addOnFailureListener
                     popup.menu.add("Hide Chat (Secret)")
                     popup.menu.add("Block User")
                     popup.setOnMenuItemClickListener { item ->
                         when (item.title) {
                             "Clear History" -> clearChat()
+                            "Schedule Message" -> showScheduleMessageDialog()
                             "Hide Chat (Secret)" -> hideChat()
                             "Block User" -> blockUser()
                         }
@@ -302,6 +401,239 @@ class ChatActivity : BaseActivity() {
                     }
                     popup.show()
                 }
+        }
+    }
+
+    private fun showScheduleMessageDialog(prefillText: String = "") {
+        val primaryColor = resolveThemeColor(androidx.appcompat.R.attr.colorPrimary)
+        val textPrimaryColor = resolveThemeColor(android.R.attr.textColorPrimary)
+        val textSecondaryColor = resolveThemeColor(android.R.attr.textColorSecondary)
+
+        val rootLayout = android.widget.LinearLayout(this).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding(48, 32, 48, 16)
+        }
+
+        val input = EditText(this).apply {
+            hint = "Type your message or link..."
+            setPadding(32, 32, 32, 32)
+            minLines = 2
+            setText(prefillText)
+            setSelection(text.length)
+            setTextColor(textPrimaryColor)
+            setHintTextColor(textSecondaryColor)
+            setBackgroundResource(R.drawable.edit_text_bg)
+        }
+        rootLayout.addView(input)
+
+        // Attachment status
+        val attachLabel = android.widget.TextView(this).apply {
+            setPadding(8, 16, 8, 8)
+            textSize = 13f
+            if (scheduledAttachedUri != null) {
+                text = "📎 Attached: ${scheduledAttachedName ?: "File"}"
+                setTextColor(android.graphics.Color.parseColor("#4CAF50"))
+            } else {
+                text = "No attachment"
+                setTextColor(textSecondaryColor)
+            }
+        }
+        rootLayout.addView(attachLabel)
+
+        // Buttons row
+        val btnRow = android.widget.LinearLayout(this).apply {
+            orientation = android.widget.LinearLayout.HORIZONTAL
+            setPadding(0, 8, 0, 8)
+        }
+
+        val btnImage = android.widget.Button(this).apply {
+            text = "🖼️ Image"
+            textSize = 12f
+            isAllCaps = false
+            setTextColor(android.graphics.Color.WHITE)
+            val gd = android.graphics.drawable.GradientDrawable().apply {
+                setColor(primaryColor)
+                cornerRadius = 24f
+            }
+            background = gd
+            setOnClickListener {
+                scheduledDialogText = input.text.toString()
+                pickScheduledAttachmentMedia.launch(
+                    androidx.activity.result.PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                )
+            }
+        }
+        val btnDoc = android.widget.Button(this).apply {
+            text = "📄 File/PDF"
+            textSize = 12f
+            isAllCaps = false
+            setTextColor(android.graphics.Color.WHITE)
+            val gd = android.graphics.drawable.GradientDrawable().apply {
+                setColor(primaryColor)
+                cornerRadius = 24f
+            }
+            background = gd
+            setOnClickListener {
+                scheduledDialogText = input.text.toString()
+                pickScheduledAttachmentDoc.launch(arrayOf("*/*"))
+            }
+        }
+        val btnRemove = android.widget.Button(this).apply {
+            text = "❌ Remove"
+            textSize = 12f
+            isAllCaps = false
+            setTextColor(android.graphics.Color.WHITE)
+            val gd = android.graphics.drawable.GradientDrawable().apply {
+                setColor(android.graphics.Color.RED)
+                cornerRadius = 24f
+            }
+            background = gd
+            visibility = if (scheduledAttachedUri != null) View.VISIBLE else View.GONE
+            setOnClickListener {
+                scheduledAttachedUri = null
+                scheduledAttachedType = null
+                scheduledAttachedMime = null
+                scheduledAttachedName = null
+                showScheduleMessageDialog(input.text.toString())
+            }
+        }
+
+        val btnParams = android.widget.LinearLayout.LayoutParams(0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
+            setMargins(8, 0, 8, 0)
+        }
+        btnRow.addView(btnImage, btnParams)
+        btnRow.addView(btnDoc, btnParams)
+        if (scheduledAttachedUri != null) {
+            btnRow.addView(btnRemove, btnParams)
+        }
+        rootLayout.addView(btnRow)
+
+        AlertDialog.Builder(this)
+            .setTitle("📅 Schedule Message")
+            .setView(rootLayout)
+            .setPositiveButton("Pick Date & Time") { _, _ ->
+                val text = input.text.toString().trim()
+                if (text.isEmpty() && scheduledAttachedUri == null) {
+                    Toast.makeText(this, "Please enter a message or attach a file", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                pickScheduleDateTime(text)
+            }
+            .setNegativeButton("Cancel") { _, _ ->
+                scheduledAttachedUri = null
+                scheduledAttachedType = null
+                scheduledAttachedMime = null
+                scheduledAttachedName = null
+                scheduledDialogText = ""
+            }
+            .show()
+    }
+
+    private fun pickScheduleDateTime(messageText: String) {
+        val now = Calendar.getInstance()
+        DatePickerDialog(this, { _, year, month, day ->
+            TimePickerDialog(this, { _, hour, minute ->
+                val scheduledCalendar = Calendar.getInstance().apply {
+                    set(year, month, day, hour, minute, 0)
+                }
+                val scheduledTime = scheduledCalendar.timeInMillis
+                if (scheduledTime <= System.currentTimeMillis()) {
+                    Toast.makeText(this, "Please pick a future time", Toast.LENGTH_SHORT).show()
+                    return@TimePickerDialog
+                }
+                saveScheduledMessage(messageText, scheduledTime)
+            }, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), false).show()
+        }, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH)).show()
+    }
+
+    private fun saveScheduledMessage(text: String, scheduledFor: Long) {
+        val currentUid = auth.uid ?: return
+
+        lifecycleScope.launch {
+            try {
+                var mediaUrlData: String? = null
+                var msgType = "TEXT"
+                var msgContent = text
+                var fileName: String? = null
+
+                val attachUri = scheduledAttachedUri
+                val attachType = scheduledAttachedType
+                val attachMime = scheduledAttachedMime
+
+                if (attachUri != null && attachType != null) {
+                    Toast.makeText(this@ChatActivity, "Processing attachment...", Toast.LENGTH_SHORT).show()
+
+                    val bytes = withContext(kotlinx.coroutines.Dispatchers.IO) {
+                        val inputStream = contentResolver.openInputStream(attachUri)
+                        val b = inputStream?.readBytes() ?: throw Exception("Failed to read file")
+                        inputStream.close()
+                        b
+                    }
+
+                    if (attachType == "IMAGE") {
+                        var bitmap = android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                        val maxDim = 800
+                        val w = bitmap.width; val h = bitmap.height
+                        val newBitmap = if (w > maxDim || h > maxDim) {
+                            val ratio = w.toFloat() / h.toFloat()
+                            val nw = if (ratio > 1) maxDim else (maxDim * ratio).toInt()
+                            val nh = if (ratio > 1) (maxDim / ratio).toInt() else maxDim
+                            android.graphics.Bitmap.createScaledBitmap(bitmap, nw, nh, true)
+                        } else bitmap
+                        val out = java.io.ByteArrayOutputStream()
+                        newBitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 30, out)
+                        val base64 = android.util.Base64.encodeToString(out.toByteArray(), android.util.Base64.DEFAULT)
+                        mediaUrlData = "data:image/jpeg;base64,$base64"
+                        msgType = "IMAGE"
+                        if (msgContent.isEmpty()) msgContent = "Scheduled Image"
+                    } else {
+                        if (bytes.size > 800000) {
+                            Toast.makeText(this@ChatActivity, "File too large (max ~800KB for free plan)", Toast.LENGTH_LONG).show()
+                            return@launch
+                        }
+                        val base64 = android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT)
+                        val mime = attachMime ?: "application/octet-stream"
+                        mediaUrlData = "data:$mime;base64,$base64"
+                        msgType = attachType
+                        fileName = scheduledAttachedName
+                        if (msgContent.isEmpty()) msgContent = "File: ${fileName ?: "document"}"
+                    }
+                }
+
+                val msgId = db.collection("scheduledMessages").document().id
+                val data = hashMapOf(
+                    "messageId" to msgId,
+                    "senderId" to currentUid,
+                    "receiverId" to (groupId ?: receiverId ?: ""),
+                    "conversationId" to chatId,
+                    "content" to msgContent,
+                    "type" to msgType,
+                    "mediaUrl" to mediaUrlData,
+                    "latitude" to null,
+                    "longitude" to null,
+                    "fileName" to fileName,
+                    "isGroup" to isGroup,
+                    "isSnap" to false,
+                    "pollQuestion" to "",
+                    "pollOptions" to emptyList<String>(),
+                    "effect" to "NONE",
+                    "scheduledFor" to scheduledFor,
+                    "sent" to false
+                )
+                db.collection("scheduledMessages").document(msgId).set(data).await()
+                val time = java.text.SimpleDateFormat("MMM dd, hh:mm a", java.util.Locale.getDefault()).format(java.util.Date(scheduledFor))
+                Toast.makeText(this@ChatActivity, "Message scheduled for $time", Toast.LENGTH_LONG).show()
+
+            } catch (e: Exception) {
+                Toast.makeText(this@ChatActivity, "Schedule failed: ${e.message}", Toast.LENGTH_SHORT).show()
+            } finally {
+                // Clear attachment state
+                scheduledAttachedUri = null
+                scheduledAttachedType = null
+                scheduledAttachedMime = null
+                scheduledAttachedName = null
+                scheduledDialogText = ""
+            }
         }
     }
 
@@ -322,6 +654,7 @@ class ChatActivity : BaseActivity() {
         val isAdmin = currentUid == groupAdminId
         
         db.collection("users").whereIn("uid", groupMemberIds).get().addOnSuccessListener { snapshot ->
+            if (isFinishing || isDestroyed) return@addOnSuccessListener
             val users = snapshot.toObjects(com.example.chatsnap.models.User::class.java)
             val names = users.map { 
                 var n = it.name
@@ -407,8 +740,21 @@ class ChatActivity : BaseActivity() {
             scanDocumentLauncher.launch(intent)
             dialog.dismiss()
         }
+        bottomSheetBinding.btnSchedule.setOnClickListener {
+            showScheduleMessageDialog()
+            dialog.dismiss()
+        }
         
         dialog.show()
+    }
+
+    private val aiChatLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK && result.data != null) {
+            val draft = result.data?.getStringExtra("response_draft")
+            if (!draft.isNullOrEmpty()) {
+                binding.etMessage.setText(draft)
+            }
+        }
     }
 
     private fun openCamera() {
@@ -452,7 +798,40 @@ class ChatActivity : BaseActivity() {
     }
 
     private val pickDocument = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        uri?.let { uploadFile(it, "DOCUMENT") }
+        uri?.let {
+            val mimeType = contentResolver.getType(it) ?: ""
+            val type = if (mimeType.startsWith("audio/")) {
+                "AUDIO"
+            } else if (mimeType.startsWith("image/")) {
+                "IMAGE"
+            } else if (mimeType.startsWith("video/")) {
+                "VIDEO"
+            } else {
+                "DOCUMENT"
+            }
+            uploadFile(it, type)
+        }
+    }
+
+    private val pickScheduledAttachmentMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        uri?.let {
+            scheduledAttachedUri = it
+            scheduledAttachedType = "IMAGE"
+            scheduledAttachedMime = contentResolver.getType(it) ?: "image/jpeg"
+            scheduledAttachedName = "Image"
+            showScheduleMessageDialog(scheduledDialogText)
+        }
+    }
+
+    private val pickScheduledAttachmentDoc = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri?.let {
+            val mime = contentResolver.getType(it) ?: "application/octet-stream"
+            scheduledAttachedUri = it
+            scheduledAttachedType = if (mime.startsWith("audio/")) "AUDIO" else "DOCUMENT"
+            scheduledAttachedMime = mime
+            scheduledAttachedName = getFileName(it)
+            showScheduleMessageDialog(scheduledDialogText)
+        }
     }
 
     private val scanDocumentLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -490,11 +869,15 @@ class ChatActivity : BaseActivity() {
         val pollBinding = DialogCreatePollBinding.inflate(layoutInflater)
         val dialog = AlertDialog.Builder(this).setView(pollBinding.root).create()
         
+        val textPrimaryColor = resolveThemeColor(android.R.attr.textColorPrimary)
+        val textSecondaryColor = resolveThemeColor(android.R.attr.textColorSecondary)
+
         pollBinding.btnAddOption.setOnClickListener {
             val et = EditText(this).apply {
                 hint = "Option ${pollBinding.optionsContainer.childCount + 1}"
-                setPadding(40, 40, 40, 40)
-                setTextColor(ContextCompat.getColor(this@ChatActivity, android.R.color.black))
+                setPadding(32, 32, 32, 32)
+                setTextColor(textPrimaryColor)
+                setHintTextColor(textSecondaryColor)
                 setBackgroundResource(R.drawable.edit_text_bg)
                 val params = android.widget.LinearLayout.LayoutParams(android.widget.LinearLayout.LayoutParams.MATCH_PARENT, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT)
                 params.setMargins(0, 0, 0, 16)
@@ -585,7 +968,13 @@ class ChatActivity : BaseActivity() {
                         return@launch
                     }
                     val base64 = android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT)
-                    val finalData = "data:audio/m4a;base64,$base64"
+                    val mimeType = if (uri.scheme == "content") {
+                        contentResolver.getType(uri) ?: "audio/m4a"
+                    } else {
+                        val ext = android.webkit.MimeTypeMap.getFileExtensionFromUrl(uri.toString())
+                        android.webkit.MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext) ?: "audio/m4a"
+                    }
+                    val finalData = "data:$mimeType;base64,$base64"
                     sendMessage("Audio Message", "AUDIO", finalData)
                 } else {
                     if (bytes.size > 800000) {
@@ -840,7 +1229,21 @@ class ChatActivity : BaseActivity() {
     }
 
     private fun forwardMessage(message: Message) {
-        Toast.makeText(this, "Forwarding: ${message.content}", Toast.LENGTH_SHORT).show()
+        val intent = Intent(this, ForwardActivity::class.java).apply {
+            putExtra("msg_content", message.content)
+            putExtra("msg_type", message.type)
+            putExtra("msg_media_url", message.mediaUrl)
+            message.latitude?.let { putExtra("msg_latitude", it) }
+            message.longitude?.let { putExtra("msg_longitude", it) }
+            putExtra("msg_file_name", message.fileName)
+            putExtra("msg_is_snap", message.isSnap)
+            putExtra("msg_poll_question", message.pollQuestion)
+            if (message.pollOptions.isNotEmpty()) {
+                putStringArrayListExtra("msg_poll_options", ArrayList(message.pollOptions))
+            }
+            putExtra("msg_effect", message.effect)
+        }
+        startActivity(intent)
     }
 
     private fun viewMedia(message: Message) {
@@ -1279,6 +1682,12 @@ class ChatActivity : BaseActivity() {
     }
 
     private fun generateChatId(id1: String, id2: String): String = if (id1 < id2) "${id1}_${id2}" else "${id2}_${id1}"
+
+    private fun resolveThemeColor(attrResId: Int): Int {
+        val typedValue = android.util.TypedValue()
+        theme.resolveAttribute(attrResId, typedValue, true)
+        return typedValue.data
+    }
     private fun checkAudioPermissions(): Boolean = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
     private fun requestAudioPermissions() {
         ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), 101)

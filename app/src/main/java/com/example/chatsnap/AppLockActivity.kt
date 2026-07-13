@@ -42,7 +42,7 @@ class AppLockActivity : BaseActivity() {
         binding.btnUnlock.setOnClickListener {
             val enteredCode = binding.etLockCode.text.toString().trim()
             if (enteredCode == expectedCode) {
-                finish()
+                onUnlockSuccess()
             } else {
                 Toast.makeText(this, "Incorrect Code", Toast.LENGTH_SHORT).show()
                 binding.etLockCode.text?.clear()
@@ -64,6 +64,17 @@ class AppLockActivity : BaseActivity() {
         }
     }
 
+    private fun onUnlockSuccess() {
+        isUnlocked = true
+        if (intent.getBooleanExtra("LAUNCH_MAIN", false)) {
+            val mainIntent = Intent(this, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            startActivity(mainIntent)
+        }
+        finish()
+    }
+
     private fun setupBiometric() {
         executor = ContextCompat.getMainExecutor(this)
         biometricPrompt = BiometricPrompt(this, executor,
@@ -75,7 +86,7 @@ class AppLockActivity : BaseActivity() {
 
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
-                    finish()
+                    onUnlockSuccess()
                 }
 
                 override fun onAuthenticationFailed() {
@@ -104,5 +115,9 @@ class AppLockActivity : BaseActivity() {
     override fun onBackPressed() {
         // Minimize app instead of killing process to keep lock active
         moveTaskToBack(true)
+    }
+
+    companion object {
+        var isUnlocked = false
     }
 }

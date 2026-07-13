@@ -60,6 +60,8 @@ class SettingsFragment : Fragment() {
             binding.itemWallpaper.root,
             binding.itemHelp.root,
             binding.itemPrivacyPolicy.root,
+            binding.itemContacts.root,
+            binding.itemMultiAccount.root,
             binding.btnLogout
         )
         com.example.chatsnap.utils.AnimUtils.animateStaggered(viewsToAnimate, 200)
@@ -227,6 +229,27 @@ class SettingsFragment : Fragment() {
                 startActivity(intent)
             }
         }
+
+        // Contacts Manager
+        binding.itemContacts.apply {
+            ivItemIcon.setImageResource(android.R.drawable.ic_menu_my_calendar)
+            tvItemTitle.text = "Contacts Manager"
+            tvItemValue.text = "Import & Export device contacts as VCF"
+            root.setOnClickListener {
+                startActivity(Intent(requireContext(), ContactsActivity::class.java))
+            }
+        }
+
+        // Multi-Account Switcher
+        binding.itemMultiAccount.apply {
+            ivItemIcon.setImageResource(android.R.drawable.ic_menu_share)
+            tvItemTitle.text = "Switch Account"
+            tvItemValue.text = "Login to another account"
+            root.setOnClickListener {
+                startActivity(Intent(requireContext(), MultiAccountActivity::class.java))
+            }
+        }
+
 
         // Admin Panel removed from visible UI - access only via secret tap
     }

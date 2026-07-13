@@ -14,5 +14,8 @@ data class Story(
     val viewers: List<StoryViewerInfo> = emptyList(),
     val viewCount: Int = 0, // Unique viewer count
     val totalViews: Int = 0, // Total impressions
-    val ownViewCount: Int = 0 // How many times the owner viewed it
+    val ownViewCount: Int = 0, // How many times the owner viewed it
+    // Story Music
+    val musicUrl: String? = null,
+    val musicTitle: String? = null
 )

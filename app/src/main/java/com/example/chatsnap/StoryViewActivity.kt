@@ -1,9 +1,11 @@
 package com.example.chatsnap
 
+import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Base64
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
@@ -18,6 +20,8 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import java.io.File
+import java.io.FileOutputStream
 import java.util.Calendar
 
 class StoryViewActivity : BaseActivity() {
@@ -33,6 +37,12 @@ class StoryViewActivity : BaseActivity() {
     
     private var startTime = 0L
     private val progressInterval = 50L // 50ms interval for smooth animation
+
+    // Story Music
+    private var storyMediaPlayer: MediaPlayer? = null
+
+    // Story Reactions
+    private val reactionEmojis = listOf("❤️", "😂", "😮", "😢", "😍", "🔥")
 
     private val storyStepRunnable = object : Runnable {
         override fun run() {
@@ -100,6 +110,21 @@ class StoryViewActivity : BaseActivity() {
                 addToHighlight(stories[counter - 1])
             }
         }
+
+        // Reaction buttons
+        val reactionButtons = listOf(
+            binding.btnReactHeart, binding.btnReactLaugh, binding.btnReactWow,
+            binding.btnReactSad, binding.btnReactLove, binding.btnReactFire
+        )
+        reactionButtons.forEachIndexed { i, btn ->
+            btn.setOnClickListener {
+                val story = if (counter > 0 && counter <= stories.size) stories[counter - 1] else return@setOnClickListener
+                sendReaction(story, reactionEmojis[i])
+                // Animate the tapped button
+                btn.animate().scaleX(1.4f).scaleY(1.4f).setDuration(150)
+                    .withEndAction { btn.animate().scaleX(1f).scaleY(1f).setDuration(150).start() }.start()
+            }
+        }
     }
 
     private fun nextStory() {
@@ -149,6 +174,7 @@ class StoryViewActivity : BaseActivity() {
         handler.removeCallbacks(progressBarRunnable)
         handler.removeCallbacks(storyStepRunnable)
         binding.vvStory.stopPlayback()
+        stopStoryMusic()
         finish()
         overridePendingTransition(0, android.R.anim.fade_out)
     }
@@ -238,8 +264,17 @@ class StoryViewActivity : BaseActivity() {
             }
         }
         
-        binding.btnDeleteStory.visibility = if (story.userId == auth.currentUser?.uid) View.VISIBLE else View.GONE
-        binding.btnHighlight.visibility = if (story.userId == auth.currentUser?.uid) View.VISIBLE else View.GONE
+        val isOwner = story.userId == auth.currentUser?.uid
+        binding.btnDeleteStory.visibility = if (isOwner) View.VISIBLE else View.GONE
+        binding.btnHighlight.visibility = if (isOwner) View.VISIBLE else View.GONE
+
+        // Show/hide reaction bar based on ownership
+        binding.reactionBar.visibility = if (isOwner) View.GONE else View.VISIBLE
+
+        // Load current user's reaction to highlight
+        if (!isOwner) {
+            loadUserReaction(story)
+        }
         
         if (story.mediaType == "video") {
             binding.ivStory.visibility = View.GONE
@@ -253,7 +288,16 @@ class StoryViewActivity : BaseActivity() {
             storyDuration = 6000L
         }
 
-        val isOwner = story.userId == auth.currentUser?.uid
+        // Handle Story Music
+        stopStoryMusic()
+        if (!story.musicUrl.isNullOrEmpty()) {
+            binding.musicContainer.visibility = View.VISIBLE
+            binding.tvMusicTitle.text = story.musicTitle ?: "Music"
+            playStoryMusic(story.musicUrl!!)
+        } else {
+            binding.musicContainer.visibility = View.GONE
+        }
+
         if (isOwner) {
             binding.viewCountContainer.visibility = View.VISIBLE
             binding.tvViewCount.text = "${story.viewCount} viewers"
@@ -272,6 +316,70 @@ class StoryViewActivity : BaseActivity() {
         startTime = System.currentTimeMillis()
         handler.removeCallbacks(progressBarRunnable)
         handler.postDelayed(progressBarRunnable, progressInterval)
+    }
+
+    // ---- Story Music ----
+    private fun playStoryMusic(base64Audio: String) {
+        try {
+            val clean = if (base64Audio.contains(",")) base64Audio.substringAfter(",") else base64Audio
+            val bytes = Base64.decode(clean, Base64.DEFAULT)
+            val tmp = File.createTempFile("story_music", ".mp3", cacheDir)
+            FileOutputStream(tmp).use { it.write(bytes) }
+            storyMediaPlayer = MediaPlayer().apply {
+                setDataSource(tmp.absolutePath)
+                isLooping = true
+                prepare()
+                start()
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("StoryView", "Music playback error: ${e.message}")
+        }
+    }
+
+    private fun stopStoryMusic() {
+        try {
+            storyMediaPlayer?.stop()
+            storyMediaPlayer?.release()
+        } catch (_: Exception) {}
+        storyMediaPlayer = null
+    }
+
+    // ---- Story Reactions ----
+    private fun sendReaction(story: Story, emoji: String) {
+        val uid = auth.currentUser?.uid ?: return
+        val reactionData = hashMapOf(
+            "userId" to uid,
+            "emoji" to emoji,
+            "timestamp" to System.currentTimeMillis()
+        )
+        firestore.collection("stories").document(story.id)
+            .collection("reactions").document(uid)
+            .set(reactionData)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Reacted $emoji", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun loadUserReaction(story: Story) {
+        val uid = auth.currentUser?.uid ?: return
+        firestore.collection("stories").document(story.id)
+            .collection("reactions").document(uid)
+            .get()
+            .addOnSuccessListener { doc ->
+                val emoji = doc.getString("emoji") ?: return@addOnSuccessListener
+                // Highlight the matching button
+                val buttons = listOf(
+                    binding.btnReactHeart to "❤️",
+                    binding.btnReactLaugh to "😂",
+                    binding.btnReactWow to "😮",
+                    binding.btnReactSad to "😢",
+                    binding.btnReactLove to "😍",
+                    binding.btnReactFire to "🔥"
+                )
+                buttons.forEach { (btn, e) ->
+                    btn.alpha = if (e == emoji) 1.0f else 0.4f
+                }
+            }
     }
 
     private fun playVideo(videoUrl: String) {
@@ -419,10 +527,16 @@ class StoryViewActivity : BaseActivity() {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        stopStoryMusic()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacks(progressBarRunnable)
         handler.removeCallbacks(storyStepRunnable)
         binding.vvStory.stopPlayback()
+        stopStoryMusic()
     }
 }

@@ -52,6 +52,17 @@ class StoriesFragment : Fragment(), SearchableFragment {
         uri?.let { handleMediaSelection(it) }
     }
 
+    private var pendingMediaUri: Uri? = null
+    private var pendingMediaType: String? = null
+
+    private val musicPickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        val mediaUri = pendingMediaUri ?: return@registerForActivityResult
+        val mediaType = pendingMediaType ?: "image"
+        uploadStoryWithMusic(mediaUri, mediaType, uri)
+        pendingMediaUri = null
+        pendingMediaType = null
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
@@ -240,10 +251,22 @@ class StoriesFragment : Fragment(), SearchableFragment {
     private fun handleMediaSelection(uri: Uri) {
         val mimeType = requireContext().contentResolver.getType(uri)
         val mediaType = if (mimeType?.startsWith("video") == true) "video" else "image"
-        uploadStory(uri, mediaType)
+        // Ask user if they want to add music
+        android.app.AlertDialog.Builder(requireContext())
+            .setTitle("Add Music?")
+            .setMessage("Do you want to add background music to your story?")
+            .setPositiveButton("Yes, pick music") { _, _ ->
+                pendingMediaUri = uri
+                pendingMediaType = mediaType
+                musicPickerLauncher.launch("audio/*")
+            }
+            .setNegativeButton("No, skip") { _, _ ->
+                uploadStoryWithMusic(uri, mediaType, null)
+            }
+            .show()
     }
 
-    private fun uploadStory(mediaUri: Uri, mediaType: String) {
+    private fun uploadStoryWithMusic(mediaUri: Uri, mediaType: String, musicUri: Uri?) {
         val context = context ?: return
         
         if (mediaType == "video") {
@@ -285,8 +308,33 @@ class StoriesFragment : Fragment(), SearchableFragment {
                         }
                         return@launch
                     }
-                    
-                    saveStoryToFirestore(finalData, "image")
+
+                    // Encode music if provided
+                    var musicBase64: String? = null
+                    var musicTitle: String? = null
+                    if (musicUri != null) {
+                        try {
+                            val musicStream = context.contentResolver.openInputStream(musicUri)
+                            val musicBytes = musicStream?.readBytes()
+                            if (musicBytes != null && musicBytes.size <= 800000) {
+                                musicBase64 = "data:audio/mp3;base64," + android.util.Base64.encodeToString(musicBytes, android.util.Base64.DEFAULT)
+                                // Get file name as title
+                                val cursor = context.contentResolver.query(musicUri, null, null, null, null)
+                                cursor?.use {
+                                    if (it.moveToFirst()) {
+                                        val idx = it.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
+                                        if (idx != -1) musicTitle = it.getString(idx).substringBeforeLast(".")
+                                    }
+                                }
+                            } else {
+                                Toast.makeText(context, "Music clip too long (max ~30s)", Toast.LENGTH_SHORT).show()
+                            }
+                        } catch (e: Exception) {
+                            android.util.Log.e("StoriesFragment", "Music encode error: ${e.message}")
+                        }
+                    }
+
+                    saveStoryToFirestore(finalData, "image", musicBase64, musicTitle)
                 }
             } catch (e: Exception) {
                 if (isAdded) {
@@ -297,7 +345,11 @@ class StoriesFragment : Fragment(), SearchableFragment {
         }
     }
 
-    private fun saveStoryToFirestore(mediaUrl: String, mediaType: String) {
+    private fun uploadStory(mediaUri: Uri, mediaType: String) {
+        uploadStoryWithMusic(mediaUri, mediaType, null)
+    }
+
+    private fun saveStoryToFirestore(mediaUrl: String, mediaType: String, musicUrl: String? = null, musicTitle: String? = null) {
         val currentUid = auth.currentUser?.uid ?: return
         
         firestore.collection("users").document(currentUid).get().addOnSuccessListener { userDoc ->
@@ -311,7 +363,9 @@ class StoriesFragment : Fragment(), SearchableFragment {
                 profileImageUrl = profilePic,
                 mediaUrl = mediaUrl,
                 mediaType = mediaType,
-                timestamp = Timestamp.now()
+                timestamp = Timestamp.now(),
+                musicUrl = musicUrl,
+                musicTitle = musicTitle
             )
 
             firestore.collection("stories").add(storyData)

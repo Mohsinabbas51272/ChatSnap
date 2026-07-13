@@ -28,11 +28,11 @@ class ThemeAdapter(
             ThemeManager.AppTheme.FULL_WHITE -> android.graphics.Color.WHITE
             ThemeManager.AppTheme.EMERALD_GREEN -> android.graphics.Color.parseColor("#008B5B")
             ThemeManager.AppTheme.SAKURA_PINK -> android.graphics.Color.parseColor("#E05275")
-            ThemeManager.AppTheme.NEON_PINK -> android.graphics.Color.parseColor("#7012F2")
+            ThemeManager.AppTheme.NEON_PINK -> android.graphics.Color.parseColor("#FF1493")
             ThemeManager.AppTheme.MAROON -> android.graphics.Color.parseColor("#B8324C")
             ThemeManager.AppTheme.MAGENTA -> android.graphics.Color.parseColor("#0086D6")
             ThemeManager.AppTheme.TEAL -> android.graphics.Color.parseColor("#008E8E")
-            ThemeManager.AppTheme.CORAL -> android.graphics.Color.parseColor("#E55B44")
+            ThemeManager.AppTheme.CORAL -> android.graphics.Color.parseColor("#FF0000")
         }
         holder.binding.viewColorPreview.setBackgroundColor(previewColor)
         

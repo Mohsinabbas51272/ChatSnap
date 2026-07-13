@@ -10,6 +10,8 @@ import com.example.chatsnap.databinding.LayoutStoryViewersBinding
 import com.example.chatsnap.models.Story
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
+import com.google.firebase.firestore.FirebaseFirestore
+
 class StoryViewersBottomSheet(private val story: Story) : BottomSheetDialogFragment() {
 
     private var _binding: LayoutStoryViewersBinding? = null
@@ -32,9 +34,29 @@ class StoryViewersBottomSheet(private val story: Story) : BottomSheetDialogFragm
         binding.tvSummary.text = "Total ${story.totalViews} views from ${story.viewers.size} viewers"
 
         binding.rvViewers.layoutManager = LinearLayoutManager(context)
-        // Sort viewers by most views or latest
         val sortedViewers = story.viewers.sortedByDescending { it.viewCount }
         binding.rvViewers.adapter = StoryViewersAdapter(sortedViewers)
+
+        loadReactions()
+    }
+
+    private fun loadReactions() {
+        if (story.id.isEmpty()) return
+        val db = FirebaseFirestore.getInstance()
+        db.collection("stories").document(story.id)
+            .collection("reactions")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                if (_binding == null) return@addOnSuccessListener
+                val list = snapshot.documents.mapNotNull { it.getString("emoji") }
+                if (list.isNotEmpty()) {
+                    val grouped = list.groupBy { it }.map { "${it.key} ${it.value.size}" }.joinToString("   ")
+                    binding.tvReactionsSummary.text = "Reactions:  $grouped"
+                    binding.tvReactionsSummary.visibility = View.VISIBLE
+                } else {
+                    binding.tvReactionsSummary.visibility = View.GONE
+                }
+            }
     }
 
     override fun onDestroyView() {

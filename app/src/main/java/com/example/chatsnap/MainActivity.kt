@@ -86,6 +86,10 @@ class MainActivity : BaseActivity() {
             handleFabClick()
         }
 
+        binding.btnAiAssistantFab.setOnClickListener {
+            startActivity(Intent(this, AiChatActivity::class.java))
+        }
+
         binding.ivHeaderProfile.setOnClickListener {
             loadFragment(SettingsFragment(), "Settings")
             updateNavUI(binding.navSettings)
@@ -311,6 +315,9 @@ class MainActivity : BaseActivity() {
     }
 
     private fun checkAppLock() {
+        if (AppLockActivity.isUnlocked) {
+            return
+        }
         val uid = auth.currentUser?.uid ?: return
         firestore.collection("users").document(uid).get().addOnSuccessListener { doc ->
             val code = doc.getString("appLockCode")
@@ -441,25 +448,30 @@ class MainActivity : BaseActivity() {
             is ChatsFragment -> {
                 binding.btnMainFab.visibility = View.VISIBLE
                 binding.btnMainFab.setImageResource(R.drawable.ic_chat)
+                binding.btnAiAssistantFab.visibility = View.VISIBLE
                 binding.cvStatusBanner.visibility = View.GONE
             }
             is StoriesFragment -> {
                 binding.btnMainFab.visibility = View.VISIBLE
                 binding.btnMainFab.setImageResource(android.R.drawable.ic_menu_camera)
+                binding.btnAiAssistantFab.visibility = View.GONE
                 binding.cvStatusBanner.visibility = View.VISIBLE
             }
             is CallsFragment -> {
                 binding.btnMainFab.visibility = View.VISIBLE
                 binding.btnMainFab.setImageResource(android.R.drawable.ic_menu_call)
+                binding.btnAiAssistantFab.visibility = View.GONE
                 binding.cvStatusBanner.visibility = View.GONE
             }
             is PeopleFragment -> {
                 binding.btnMainFab.visibility = View.VISIBLE
                 binding.btnMainFab.setImageResource(android.R.drawable.ic_input_add)
+                binding.btnAiAssistantFab.visibility = View.GONE
                 binding.cvStatusBanner.visibility = View.GONE
             }
             else -> {
                 binding.btnMainFab.visibility = View.GONE
+                binding.btnAiAssistantFab.visibility = View.GONE
                 binding.cvStatusBanner.visibility = View.GONE
             }
         }

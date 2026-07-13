@@ -25,5 +25,8 @@ data class Message(
     val pollQuestion: String = "",
     val pollOptions: List<String> = emptyList(),
     val pollVotes: Map<String, Int> = emptyMap(), // userId -> selectedOptionIndex
-    val effect: String = "NONE" // NONE, SHOUT, WHISPER, BALLOONS
+    val effect: String = "NONE", // NONE, SHOUT, WHISPER, BALLOONS
+    // Scheduled Message
+    val scheduledFor: Long? = null,
+    val isScheduled: Boolean = false
 )

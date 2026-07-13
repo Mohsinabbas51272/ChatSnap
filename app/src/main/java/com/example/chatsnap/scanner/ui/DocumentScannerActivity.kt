@@ -14,7 +14,7 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
+import com.example.chatsnap.BaseActivity
 import androidx.camera.core.ImageCapture
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Lifecycle
@@ -34,7 +34,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class DocumentScannerActivity : AppCompatActivity() {
+class DocumentScannerActivity : BaseActivity() {
 
     private lateinit var binding: ActivityDocumentScannerBinding
     private val viewModel: ScannerViewModel by viewModels()

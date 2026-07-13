@@ -13,6 +13,9 @@ class SplashActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
+        // Reset unlock state on clean launch
+        AppLockActivity.isUnlocked = false
+
         val logoContainer = findViewById<android.view.View>(R.id.logoContainer)
         logoContainer.alpha = 0f
         logoContainer.scaleX = 0.8f
@@ -37,6 +40,7 @@ class SplashActivity : BaseActivity() {
                     if (!lockCode.isNullOrEmpty()) {
                         val intent = Intent(this, AppLockActivity::class.java)
                         intent.putExtra("EXPECTED_CODE", lockCode)
+                        intent.putExtra("LAUNCH_MAIN", true)
                         startActivity(intent)
                     } else {
                         startActivity(Intent(this, MainActivity::class.java))

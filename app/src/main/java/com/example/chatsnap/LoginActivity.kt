@@ -15,17 +15,22 @@ class LoginActivity : BaseActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var firestore: FirebaseFirestore
+    private var typedPassword = ""
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Reset unlock state on login screen access
+        AppLockActivity.isUnlocked = false
+
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
 
-        // If user is already logged in, verify profile status
-        if (auth.currentUser != null) {
+        // If user is already logged in, verify profile status (unless we are adding another account)
+        if (auth.currentUser != null && !intent.getBooleanExtra("add_account", false)) {
             checkProfileCompletion(auth.currentUser!!.uid)
         }
 
@@ -38,6 +43,7 @@ class LoginActivity : BaseActivity() {
                 return@setOnClickListener
             }
 
+            typedPassword = password
             binding.loginButton.isEnabled = false
 
             if (android.util.Patterns.EMAIL_ADDRESS.matcher(input).matches()) {
@@ -162,6 +168,24 @@ class LoginActivity : BaseActivity() {
                     }
 
                     val isCompleted = document.getBoolean("profileCompleted") ?: false
+                    
+                    // Save account to local accounts database for multi-account switching
+                    val email = document.getString("email") ?: auth.currentUser?.email ?: ""
+                    val name = document.getString("name") ?: "User"
+                    val profileUrl = document.getString("profileImageUrl") ?: ""
+                    if (email.isNotEmpty() && typedPassword.isNotEmpty()) {
+                        val encrypted = com.example.chatsnap.utils.AccountManager.encryptPassword(typedPassword)
+                        val newAcc = com.example.chatsnap.utils.AccountManager.SavedAccount(
+                            uid = userId,
+                            email = email,
+                            name = name,
+                            profileImageUrl = profileUrl,
+                            encryptedPasswordBase64 = encrypted.first,
+                            ivBase64 = encrypted.second
+                        )
+                        com.example.chatsnap.utils.AccountManager.saveAccount(this, newAcc)
+                    }
+
                     com.example.chatsnap.utils.SessionManager.startNewSession(this, userId) {
                         if (isCompleted) {
                             startActivity(Intent(this, MainActivity::class.java))

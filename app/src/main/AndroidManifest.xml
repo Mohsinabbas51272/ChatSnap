@@ -18,6 +18,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
 
     <application
         android:name=".ChatSnapApplication"
@@ -76,6 +77,7 @@
         <activity android:name=".AppLockActivity" />
         <activity android:name=".CreateGroupActivity" />
         <activity android:name=".AdminActivity" />
+        <activity android:name=".ForwardActivity" android:theme="@style/Theme.ChatSnap.NoActionBar" />
         <activity android:name=".CallActivity" android:theme="@style/Theme.ChatSnap.NoActionBar" />
         <activity android:name=".IncomingCallActivity" android:theme="@style/Theme.ChatSnap.NoActionBar" />
 
@@ -84,6 +86,48 @@
             android:exported="false"
             android:theme="@style/Theme.ChatSnap.NoActionBar"
             android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ShareReceiverActivity"
+            android:exported="true"
+            android:theme="@style/Theme.ChatSnap.NoActionBar"
+            android:label="ChatSnap">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="audio/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".StoryViewActivity"
@@ -144,6 +188,22 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.ChatSnap.NoActionBar" />
+
+        <activity
+            android:name=".ContactsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.ChatSnap.NoActionBar" />
+
+        <activity
+            android:name=".MultiAccountActivity"
+            android:exported="false"
+            android:theme="@style/Theme.ChatSnap.NoActionBar" />
+
+        <activity
+            android:name=".AiChatActivity"
+            android:exported="false"
+            android:theme="@style/Theme.ChatSnap.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
 
         <service
             android:name=".services.DownloadService"

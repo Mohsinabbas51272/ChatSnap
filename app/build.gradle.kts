@@ -1,9 +1,19 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.services)
     alias(libs.plugins.ksp)
 }
+
+val envProperties = Properties().apply {
+    val envFile = rootProject.file(".env")
+    if (envFile.exists()) {
+        envFile.inputStream().use { load(it) }
+    }
+}
+val groqApiKey = envProperties.getProperty("GROQ_API_KEY") ?: ""
 
 android {
     namespace = "com.example.chatsnap"
@@ -24,6 +34,8 @@ android {
         ndk {
             abiFilters.addAll(setOf("x86", "x86_64", "armeabi-v7a", "arm64-v8a"))
         }
+
+        buildConfigField("String", "GROQ_API_KEY", "\"$groqApiKey\"")
     }
 
     buildTypes {
@@ -58,7 +70,7 @@ android {
     buildFeatures {
         viewBinding = true
         // Optimization: Disable features you don't use
-        buildConfig = false
+        buildConfig = true
         aidl = false
         renderScript = false
         shaders = false
@@ -98,6 +110,12 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+
+    // WorkManager (Scheduled Messages)
+    implementation("androidx.work:work-runtime-ktx:2.9.1")
+
+    // OkHttp (Gemini AI API)
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     // Local Storage (Room) - Migrated to KSP for faster builds
     implementation(libs.androidx.room.runtime)

@@ -13,11 +13,11 @@ object ThemeManager {
         FULL_WHITE(R.style.Theme_ChatSnap_FullWhite, "Full White (Light)", 0),
         EMERALD_GREEN(R.style.Theme_ChatSnap_EmeraldGreen, "Sage & Mint (Light)", 0),
         SAKURA_PINK(R.style.Theme_ChatSnap_SakuraPink, "Sakura Rose (Light)", 0),
-        NEON_PINK(R.style.Theme_ChatSnap_NeonPink, "Lavender Mist (Light)", 0),
-        MAROON(R.style.Theme_ChatSnap_Maroon, "Burgundy Velvet (Light)", 0),
+        NEON_PINK(R.style.Theme_ChatSnap_NeonPink, "Deep Pink (Light)", 0),
+        MAROON(R.style.Theme_ChatSnap_Maroon, "Maroon (Light)", 0),
         MAGENTA(R.style.Theme_ChatSnap_Magenta, "Ocean Sky (Light)", 0),
         TEAL(R.style.Theme_ChatSnap_Teal, "Teal Ice (Light)", 0),
-        CORAL(R.style.Theme_ChatSnap_Coral, "Coral Sunset (Light)", 0)
+        CORAL(R.style.Theme_ChatSnap_Coral, "Red (Light)", 0)
     }
 
     fun setTheme(context: Context, theme: AppTheme) {

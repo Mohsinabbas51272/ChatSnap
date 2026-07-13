@@ -216,11 +216,6 @@ class DownloaderActivity : BaseActivity() {
             fetchPlaylistAndHandleQueue()
         }
 
-        binding.cvWebDownloader.setOnClickListener {
-            val intent = Intent(this, WebVideoDownloaderActivity::class.java)
-            startActivity(intent)
-        }
-
         // Import links from text file
         binding.btnImportFile.setOnClickListener {
             if (!engineReady) {
@@ -257,6 +252,12 @@ class DownloaderActivity : BaseActivity() {
 
         // Load history
         loadHistory()
+
+        // Prefill URL if passed via intent
+        val passedUrl = intent.getStringExtra("download_url")
+        if (!passedUrl.isNullOrEmpty()) {
+            binding.etUrl.setText(passedUrl)
+        }
     }
 
     override fun onResume() {

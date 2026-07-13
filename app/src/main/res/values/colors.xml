@@ -27,13 +27,13 @@
     <color name="white_primary">#FFFFFF</color>
 
     <!-- 1. Sage & Mint Theme (Light) -->
-    <color name="emerald_bg">#F3FDF7</color>
-    <color name="emerald_surface">#E5FAF0</color>
-    <color name="emerald_primary">#008B5B</color>
-    <color name="emerald_text_primary">#112F21</color>
-    <color name="emerald_text_secondary">#4A6B5D</color>
+    <color name="sage_mint_bg">#F3FDF7</color>
+    <color name="sage_mint_surface">#E5FAF0</color>
+    <color name="sage_mint_primary">#008B5B</color>
+    <color name="sage_mint_text_primary">#112F21</color>
+    <color name="sage_mint_text_secondary">#4A6B5D</color>
 
-    <!-- 2. Burgundy Velvet Theme (Light) -->
+    <!-- 2. Maroon Theme (Light) -->
     <color name="maroon_bg">#FFF5F5</color>
     <color name="maroon_surface">#FFE6E8</color>
     <color name="maroon_primary">#B8324C</color>
@@ -41,11 +41,11 @@
     <color name="maroon_text_secondary">#734B52</color>
 
     <!-- 3. Ocean Sky Theme (Light) -->
-    <color name="magenta_bg">#F2F8FD</color>
-    <color name="magenta_surface">#E1F1FD</color>
-    <color name="magenta_primary">#0086D6</color>
-    <color name="magenta_text">#081E33</color>
-    <color name="magenta_text_secondary">#4A5F73</color>
+    <color name="ocean_sky_bg">#F2F8FD</color>
+    <color name="ocean_sky_surface">#E1F1FD</color>
+    <color name="ocean_sky_primary">#0086D6</color>
+    <color name="ocean_sky_text">#081E33</color>
+    <color name="ocean_sky_text_secondary">#4A5F73</color>
 
     <!-- 4. Teal Ice Theme (Light) -->
     <color name="teal_bg">#F0FAF9</color>
@@ -57,7 +57,7 @@
     <!-- 5. Coral Sunset Theme (Light) -->
     <color name="coral_bg">#FFF6F3</color>
     <color name="coral_surface">#FFEBE5</color>
-    <color name="coral_primary">#E55B44</color>
+    <color name="coral_primary">#FF0000</color>
     <color name="coral_text">#33110C</color>
     <color name="coral_text_secondary">#75504A</color>
 
@@ -68,10 +68,10 @@
     <color name="sakura_text_primary">#30000C</color>
     <color name="sakura_text_secondary">#754854</color>
 
-    <!-- 7. Lavender Mist Theme (Light) -->
-    <color name="neon_pink_bg">#F6F5FF</color>
-    <color name="neon_pink_surface">#EBE8FF</color>
-    <color name="neon_pink_primary">#7012F2</color>
-    <color name="neon_pink_text_primary">#1B1333</color>
-    <color name="neon_pink_text_secondary">#595270</color>
+    <!-- 7. Deep Pink Theme (Light) -->
+    <color name="deep_pink_bg">#F6F5FF</color>
+    <color name="deep_pink_surface">#EBE8FF</color>
+    <color name="deep_pink_primary">#FF1493</color>
+    <color name="deep_pink_text_primary">#1B1333</color>
+    <color name="deep_pink_text_secondary">#595270</color>
 </resources>

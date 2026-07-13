@@ -178,9 +178,13 @@ class ChatAdapter(
                 renderPoll(binding.pollContainer, message)
             } else if (message.type == "LOCATION") {
                 binding.ivMessageImage.visibility = View.VISIBLE
-                binding.ivMessageImage.setImageResource(R.drawable.ic_location)
-                binding.ivMessageImage.imageTintList = ColorStateList.valueOf(Color.parseColor("#34B7F1"))
-                binding.tvMessage.text = "Location: ${message.latitude}, ${message.longitude}\nTap to view on Map"
+                binding.ivMessageImage.imageTintList = null
+                val mapUrl = "https://static-maps.yandex.ru/1.x/?ll=${message.longitude},${message.latitude}&z=15&l=map&size=350,350&pt=${message.longitude},${message.latitude},pm2rdm"
+                binding.ivMessageImage.load(mapUrl) {
+                    placeholder(R.drawable.ic_location)
+                    error(R.drawable.ic_location)
+                }
+                binding.tvMessage.text = "📍 Location Shared\n(Tap to view on Map)"
                 binding.tvMessage.setTextColor(Color.parseColor("#34B7F1"))
             } else if (message.type == "AUDIO") {
                 binding.ivMessageImage.visibility = View.GONE
@@ -278,9 +282,13 @@ class ChatAdapter(
                 renderPoll(binding.pollContainer, message)
             } else if (message.type == "LOCATION") {
                 binding.ivMessageImage.visibility = View.VISIBLE
-                binding.ivMessageImage.setImageResource(R.drawable.ic_location)
-                binding.ivMessageImage.imageTintList = ColorStateList.valueOf(Color.parseColor("#34B7F1"))
-                binding.tvMessage.text = "Location: ${message.latitude}, ${message.longitude}\nTap to view on Map"
+                binding.ivMessageImage.imageTintList = null
+                val mapUrl = "https://static-maps.yandex.ru/1.x/?ll=${message.longitude},${message.latitude}&z=15&l=map&size=350,350&pt=${message.longitude},${message.latitude},pm2rdm"
+                binding.ivMessageImage.load(mapUrl) {
+                    placeholder(R.drawable.ic_location)
+                    error(R.drawable.ic_location)
+                }
+                binding.tvMessage.text = "📍 Location Shared\n(Tap to view on Map)"
                 binding.tvMessage.setTextColor(Color.parseColor("#34B7F1"))
             } else if (message.type == "AUDIO") {
                 binding.ivMessageImage.visibility = View.GONE
