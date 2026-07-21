@@ -131,7 +131,7 @@
                             android:layout_marginEnd="2dp"
                             android:background="@drawable/bg_badge"
                             android:gravity="center"
-                            android:textColor="#FFFFFF"
+                            android:textColor="?attr/colorOnPrimary"
                             android:textSize="9sp"
                             android:fontFamily="sans-serif-black"
                             android:visibility="gone"
@@ -294,7 +294,7 @@
                         android:gravity="center"
                         android:orientation="vertical"
                         android:padding="16dp">
-                        <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@android:drawable/ic_menu_rotate" app:tint="#F59E0B" />
+                        <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@android:drawable/ic_menu_rotate" app:tint="?attr/colorWarning" />
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="SYNC" android:textSize="11sp" android:fontFamily="sans-serif-black" android:layout_marginTop="6dp" />
                     </LinearLayout>
 
@@ -308,7 +308,7 @@
                         android:gravity="center"
                         android:orientation="vertical"
                         android:padding="16dp">
-                        <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@android:drawable/ic_menu_camera" app:tint="#10B981" />
+                        <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@android:drawable/ic_menu_camera" app:tint="?attr/colorSuccess" />
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="SCAN QR" android:textSize="11sp" android:fontFamily="sans-serif-black" android:layout_marginTop="6dp" />
                     </LinearLayout>
 
@@ -322,7 +322,7 @@
                         android:gravity="center"
                         android:orientation="vertical"
                         android:padding="16dp">
-                        <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@android:drawable/ic_menu_gallery" app:tint="#3B82F6" />
+                        <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@android:drawable/ic_menu_gallery" app:tint="?attr/colorLink" />
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="MY QR" android:textSize="11sp" android:fontFamily="sans-serif-black" android:layout_marginTop="6dp" />
                     </LinearLayout>
                 </LinearLayout>

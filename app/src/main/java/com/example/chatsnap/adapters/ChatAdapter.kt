@@ -185,7 +185,9 @@ class ChatAdapter(
                     error(R.drawable.ic_location)
                 }
                 binding.tvMessage.text = "📍 Location Shared\n(Tap to view on Map)"
-                binding.tvMessage.setTextColor(Color.parseColor("#34B7F1"))
+                val tv1 = android.util.TypedValue()
+                binding.root.context.theme.resolveAttribute(com.example.chatsnap.R.attr.colorLink, tv1, true)
+                binding.tvMessage.setTextColor(tv1.data)
             } else if (message.type == "AUDIO") {
                 binding.ivMessageImage.visibility = View.GONE
                 if (playingMessageId == message.messageId) {
@@ -213,11 +215,15 @@ class ChatAdapter(
                 when (message.status) {
                     "READ" -> {
                         binding.ivStatus.setImageResource(R.drawable.ic_tick_double)
-                        binding.ivStatus.imageTintList = ColorStateList.valueOf(Color.parseColor("#34B7F1"))
+                        val tv2 = android.util.TypedValue()
+                        binding.root.context.theme.resolveAttribute(com.example.chatsnap.R.attr.colorLink, tv2, true)
+                        binding.ivStatus.imageTintList = ColorStateList.valueOf(tv2.data)
                     }
                     "DELIVERED" -> {
                         binding.ivStatus.setImageResource(R.drawable.ic_tick_double)
-                        binding.ivStatus.imageTintList = ColorStateList.valueOf(Color.RED)
+                        val tv3 = android.util.TypedValue()
+                        binding.root.context.theme.resolveAttribute(com.example.chatsnap.R.attr.colorError, tv3, true)
+                        binding.ivStatus.imageTintList = ColorStateList.valueOf(tv3.data)
                     }
                     else -> {
                         binding.ivStatus.setImageResource(R.drawable.ic_tick_single)
@@ -289,7 +295,9 @@ class ChatAdapter(
                     error(R.drawable.ic_location)
                 }
                 binding.tvMessage.text = "📍 Location Shared\n(Tap to view on Map)"
-                binding.tvMessage.setTextColor(Color.parseColor("#34B7F1"))
+                val tv4 = android.util.TypedValue()
+                binding.root.context.theme.resolveAttribute(com.example.chatsnap.R.attr.colorLink, tv4, true)
+                binding.tvMessage.setTextColor(tv4.data)
             } else if (message.type == "AUDIO") {
                 binding.ivMessageImage.visibility = View.GONE
                 if (playingMessageId == message.messageId) {
@@ -450,7 +458,9 @@ class ChatAdapter(
             if (votersForThisOption.isNotEmpty()) {
                 val tvVoters = TextView(container.context).apply {
                     textSize = 10f
-                    setTextColor(Color.GRAY)
+                    val tv5 = android.util.TypedValue()
+                    container.context.theme.resolveAttribute(android.R.attr.textColorSecondary, tv5, true)
+                    setTextColor(tv5.data)
                     setPadding(10, 0, 10, 5)
                 }
                 pollView.findViewById<LinearLayout>(R.id.pollOptionLayout)?.addView(tvVoters)

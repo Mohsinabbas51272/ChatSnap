@@ -30,12 +30,18 @@ class SupportAdapter(
         val status = request.status.uppercase()
         holder.binding.tvSupportStatus.text = status
         
-        // Dynamic background for status
+        // Dynamic background for status — resolve from theme
+        val ctx = holder.binding.root.context
+        fun resolveColor(attr: Int): Int {
+            val tv = android.util.TypedValue()
+            ctx.theme.resolveAttribute(attr, tv, true)
+            return tv.data
+        }
         val statusBg = when (status) {
-            "OPEN" -> android.graphics.Color.parseColor("#2563EB")
-            "IN-PROGRESS" -> android.graphics.Color.parseColor("#F59E0B")
-            "RESOLVED" -> android.graphics.Color.parseColor("#10B981")
-            else -> android.graphics.Color.parseColor("#6B7280")
+            "OPEN" -> resolveColor(com.example.chatsnap.R.attr.colorLink)
+            "IN-PROGRESS" -> resolveColor(com.example.chatsnap.R.attr.colorWarning)
+            "RESOLVED" -> resolveColor(com.example.chatsnap.R.attr.colorSuccess)
+            else -> resolveColor(android.R.attr.textColorSecondary)
         }
         holder.binding.tvSupportStatus.background.setTint(statusBg)
 

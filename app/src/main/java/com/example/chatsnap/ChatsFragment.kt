@@ -671,7 +671,9 @@ class ChatsFragment : Fragment(), SearchableFragment {
                                 tvText.layoutParams = params
                             } else {
                                 tvText.setBackgroundResource(R.drawable.bg_bubble_received)
-                                tvText.setTextColor(context.getColor(android.R.color.black))
+                                val tvReceivedColor = android.util.TypedValue()
+                                context.theme.resolveAttribute(android.R.attr.textColorPrimary, tvReceivedColor, true)
+                                tvText.setTextColor(tvReceivedColor.data)
                                 val params = tvText.layoutParams as android.widget.LinearLayout.LayoutParams
                                 params.gravity = android.view.Gravity.START
                                 tvText.layoutParams = params

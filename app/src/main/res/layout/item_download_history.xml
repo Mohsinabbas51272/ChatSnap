@@ -84,7 +84,7 @@
                     android:layout_height="12dp"
                     android:layout_marginEnd="4dp"
                     android:src="@android:drawable/stat_sys_download_done"
-                    app:tint="#34C759"
+                    app:tint="?attr/colorSuccess"
                     android:contentDescription="Status Indicator" />
 
                 <TextView
@@ -92,7 +92,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Completed"
-                    android:textColor="#34C759"
+                    android:textColor="?attr/colorSuccess"
                     android:textSize="10sp"
                     android:textStyle="bold" />
 

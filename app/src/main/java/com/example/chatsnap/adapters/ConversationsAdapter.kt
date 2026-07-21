@@ -90,13 +90,17 @@ class ConversationsAdapter(
             holder.binding.tvUnreadCount.visibility = View.VISIBLE
             holder.binding.tvUnreadCount.text = conversation.unreadCount.toString()
             holder.binding.tvPartnerName.setTypeface(null, android.graphics.Typeface.BOLD)
-            holder.binding.tvLastMessage.setTextColor(context.getColor(R.color.primary))
+            val tvPrimary = android.util.TypedValue()
+            context.theme.resolveAttribute(com.google.android.material.R.attr.colorPrimary, tvPrimary, true)
+            holder.binding.tvLastMessage.setTextColor(tvPrimary.data)
             holder.binding.ivMessageStatus.visibility = View.GONE
         } else {
             holder.binding.viewUnreadIndicator.visibility = View.GONE
             holder.binding.tvUnreadCount.visibility = View.GONE
             holder.binding.tvPartnerName.setTypeface(null, android.graphics.Typeface.NORMAL)
-            holder.binding.tvLastMessage.setTextColor(context.getColor(android.R.color.darker_gray))
+            val tvSec = android.util.TypedValue()
+            context.theme.resolveAttribute(android.R.attr.textColorSecondary, tvSec, true)
+            holder.binding.tvLastMessage.setTextColor(tvSec.data)
             
             // Show status icon (Delivered/Viewed) for the last message you sent
             // This is a simplified logic: if viewed is true, show blue double tick, else grey

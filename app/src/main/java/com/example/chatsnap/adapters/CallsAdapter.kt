@@ -48,9 +48,11 @@ class CallsAdapter(
         val isMissed = call.status == "missed"
         
         if (isMissed && isFollowedFriend) {
-            holder.binding.tvPartnerName.setTextColor(android.graphics.Color.RED)
-            holder.binding.tvCallInfo.setTextColor(android.graphics.Color.RED)
-            holder.binding.ivCallIcon.imageTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.RED)
+            val tvError = android.util.TypedValue()
+            holder.binding.root.context.theme.resolveAttribute(com.example.chatsnap.R.attr.colorError, tvError, true)
+            holder.binding.tvPartnerName.setTextColor(tvError.data)
+            holder.binding.tvCallInfo.setTextColor(tvError.data)
+            holder.binding.ivCallIcon.imageTintList = android.content.res.ColorStateList.valueOf(tvError.data)
         } else {
             val typedValue = android.util.TypedValue()
             holder.binding.root.context.theme.resolveAttribute(android.R.attr.textColorPrimary, typedValue, true)

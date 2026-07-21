@@ -22,9 +22,10 @@
         android:layout_gravity="top|end"
         android:layout_margin="2dp"
         android:background="@drawable/bg_icon_circle"
-        android:backgroundTint="#CC000000"
+        android:backgroundTint="?attr/colorSurfaceVariant"
+        android:alpha="0.85"
         android:src="@android:drawable/ic_menu_close_clear_cancel"
-        app:tint="#FFFFFF"
+        app:tint="?attr/colorOnSurface"
         android:padding="2dp"
         android:scaleType="centerInside"
         android:contentDescription="Remove Image" />

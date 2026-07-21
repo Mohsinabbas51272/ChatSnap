@@ -9,7 +9,7 @@
         android:id="@+id/voteProgress"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:background="#20000000" />
+        android:background="?attr/colorSurfaceVariant" />
 
     <LinearLayout
         android:id="@+id/pollOptionLayout"

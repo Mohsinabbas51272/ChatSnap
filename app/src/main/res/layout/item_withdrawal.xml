@@ -59,7 +59,7 @@
                 android:paddingVertical="4dp"
                 android:textSize="11sp"
                 android:textStyle="bold"
-                android:textColor="#FFFFFF"
+                android:textColor="?attr/colorOnPrimary"
                 tools:text="Easypaisa" />
 
             <TextView
@@ -72,7 +72,7 @@
                 android:paddingVertical="4dp"
                 android:textSize="11sp"
                 android:textStyle="bold"
-                android:textColor="#FFFFFF"
+                android:textColor="?attr/colorOnPrimary"
                 tools:text="PENDING" />
 
             <View

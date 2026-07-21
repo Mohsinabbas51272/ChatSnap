@@ -6,7 +6,7 @@
     app:cardCornerRadius="24dp"
     app:cardElevation="4dp"
     app:strokeWidth="0dp"
-    app:cardBackgroundColor="#005DFF">
+    app:cardBackgroundColor="?attr/colorPrimary">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -21,7 +21,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Admin Panel"
-            android:textColor="#FFFFFF"
+            android:textColor="?attr/colorOnPrimary"
             android:textSize="18sp"
             android:fontFamily="sans-serif-black" />
 
@@ -32,7 +32,8 @@
             android:layout_below="@id/tvItemTitle"
             android:layout_marginTop="2dp"
             android:text="Enterprise controls &amp; moderation"
-            android:textColor="#BFFFffff"
+            android:textColor="?attr/colorOnPrimary"
+            android:alpha="0.75"
             android:textSize="12sp" />
 
         <!-- Access Portal pill button -->
@@ -42,11 +43,12 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:background="@drawable/bg_green_chip"
-            android:backgroundTint="#20ffffff"
+            android:backgroundTint="?attr/colorOnPrimary"
+            android:alpha="0.2"
             android:paddingHorizontal="16dp"
             android:gravity="center"
             android:text="Access Portal"
-            android:textColor="#FFFFFF"
+            android:textColor="?attr/colorOnPrimary"
             android:textSize="11sp"
             android:textStyle="bold" />
 

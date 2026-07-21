@@ -4,6 +4,11 @@
     <attr name="chatBubbleReceivedColor" format="color" />
     <attr name="chatBubbleSentTextColor" format="color" />
     <attr name="chatBubbleReceivedTextColor" format="color" />
-    <attr name="colorOnPrimary" format="color" />
     <attr name="themeAccentColor" format="color" />
+    <!-- Semantic status colors — used across all layouts & adapters -->
+    <attr name="colorSuccess" format="color" />
+    <attr name="colorWarning" format="color" />
+    <attr name="colorError" format="color" />
+    <attr name="colorLink" format="color" />
+    <attr name="colorCardElevated" format="color" />
 </resources>

@@ -66,9 +66,9 @@
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="24dp"
                 app:cardElevation="2dp"
-                app:cardBackgroundColor="#1A007AFF"
+                app:cardBackgroundColor="?attr/colorPrimaryContainer"
                 app:strokeWidth="1dp"
-                app:strokeColor="#33007AFF">
+                app:strokeColor="?attr/colorPrimary">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -89,7 +89,7 @@
                             android:padding="2dp"
                             android:src="@drawable/ic_launcher_background"
                             app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
-                            app:strokeColor="#007AFF"
+                            app:strokeColor="?attr/colorPrimary"
                             app:strokeWidth="2dp"
                             android:scaleType="centerCrop" />
 
@@ -101,7 +101,7 @@
                             android:layout_marginEnd="4dp"
                             android:layout_marginBottom="4dp"
                             android:background="@drawable/bg_icon_circle"
-                            android:backgroundTint="#34C759" />
+                            android:backgroundTint="?attr/colorSuccess" />
                     </FrameLayout>
 
                     <!-- Name / Status / Phone Number inside vertical layout -->
@@ -167,8 +167,8 @@
                         android:text="Edit"
                         android:fontFamily="sans-serif-black"
                         android:textSize="12sp"
-                        android:textColor="#FFFFFF"
-                        app:backgroundTint="#005DFF"
+                        android:textColor="?attr/colorOnPrimary"
+                        app:backgroundTint="?attr/colorPrimary"
                         app:cornerRadius="18dp"
                         android:paddingHorizontal="12dp"
                         android:insetTop="0dp"
@@ -241,7 +241,7 @@
                         android:layout_below="@id/balanceRow"
                         android:layout_marginTop="4dp"
                         android:text="PKR 0.00"
-                        android:textColor="#34C759"
+                        android:textColor="?attr/colorSuccess"
                         android:textSize="11sp"
                         android:textStyle="bold" />
 
@@ -256,14 +256,14 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:background="@drawable/bg_icon_circle"
-                            android:backgroundTint="#0E007AFF" />
+                            android:backgroundTint="?attr/colorPrimaryContainer" />
 
                         <ImageView
                             android:layout_width="16dp"
                             android:layout_height="16dp"
                             android:layout_gravity="center"
                             android:src="@android:drawable/ic_menu_crop"
-                            app:tint="#007AFF" />
+                            app:tint="?attr/colorPrimary" />
                     </FrameLayout>
 
                     <!-- Mock Trend Chart bars matching screenshot -->
@@ -281,48 +281,54 @@
                             android:layout_weight="1"
                             android:layout_marginEnd="4dp"
                             android:background="@drawable/bg_green_chip"
-                            android:backgroundTint="#508AB9E6" />
+                            android:backgroundTint="?attr/colorPrimaryContainer"
+                            android:alpha="0.5" />
                         <View
                             android:layout_width="0dp"
                             android:layout_height="18dp"
                             android:layout_weight="1"
                             android:layout_marginEnd="4dp"
                             android:background="@drawable/bg_green_chip"
-                            android:backgroundTint="#808AB9E6" />
+                            android:backgroundTint="?attr/colorPrimaryContainer"
+                            android:alpha="0.6" />
                         <View
                             android:layout_width="0dp"
                             android:layout_height="18dp"
                             android:layout_weight="1"
                             android:layout_marginEnd="4dp"
                             android:background="@drawable/bg_green_chip"
-                            android:backgroundTint="#808AB9E6" />
+                            android:backgroundTint="?attr/colorPrimaryContainer"
+                            android:alpha="0.7" />
                         <View
                             android:layout_width="0dp"
                             android:layout_height="18dp"
                             android:layout_weight="1"
                             android:layout_marginEnd="4dp"
                             android:background="@drawable/bg_green_chip"
-                            android:backgroundTint="#808AB9E6" />
+                            android:backgroundTint="?attr/colorPrimaryContainer"
+                            android:alpha="0.8" />
                         <View
                             android:layout_width="0dp"
                             android:layout_height="18dp"
                             android:layout_weight="1"
                             android:layout_marginEnd="4dp"
                             android:background="@drawable/bg_green_chip"
-                            android:backgroundTint="#808AB9E6" />
+                            android:backgroundTint="?attr/colorPrimaryContainer"
+                            android:alpha="0.9" />
                         <View
                             android:layout_width="0dp"
                             android:layout_height="18dp"
                             android:layout_weight="1"
                             android:layout_marginEnd="4dp"
                             android:background="@drawable/bg_green_chip"
-                            android:backgroundTint="#808AB9E6" />
+                            android:backgroundTint="?attr/colorPrimary"
+                            android:alpha="0.9" />
                         <View
                             android:layout_width="0dp"
                             android:layout_height="18dp"
                             android:layout_weight="1"
                             android:background="@drawable/bg_green_chip"
-                            android:backgroundTint="#FF8AB9E6" />
+                            android:backgroundTint="?attr/colorPrimary" />
                     </LinearLayout>
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -516,14 +522,14 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:src="@android:drawable/ic_lock_power_off"
-                    app:tint="#FF3B30" />
+                    app:tint="?attr/colorError" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:text="Log Out"
-                    android:textColor="#FF3B30"
+                    android:textColor="?attr/colorError"
                     android:textSize="16sp"
                     android:fontFamily="sans-serif-black" />
             </LinearLayout>

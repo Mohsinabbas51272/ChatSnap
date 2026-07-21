@@ -157,7 +157,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     private fun showMaintenanceDialog() {
         if (isFinishing || isDestroyed) return
-        androidx.appcompat.app.AlertDialog.Builder(this)
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
             .setTitle("Under Maintenance")
             .setMessage("ChatSnap is currently undergoing scheduled maintenance. Please try again later.")
             .setCancelable(false)
