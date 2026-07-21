@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.chatsnap.databinding.ActivityMainBinding
 import com.example.chatsnap.utils.SearchableFragment
 import com.google.firebase.auth.FirebaseAuth
@@ -30,6 +31,24 @@ class MainActivity : BaseActivity() {
     private lateinit var firestore: FirebaseFirestore
     private var currentFragment: Fragment? = null
     private var statusJob: Job? = null
+
+    private var currentSnapFilePath: String? = null
+    private var snapPhotoUri: android.net.Uri? = null
+
+    private val takeSnapLauncher = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.TakePicture()) { success ->
+        if (success) {
+            val uri = snapPhotoUri
+            if (uri != null) {
+                processAndSendSnap(uri)
+            } else {
+                Toast.makeText(this, "Snap capture failed, try again", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private val pickSnapLauncher = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia()) { uri ->
+        uri?.let { processAndSendSnap(it) }
+    }
 
     private data class StatusUpdate(
         val userId: String,
@@ -68,6 +87,7 @@ class MainActivity : BaseActivity() {
         initializeFcmToken()
         loadAnnouncement()
         checkMaintenanceMode()
+        listenForActiveCall()
 
         if (savedInstanceState == null) {
             loadFragment(ChatsFragment(), "Chats")
@@ -84,6 +104,10 @@ class MainActivity : BaseActivity() {
 
         binding.btnMainFab.setOnClickListener {
             handleFabClick()
+        }
+
+        binding.btnSnapPlusFab.setOnClickListener {
+            showSnapCreationDialog()
         }
 
         binding.btnAiAssistantFab.setOnClickListener {
@@ -448,29 +472,34 @@ class MainActivity : BaseActivity() {
             is ChatsFragment -> {
                 binding.btnMainFab.visibility = View.VISIBLE
                 binding.btnMainFab.setImageResource(R.drawable.ic_chat)
+                binding.btnSnapPlusFab.visibility = View.VISIBLE
                 binding.btnAiAssistantFab.visibility = View.VISIBLE
                 binding.cvStatusBanner.visibility = View.GONE
             }
             is StoriesFragment -> {
                 binding.btnMainFab.visibility = View.VISIBLE
                 binding.btnMainFab.setImageResource(android.R.drawable.ic_menu_camera)
+                binding.btnSnapPlusFab.visibility = View.GONE
                 binding.btnAiAssistantFab.visibility = View.GONE
                 binding.cvStatusBanner.visibility = View.VISIBLE
             }
             is CallsFragment -> {
                 binding.btnMainFab.visibility = View.VISIBLE
                 binding.btnMainFab.setImageResource(android.R.drawable.ic_menu_call)
+                binding.btnSnapPlusFab.visibility = View.GONE
                 binding.btnAiAssistantFab.visibility = View.GONE
                 binding.cvStatusBanner.visibility = View.GONE
             }
             is PeopleFragment -> {
                 binding.btnMainFab.visibility = View.VISIBLE
                 binding.btnMainFab.setImageResource(android.R.drawable.ic_input_add)
+                binding.btnSnapPlusFab.visibility = View.GONE
                 binding.btnAiAssistantFab.visibility = View.GONE
                 binding.cvStatusBanner.visibility = View.GONE
             }
             else -> {
                 binding.btnMainFab.visibility = View.GONE
+                binding.btnSnapPlusFab.visibility = View.GONE
                 binding.btnAiAssistantFab.visibility = View.GONE
                 binding.cvStatusBanner.visibility = View.GONE
             }
@@ -522,6 +551,46 @@ class MainActivity : BaseActivity() {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
         }
         startActivity(intent)
+    }
+
+    private fun listenForActiveCall() {
+        val uid = auth.currentUser?.uid ?: return
+        val pill = binding.cardActiveCallPill
+        val dot = binding.viewCallDot
+
+        // Pulsing alpha animation on the green dot
+        val pulseAnim = android.animation.ObjectAnimator.ofFloat(dot, "alpha", 1f, 0.2f).apply {
+            duration = 800
+            repeatMode = android.animation.ObjectAnimator.REVERSE
+            repeatCount = android.animation.ObjectAnimator.INFINITE
+        }
+
+        firestore.collection("calls")
+            .whereIn("status", listOf("pending", "active"))
+            .whereEqualTo("callerId", uid)
+            .limit(1)
+            .addSnapshotListener { snapshot, _ ->
+                val hasActive = snapshot != null && !snapshot.isEmpty
+                if (hasActive) {
+                    pill.visibility = android.view.View.VISIBLE
+                    if (!pulseAnim.isRunning) pulseAnim.start()
+                    val doc = snapshot!!.documents[0]
+                    pill.setOnClickListener {
+                        val intent = Intent(this, CallActivity::class.java).apply {
+                            putExtra("receiverId", doc.getString("receiverId"))
+                            putExtra("receiverName", doc.getString("receiverName"))
+                            putExtra("callerName", doc.getString("callerName"))
+                            putExtra("callType", doc.getString("type") ?: "Voice")
+                            putExtra("channelName", doc.getString("channelName"))
+                            putExtra("isCaller", true)
+                        }
+                        startActivity(intent)
+                    }
+                } else {
+                    pill.visibility = android.view.View.GONE
+                    pulseAnim.cancel()
+                }
+            }
     }
 
     private fun requestNotificationPermission() {
@@ -613,4 +682,82 @@ class MainActivity : BaseActivity() {
             .setPositiveButton("OK") { _, _ -> finish() }
             .show()
     }
+
+    private fun showSnapCreationDialog() {
+        val options = arrayOf("📸 Take a Photo Snap", "🖼️ Choose Snap from Gallery")
+        AlertDialog.Builder(this)
+            .setTitle("Send a Snap ✨")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> openCameraForSnap()
+                    1 -> pickSnapLauncher.launch(androidx.activity.result.PickVisualMediaRequest(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageAndVideo))
+                }
+            }
+            .show()
+    }
+
+    private fun openCameraForSnap() {
+        if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            androidx.core.app.ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.CAMERA), 108)
+            return
+        }
+        try {
+            val file = java.io.File.createTempFile("SNAP_${System.currentTimeMillis()}", ".jpg", getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES))
+            currentSnapFilePath = file.absolutePath
+            val uri = androidx.core.content.FileProvider.getUriForFile(this, "${packageName}.fileprovider", file)
+            snapPhotoUri = uri
+            takeSnapLauncher.launch(uri)
+        } catch (e: Exception) {
+            Toast.makeText(this, "Camera error: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 108 && grantResults.isNotEmpty() && grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            openCameraForSnap()
+        }
+    }
+
+    private fun processAndSendSnap(uri: android.net.Uri) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val bytes = contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                if (bytes == null || bytes.isEmpty()) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@MainActivity, "Photo capture failed, please try again", Toast.LENGTH_SHORT).show()
+                    }
+                    return@launch
+                }
+                // Compress image before encoding to reduce size
+                val bitmap = android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                val compressed = java.io.ByteArrayOutputStream()
+                bitmap?.compress(android.graphics.Bitmap.CompressFormat.JPEG, 60, compressed)
+                val finalBytes = if (compressed.size() > 0) compressed.toByteArray() else bytes
+
+                val base64 = android.util.Base64.encodeToString(finalBytes, android.util.Base64.DEFAULT)
+                val mimeType = "image/jpeg"
+                val finalData = "data:$mimeType;base64,$base64"
+
+                // Write to temp file to avoid TransactionTooLargeException (Binder 1MB limit)
+                val tempFile = java.io.File(cacheDir, "snap_temp_${System.currentTimeMillis()}.txt")
+                tempFile.writeText(finalData)
+
+                withContext(Dispatchers.Main) {
+                    val intent = Intent(this@MainActivity, ForwardActivity::class.java).apply {
+                        putExtra("msg_content", "📸 Snap")
+                        putExtra("msg_type", "SNAP")
+                        putExtra("msg_media_file", tempFile.absolutePath)
+                        putExtra("msg_is_snap", true)
+                    }
+                    startActivity(intent)
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@MainActivity, "Snap error: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 }
+

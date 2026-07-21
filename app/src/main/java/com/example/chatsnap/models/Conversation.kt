@@ -15,5 +15,6 @@ data class Conversation(
     val isGroup: Boolean = false,
     val streakCount: Int = 0,
     val isExpiringSoon: Boolean = false,
-    val isPartnerAdmin: Boolean = false
+    val isPartnerAdmin: Boolean = false,
+    val isPinned: Boolean = false
 )

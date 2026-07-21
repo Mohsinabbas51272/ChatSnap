@@ -73,6 +73,7 @@ class ConversationsAdapter(
         }
         
         holder.binding.viewOnlineStatus.visibility = if (conversation.isOnline) View.VISIBLE else View.GONE
+        holder.binding.ivPinned.visibility = if (conversation.isPinned) View.VISIBLE else View.GONE
         
         // Streak Display
         if (conversation.streakCount > 0) {
@@ -114,6 +115,8 @@ class ConversationsAdapter(
     }
 
     override fun getItemCount(): Int = conversations.size
+
+    fun getConversationsList(): List<Conversation> = conversations
 
     fun updateData(newConversations: List<Conversation>) {
         conversations = newConversations

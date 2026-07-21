@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="?attr/colorSurface"
+    app:strokeColor="?attr/colorOutlineVariant"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivPreviewProfile"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_launcher_foreground"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
+                app:strokeColor="?attr/colorOutlineVariant"
+                app:strokeWidth="1dp" />
+
+            <TextView
+                android:id="@+id/tvPreviewName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:textSize="16sp"
+                android:fontFamily="sans-serif-black"
+                android:textColor="?android:attr/textColorPrimary"
+                android:text="Chat Preview" />
+
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/previewProgress"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:layout_margin="16dp" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxHeight="240dp">
+
+            <LinearLayout
+                android:id="@+id/layoutPreviewMessages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+        </ScrollView>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

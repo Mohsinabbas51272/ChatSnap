@@ -45,22 +45,41 @@
         app:layout_constraintEnd_toEndOf="@id/ivPartnerProfile"
         android:layout_margin="2dp" />
 
-    <TextView
-        android:id="@+id/tvPartnerName"
+    <LinearLayout
+        android:id="@+id/layoutNameContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="8dp"
-        android:ellipsize="end"
-        android:fontFamily="sans-serif-black"
-        android:maxLines="1"
-        android:text="Partner Name"
-        android:textColor="?android:attr/textColorPrimary"
-        android:textSize="15sp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
         app:layout_constraintEnd_toStartOf="@+id/layoutMeta"
         app:layout_constraintStart_toEndOf="@id/ivPartnerProfile"
         app:layout_constraintTop_toTopOf="@id/ivPartnerProfile"
-        app:layout_constraintVertical_chainStyle="packed" />
+        app:layout_constraintVertical_chainStyle="packed">
+
+        <TextView
+            android:id="@+id/tvPartnerName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-black"
+            android:maxLines="1"
+            android:text="Partner Name"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="15sp" />
+
+        <ImageView
+            android:id="@+id/ivPinned"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_marginStart="4dp"
+            android:src="@drawable/ic_pin"
+            app:tint="?attr/colorPrimary"
+            android:visibility="gone"
+            tools:visibility="visible" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/layoutMessageContainer"
@@ -69,9 +88,9 @@
         android:layout_marginTop="2dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="@id/tvPartnerName"
-        app:layout_constraintStart_toStartOf="@id/tvPartnerName"
-        app:layout_constraintTop_toBottomOf="@id/tvPartnerName">
+        app:layout_constraintEnd_toEndOf="@id/layoutNameContainer"
+        app:layout_constraintStart_toStartOf="@id/layoutNameContainer"
+        app:layout_constraintTop_toBottomOf="@id/layoutNameContainer">
 
         <ImageView
             android:id="@+id/ivMessageStatus"
@@ -102,7 +121,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="end"
-        app:layout_constraintTop_toTopOf="@id/tvPartnerName"
+        app:layout_constraintTop_toTopOf="@id/layoutNameContainer"
         app:layout_constraintEnd_toEndOf="parent">
 
         <TextView

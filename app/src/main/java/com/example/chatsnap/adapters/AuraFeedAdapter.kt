@@ -155,9 +155,116 @@ class AuraFeedAdapter(
             binding.btnShare.setOnClickListener { shareVideo() }
             binding.btnOptions.setOnClickListener { showDeleteDialog() }
 
-            // Gesture Overlay Tap play/pause
-            binding.gestureOverlay.setOnClickListener {
-                togglePlayback()
+            // Gesture Overlay with Double-Tap to Like & Heart Pop-Up Animation
+            val gestureDetector = android.view.GestureDetector(context, object : android.view.GestureDetector.SimpleOnGestureListener() {
+                override fun onSingleTapConfirmed(e: android.view.MotionEvent): Boolean {
+                    togglePlayback()
+                    return true
+                }
+
+                override fun onDoubleTap(e: android.view.MotionEvent): Boolean {
+                    showHeartPopUp(e.x, e.y)
+                    val v = auraVideo ?: return true
+                    if (!v.likes.contains(currentUid)) {
+                        toggleLike()
+                    }
+                    return true
+                }
+            })
+
+            binding.gestureOverlay.setOnTouchListener { _, event ->
+                gestureDetector.onTouchEvent(event)
+                true
+            }
+
+            // Start Vinyl Spinning Animation
+            startVinylAnimation()
+        }
+
+        private fun startVinylAnimation() {
+            binding.ivMusicVinyl.animate()
+                .rotationBy(360f)
+                .setDuration(3000)
+                .setInterpolator(android.view.animation.LinearInterpolator())
+                .withEndAction {
+                    if (binding.ivMusicVinyl.isAttachedToWindow) {
+                        startVinylAnimation()
+                        showFloatingMusicNote()
+                    }
+                }
+                .start()
+        }
+
+        private fun showFloatingMusicNote() {
+            val container = binding.root as? ViewGroup ?: return
+            val noteView = android.widget.TextView(context).apply {
+                text = if (java.util.Random().nextBoolean()) "🎵" else "🎶"
+                textSize = 18f
+                alpha = 0.9f
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            }
+            container.addView(noteView)
+
+            val vinylLoc = IntArray(2)
+            binding.flVinylContainer.getLocationInWindow(vinylLoc)
+            val rootLoc = IntArray(2)
+            container.getLocationInWindow(rootLoc)
+
+            val startX = (vinylLoc[0] - rootLoc[0] + 10).toFloat()
+            val startY = (vinylLoc[1] - rootLoc[1]).toFloat()
+
+            noteView.x = startX
+            noteView.y = startY
+
+            val moveY = android.animation.ObjectAnimator.ofFloat(noteView, "translationY", 0f, -220f)
+            val moveX = android.animation.ObjectAnimator.ofFloat(noteView, "translationX", 0f, -50f)
+            val fade = android.animation.ObjectAnimator.ofFloat(noteView, "alpha", 0.9f, 0f)
+            val scaleX = android.animation.ObjectAnimator.ofFloat(noteView, "scaleX", 0.7f, 1.4f)
+            val scaleY = android.animation.ObjectAnimator.ofFloat(noteView, "scaleY", 0.7f, 1.4f)
+
+            android.animation.AnimatorSet().apply {
+                playTogether(moveY, moveX, fade, scaleX, scaleY)
+                duration = 1600
+                addListener(object : android.animation.AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: android.animation.Animator) {
+                        container.removeView(noteView)
+                    }
+                })
+                start()
+            }
+        }
+
+        private fun showHeartPopUp(x: Float, y: Float) {
+            val container = binding.root as? ViewGroup ?: return
+            val heartView = android.widget.ImageView(context).apply {
+                setImageResource(android.R.drawable.btn_star_big_on)
+                imageTintList = android.content.res.ColorStateList.valueOf(
+                    android.graphics.Color.parseColor("#FF0055")
+                )
+                layoutParams = ViewGroup.LayoutParams(120, 120)
+                this.x = x - 60
+                this.y = y - 60
+                rotation = (java.util.Random().nextInt(30) - 15).toFloat()
+            }
+            container.addView(heartView)
+
+            val scaleX = android.animation.ObjectAnimator.ofFloat(heartView, "scaleX", 0.2f, 1.4f, 1.0f)
+            val scaleY = android.animation.ObjectAnimator.ofFloat(heartView, "scaleY", 0.2f, 1.4f, 1.0f)
+            val alpha = android.animation.ObjectAnimator.ofFloat(heartView, "alpha", 1.0f, 0.0f)
+
+            android.animation.AnimatorSet().apply {
+                play(scaleX).with(scaleY)
+                play(alpha).after(400)
+                duration = 800
+                addListener(object : android.animation.AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: android.animation.Animator) {
+                        container.removeView(heartView)
+                    }
+                })
+                start()
             }
         }
 

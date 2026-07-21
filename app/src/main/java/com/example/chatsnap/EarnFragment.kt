@@ -345,6 +345,7 @@ class EarnFragment : Fragment() {
             if (_binding != null) {
                 Toast.makeText(context, "Claimed $amount coins!", Toast.LENGTH_SHORT).show()
                 updateButtonStatus(button, true, true, "", {}, {})
+                showCoinBurst(button)
             }
         }.addOnFailureListener { e ->
             if (_binding != null) {
@@ -354,8 +355,58 @@ class EarnFragment : Fragment() {
         }
     }
 
+    private fun showCoinBurst(anchorView: android.view.View) {
+        val rootView = binding.root as? android.view.ViewGroup ?: return
+        val location = IntArray(2)
+        anchorView.getLocationInWindow(location)
+        val rootLocation = IntArray(2)
+        rootView.getLocationInWindow(rootLocation)
+        val startX = (location[0] - rootLocation[0] + anchorView.width / 2).toFloat()
+        val startY = (location[1] - rootLocation[1] + anchorView.height / 2).toFloat()
+
+        val emojis = listOf("🪙", "💰", "✨", "⭐", "🪙", "💫", "🪙")
+        val random = java.util.Random()
+        emojis.forEachIndexed { index, emoji ->
+            val tv = android.widget.TextView(requireContext()).apply {
+                text = emoji
+                textSize = 22f
+                layoutParams = android.view.ViewGroup.LayoutParams(
+                    android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
+                    android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                x = startX
+                y = startY
+                alpha = 1f
+            }
+            rootView.addView(tv)
+
+            val dx = (random.nextFloat() - 0.5f) * 400f
+            val dy = -(random.nextFloat() * 300f + 100f)
+            val delay = index * 60L
+
+            android.animation.AnimatorSet().apply {
+                val moveX = android.animation.ObjectAnimator.ofFloat(tv, "translationX", 0f, dx)
+                val moveY = android.animation.ObjectAnimator.ofFloat(tv, "translationY", 0f, dy)
+                val fadeOut = android.animation.ObjectAnimator.ofFloat(tv, "alpha", 1f, 0f)
+                val scaleX = android.animation.ObjectAnimator.ofFloat(tv, "scaleX", 0.5f, 1.2f, 0f)
+                val scaleY = android.animation.ObjectAnimator.ofFloat(tv, "scaleY", 0.5f, 1.2f, 0f)
+                playTogether(moveX, moveY, fadeOut, scaleX, scaleY)
+                duration = 900
+                startDelay = delay
+                interpolator = android.view.animation.DecelerateInterpolator()
+                addListener(object : android.animation.AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: android.animation.Animator) {
+                        rootView.removeView(tv)
+                    }
+                })
+                start()
+            }
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 }
+

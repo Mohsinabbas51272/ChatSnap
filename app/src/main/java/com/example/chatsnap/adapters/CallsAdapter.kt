@@ -69,6 +69,8 @@ class CallsAdapter(
 
     override fun getItemCount(): Int = calls.size
 
+    fun getCallsList(): List<Call> = calls
+
     fun updateData(newCalls: List<Call>, newFollowed: List<String> = followedFriends) {
         calls = newCalls
         followedFriends = newFollowed

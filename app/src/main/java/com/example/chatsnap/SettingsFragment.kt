@@ -45,6 +45,7 @@ class SettingsFragment : Fragment() {
         setupSettingItems()
         listenToUserData()
         loadStats()
+        setupSettingsSearch()
 
         // Apply staggered animations
         val viewsToAnimate = listOf(
@@ -433,6 +434,44 @@ class SettingsFragment : Fragment() {
         super.onDestroyView()
         removeListeners()
         _binding = null
+    }
+
+    private fun setupSettingsSearch() {
+        binding.etSettingsSearch.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                filterSettings(s?.toString()?.trim()?.lowercase() ?: "")
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
+    }
+
+    private fun filterSettings(query: String) {
+        if (_binding == null) return
+        val itemsMap = mapOf(
+            "theme dark light color" to binding.itemTheme.root,
+            "wallpaper background" to binding.itemWallpaper.root,
+            "vault lock secret" to binding.itemVault.root,
+            "downloader media video" to binding.itemDownloader.root,
+            "scanner qr code" to binding.itemScanner.root,
+            "notes memo checklist" to binding.itemNotes.root,
+            "web downloader site" to binding.itemWebDownloader.root,
+            "contacts sync phone" to binding.itemContacts.root,
+            "multi account switch" to binding.itemMultiAccount.root,
+            "notifications alert sound" to binding.itemNotifications.root,
+            "ghost mode stealth online" to binding.itemGhostMode.root,
+            "app lock passcode pin" to binding.itemAppLock.root,
+            "privacy policy terms" to binding.itemPrivacyPolicy.root,
+            "help support faq" to binding.itemHelp.root
+        )
+
+        itemsMap.forEach { (keywords, view) ->
+            if (query.isEmpty() || keywords.contains(query)) {
+                view.visibility = View.VISIBLE
+            } else {
+                view.visibility = View.GONE
+            }
+        }
     }
 
     private fun sendTestNotification() {

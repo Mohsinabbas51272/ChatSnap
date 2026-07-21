@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import coil.load
 import com.example.chatsnap.adapters.ConversationsAdapter
 import com.example.chatsnap.databinding.FragmentChatsBinding
 import com.example.chatsnap.models.Conversation
@@ -236,10 +237,43 @@ class ChatsFragment : Fragment(), SearchableFragment {
         }, onLongClick = { conversation ->
             if (viewMode == "SECRET") {
                 showUnhideDialog(conversation)
+            } else {
+                showQuickPreviewDialog(conversation)
             }
         })
         binding.rvConversations.layoutManager = LinearLayoutManager(requireContext())
         binding.rvConversations.adapter = adapter
+
+        val swipeHandler = object : androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback(0, androidx.recyclerview.widget.ItemTouchHelper.LEFT or androidx.recyclerview.widget.ItemTouchHelper.RIGHT) {
+            override fun onMove(
+                recyclerView: androidx.recyclerview.widget.RecyclerView,
+                viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder,
+                target: androidx.recyclerview.widget.RecyclerView.ViewHolder
+            ): Boolean = false
+
+            override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                val list = (binding.rvConversations.adapter as? ConversationsAdapter)?.getConversationsList() ?: return
+                if (position in list.indices) {
+                    val conversation = list[position]
+                    if (direction == androidx.recyclerview.widget.ItemTouchHelper.RIGHT) {
+                        togglePinChat(conversation.partnerId)
+                    } else {
+                        if (viewMode == "SECRET") {
+                            showUnhideDialog(conversation)
+                        } else {
+                            if (conversation.isGroup) {
+                                android.widget.Toast.makeText(context, "Groups cannot be made secret", android.widget.Toast.LENGTH_SHORT).show()
+                                refreshAdapter()
+                            } else {
+                                hideChatDirectly(conversation.partnerId)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        androidx.recyclerview.widget.ItemTouchHelper(swipeHandler).attachToRecyclerView(binding.rvConversations)
 
         binding.swipeRefresh.setOnRefreshListener {
             loadConversations()
@@ -420,7 +454,9 @@ class ChatsFragment : Fragment(), SearchableFragment {
 
     private fun refreshAdapter() {
         if (_binding == null) return
+        val pinnedIds = getPinnedChats()
         val list = conversationMap.values.toList()
+            .map { it.copy(isPinned = pinnedIds.contains(it.partnerId)) }
             .filter { conv ->
                 when (viewMode) {
                     "CHATS" -> !secretPartnerIds.contains(conv.partnerId) && !conv.isGroup
@@ -429,7 +465,8 @@ class ChatsFragment : Fragment(), SearchableFragment {
                     else -> true
                 }
             }
-            .sortedByDescending { it.lastMessageTimestamp }
+            .sortedWith(compareByDescending<Conversation> { it.isPinned }
+                .thenByDescending { it.lastMessageTimestamp })
             
         adapter.updateData(list)
         binding.progressBar.visibility = View.GONE
@@ -443,7 +480,9 @@ class ChatsFragment : Fragment(), SearchableFragment {
 
     override fun onSearch(query: String) {
         if (_binding == null) return
+        val pinnedIds = getPinnedChats()
         val list = conversationMap.values.toList()
+            .map { it.copy(isPinned = pinnedIds.contains(it.partnerId)) }
             .filter { conv ->
                 val matchesMode = when (viewMode) {
                     "CHATS" -> !secretPartnerIds.contains(conv.partnerId) && !conv.isGroup
@@ -453,7 +492,8 @@ class ChatsFragment : Fragment(), SearchableFragment {
                 }
                 matchesMode && (conv.partnerName.contains(query, true) || conv.lastMessage.contains(query, true))
             }
-            .sortedByDescending { it.lastMessageTimestamp }
+            .sortedWith(compareByDescending<Conversation> { it.isPinned }
+                .thenByDescending { it.lastMessageTimestamp })
         adapter.updateData(list)
     }
 
@@ -470,8 +510,182 @@ class ChatsFragment : Fragment(), SearchableFragment {
                         android.widget.Toast.makeText(context, "Chat unhidden", android.widget.Toast.LENGTH_SHORT).show()
                     }
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton("Cancel") { _, _ ->
+                refreshAdapter()
+            }
+            .setOnCancelListener {
+                refreshAdapter()
+            }
             .show()
+    }
+
+    private fun getPinnedChats(): Set<String> {
+        val prefs = requireContext().getSharedPreferences("pinned_chats_prefs", android.content.Context.MODE_PRIVATE)
+        return prefs.getStringSet("pinned_partner_ids", emptySet()) ?: emptySet()
+    }
+
+    private fun togglePinChat(partnerId: String) {
+        val prefs = requireContext().getSharedPreferences("pinned_chats_prefs", android.content.Context.MODE_PRIVATE)
+        val current = prefs.getStringSet("pinned_partner_ids", emptySet())?.toMutableSet() ?: mutableSetOf()
+        val isCurrentlyPinned = current.contains(partnerId)
+        val pinned = if (isCurrentlyPinned) {
+            current.remove(partnerId)
+            false
+        } else {
+            current.add(partnerId)
+            true
+        }
+        prefs.edit().putStringSet("pinned_partner_ids", current).apply()
+        val msg = if (pinned) "Chat pinned to top" else "Chat unpinned"
+        android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_SHORT).show()
+        refreshAdapter()
+    }
+
+    private fun hideChatDirectly(partnerId: String) {
+        val uid = auth.currentUser?.uid ?: return
+        val secretData = hashMapOf(
+            "userId" to uid,
+            "partnerId" to partnerId,
+            "timestamp" to com.google.firebase.Timestamp.now()
+        )
+        firestore.collection("secretConversations").document("${uid}_${partnerId}").set(secretData)
+            .addOnSuccessListener {
+                android.widget.Toast.makeText(context, "Chat hidden in Secret tab", android.widget.Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener {
+                android.widget.Toast.makeText(context, "Failed to hide chat", android.widget.Toast.LENGTH_SHORT).show()
+                refreshAdapter()
+            }
+    }
+
+    private fun showQuickPreviewDialog(conversation: Conversation) {
+        val context = requireContext()
+        val view = LayoutInflater.from(context).inflate(R.layout.dialog_quick_preview, null)
+        
+        val tvName = view.findViewById<android.widget.TextView>(R.id.tvPreviewName)
+        val ivProfile = view.findViewById<android.widget.ImageView>(R.id.ivPreviewProfile)
+        val layoutMessages = view.findViewById<android.widget.LinearLayout>(R.id.layoutPreviewMessages)
+        val progress = view.findViewById<android.widget.ProgressBar>(R.id.previewProgress)
+        
+        tvName.text = conversation.partnerName
+        if (conversation.isPartnerAdmin) {
+            ivProfile.setImageResource(R.drawable.ic_app_logo)
+        } else {
+            val photo = conversation.partnerPhotoUrl
+            if (!photo.isNullOrEmpty()) {
+                if (photo.startsWith("data:image") || photo.length > 1000) {
+                    try {
+                        val cleanBase64 = photo.substringAfter(",")
+                        val decodedString: ByteArray = android.util.Base64.decode(cleanBase64, android.util.Base64.DEFAULT)
+                        val decodedByte = android.graphics.BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                        ivProfile.setImageBitmap(decodedByte)
+                    } catch (e: Exception) {
+                        ivProfile.setImageResource(R.drawable.ic_launcher_foreground)
+                    }
+                } else {
+                    ivProfile.load(photo) {
+                        placeholder(R.drawable.ic_launcher_foreground)
+                    }
+                }
+            } else {
+                ivProfile.setImageResource(R.drawable.ic_launcher_foreground)
+            }
+        }
+        
+        // Haptic Feedback
+        view.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+        
+        val dialog = android.app.Dialog(context)
+        dialog.setContentView(view)
+        dialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.85).toInt(),
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        
+        val myUid = auth.currentUser?.uid ?: return
+        val partnerId = conversation.partnerId
+        
+        if (conversation.isGroup) {
+            firestore.collection("groupMessages")
+                .whereEqualTo("conversationId", partnerId)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(5)
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    progress.visibility = View.GONE
+                    val messages = snapshot.toObjects(Message::class.java).reversed()
+                    if (messages.isEmpty()) {
+                        val emptyTv = android.widget.TextView(context).apply {
+                            text = "No messages yet"
+                            setTextColor(context.getColor(android.R.color.darker_gray))
+                            setPadding(16, 16, 16, 16)
+                            gravity = android.view.Gravity.CENTER
+                        }
+                        layoutMessages.addView(emptyTv)
+                    } else {
+                        messages.forEach { msg ->
+                            val msgView = LayoutInflater.from(context).inflate(R.layout.item_preview_message, layoutMessages, false)
+                            val tvText = msgView.findViewById<android.widget.TextView>(R.id.tvPreviewText)
+                            val tvSender = msgView.findViewById<android.widget.TextView>(R.id.tvPreviewSender)
+                            
+                            tvText.text = msg.content
+                            tvSender.visibility = View.VISIBLE
+                            tvSender.text = if (msg.senderId == myUid) "You" else conversation.partnerName
+                            layoutMessages.addView(msgView)
+                        }
+                    }
+                }
+                .addOnFailureListener {
+                    progress.visibility = View.GONE
+                }
+        } else {
+            val conversationId = if (myUid < partnerId) "${myUid}_${partnerId}" else "${partnerId}_${myUid}"
+            firestore.collection("messages")
+                .whereEqualTo("conversationId", conversationId)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(5)
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    progress.visibility = View.GONE
+                    val messages = snapshot.toObjects(Message::class.java).reversed()
+                    if (messages.isEmpty()) {
+                        val emptyTv = android.widget.TextView(context).apply {
+                            text = "No messages yet"
+                            setTextColor(context.getColor(android.R.color.darker_gray))
+                            setPadding(16, 16, 16, 16)
+                            gravity = android.view.Gravity.CENTER
+                        }
+                        layoutMessages.addView(emptyTv)
+                    } else {
+                        messages.forEach { msg ->
+                            val msgView = LayoutInflater.from(context).inflate(R.layout.item_preview_message, layoutMessages, false)
+                            val tvText = msgView.findViewById<android.widget.TextView>(R.id.tvPreviewText)
+                            tvText.text = msg.content
+                            val isMe = msg.senderId == myUid
+                            if (isMe) {
+                                tvText.setBackgroundResource(R.drawable.bg_bubble_circle)
+                                tvText.setTextColor(context.getColor(android.R.color.white))
+                                val params = tvText.layoutParams as android.widget.LinearLayout.LayoutParams
+                                params.gravity = android.view.Gravity.END
+                                tvText.layoutParams = params
+                            } else {
+                                tvText.setBackgroundResource(R.drawable.bg_bubble_received)
+                                tvText.setTextColor(context.getColor(android.R.color.black))
+                                val params = tvText.layoutParams as android.widget.LinearLayout.LayoutParams
+                                params.gravity = android.view.Gravity.START
+                                tvText.layoutParams = params
+                            }
+                            layoutMessages.addView(msgView)
+                        }
+                    }
+                }
+                .addOnFailureListener {
+                    progress.visibility = View.GONE
+                }
+        }
+        
+        dialog.show()
     }
 
     override fun onDestroyView() {

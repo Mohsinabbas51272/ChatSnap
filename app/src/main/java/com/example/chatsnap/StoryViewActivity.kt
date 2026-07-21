@@ -352,12 +352,49 @@ class StoryViewActivity : BaseActivity() {
             "emoji" to emoji,
             "timestamp" to System.currentTimeMillis()
         )
+        
+        // Show immediate floating animation for instant feedback
+        showFloatingReactionEmoji(emoji)
+        
         firestore.collection("stories").document(story.id)
             .collection("reactions").document(uid)
             .set(reactionData)
             .addOnSuccessListener {
-                Toast.makeText(this, "Reacted $emoji", Toast.LENGTH_SHORT).show()
+                loadUserReaction(story)
             }
+    }
+
+    private fun showFloatingReactionEmoji(emoji: String) {
+        val container = binding.root
+        val textView = android.widget.TextView(this).apply {
+            text = emoji
+            textSize = 36f
+        }
+        container.addView(textView)
+        
+        val density = resources.displayMetrics.density
+        val startX = container.width / 2f - (18 * density)
+        val startY = container.height - (120 * density)
+        
+        textView.x = startX
+        textView.y = startY
+        
+        val random = java.util.Random()
+        val driftX = (random.nextFloat() - 0.5f) * 150f * density
+        val driftY = - (300f + random.nextFloat() * 200f) * density
+        
+        textView.animate()
+            .translationXBy(driftX)
+            .translationYBy(driftY)
+            .alpha(0f)
+            .scaleX(1.8f)
+            .scaleY(1.8f)
+            .setDuration(1500)
+            .setInterpolator(android.view.animation.AccelerateDecelerateInterpolator())
+            .withEndAction {
+                container.removeView(textView)
+            }
+            .start()
     }
 
     private fun loadUserReaction(story: Story) {

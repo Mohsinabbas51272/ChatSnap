@@ -66,7 +66,16 @@ class StoryGroupAdapter(
         // Snapchat style: Unread ring is visible only if there are unread stories and it's NOT the user's own story
         // Or if it IS the user's story and they just posted (optional). 
         // Let's stick to showing it for others.
-        holder.binding.viewUnreadRing.visibility = if (group.hasUnread && !isMe) View.VISIBLE else View.GONE
+        if (isMe) {
+            holder.binding.viewUnreadRing.visibility = View.GONE
+        } else {
+            holder.binding.viewUnreadRing.visibility = View.VISIBLE
+            if (group.hasUnread) {
+                holder.binding.viewUnreadRing.setBackgroundResource(R.drawable.story_ring_unread)
+            } else {
+                holder.binding.viewUnreadRing.setBackgroundResource(R.drawable.story_ring_read)
+            }
+        }
         
         // Show '+' icon only on user's own story circle
         holder.binding.ivAddStory.visibility = if (isMe) View.VISIBLE else View.GONE

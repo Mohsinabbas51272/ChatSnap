@@ -139,41 +139,66 @@ class CallsFragment : Fragment(), SearchableFragment {
         }
     }
 
+    private fun triggerCall(call: Call) {
+        val uid = auth.currentUser?.uid ?: return
+        val partnerId = if (call.callerId == uid) call.receiverId else call.callerId
+        val partnerName = if (call.callerId == uid) call.receiverName else call.callerName
+        
+        firestore.collection("users").document(uid).get()
+            .addOnSuccessListener { userDoc ->
+                val callerName = userDoc.getString("name") ?: "A Friend"
+                val intent = Intent(requireContext(), CallActivity::class.java).apply {
+                    putExtra("receiverId", partnerId)
+                    putExtra("receiverName", partnerName)
+                    putExtra("callerName", callerName)
+                    putExtra("callType", call.type)
+                    putExtra("isCaller", true)
+                    val ids = listOf(uid, partnerId).sorted()
+                    putExtra("channelName", "${ids[0]}_${ids[1]}")
+                }
+                startActivity(intent)
+                updateUI() // reset swipe visual
+            }
+            .addOnFailureListener {
+                val intent = Intent(requireContext(), CallActivity::class.java).apply {
+                    putExtra("receiverId", partnerId)
+                    putExtra("receiverName", partnerName)
+                    putExtra("callerName", "A Friend")
+                    putExtra("callType", call.type)
+                    putExtra("isCaller", true)
+                    val ids = listOf(uid, partnerId).sorted()
+                    putExtra("channelName", "${ids[0]}_${ids[1]}")
+                }
+                startActivity(intent)
+                updateUI() // reset swipe visual
+            }
+    }
+
     private fun setupRecyclerView() {
         val uid = auth.currentUser?.uid ?: ""
         adapter = CallsAdapter(emptyList(), uid, followedFriends) { call ->
-            val partnerId = if (call.callerId == uid) call.receiverId else call.callerId
-            val partnerName = if (call.callerId == uid) call.receiverName else call.callerName
-            
-            firestore.collection("users").document(uid).get()
-                .addOnSuccessListener { userDoc ->
-                    val callerName = userDoc.getString("name") ?: "A Friend"
-                    val intent = Intent(requireContext(), CallActivity::class.java).apply {
-                        putExtra("receiverId", partnerId)
-                        putExtra("receiverName", partnerName)
-                        putExtra("callerName", callerName)
-                        putExtra("callType", call.type)
-                        putExtra("isCaller", true)
-                        val ids = listOf(uid, partnerId).sorted()
-                        putExtra("channelName", "${ids[0]}_${ids[1]}")
-                    }
-                    startActivity(intent)
-                }
-                .addOnFailureListener {
-                    val intent = Intent(requireContext(), CallActivity::class.java).apply {
-                        putExtra("receiverId", partnerId)
-                        putExtra("receiverName", partnerName)
-                        putExtra("callerName", "A Friend")
-                        putExtra("callType", call.type)
-                        putExtra("isCaller", true)
-                        val ids = listOf(uid, partnerId).sorted()
-                        putExtra("channelName", "${ids[0]}_${ids[1]}")
-                    }
-                    startActivity(intent)
-                }
+            triggerCall(call)
         }
         binding.rvCalls.layoutManager = LinearLayoutManager(requireContext())
         binding.rvCalls.adapter = adapter
+
+        val swipeHandler = object : androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback(0, androidx.recyclerview.widget.ItemTouchHelper.RIGHT) {
+            override fun onMove(
+                recyclerView: androidx.recyclerview.widget.RecyclerView,
+                viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder,
+                target: androidx.recyclerview.widget.RecyclerView.ViewHolder
+            ): Boolean = false
+
+            override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                val list = adapter.getCallsList()
+                if (position in list.indices) {
+                    val call = list[position]
+                    triggerCall(call)
+                }
+            }
+        }
+        androidx.recyclerview.widget.ItemTouchHelper(swipeHandler).attachToRecyclerView(binding.rvCalls)
     }
 
     private fun loadCallHistory() {

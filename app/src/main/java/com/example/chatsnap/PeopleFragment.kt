@@ -158,12 +158,50 @@ class PeopleFragment : Fragment(), SearchableFragment {
                     R.id.btnTabFriends -> {
                         binding.layoutFriendsView.visibility = View.VISIBLE
                         binding.layoutAddView.visibility = View.GONE
+                        binding.hsvFilterChips.visibility = View.VISIBLE
                     }
                     R.id.btnTabAdd -> {
                         binding.layoutFriendsView.visibility = View.GONE
                         binding.layoutAddView.visibility = View.VISIBLE
+                        binding.hsvFilterChips.visibility = View.GONE
                     }
                 }
+            }
+        }
+
+        binding.chipGroupFilter.setOnCheckedStateChangeListener { _, checkedIds ->
+            val checkedId = checkedIds.firstOrNull() ?: return@setOnCheckedStateChangeListener
+            applyFriendFilter(checkedId)
+        }
+    }
+
+    private var cachedFriendList: List<User> = emptyList()
+
+    private fun applyFriendFilter(chipId: Int) {
+        if (_binding == null) return
+        when (chipId) {
+            R.id.chipAll -> {
+                allFriendsAdapter.updateData(cachedFriendList, getStatusMap())
+                binding.layoutRequests.visibility = View.GONE
+                binding.layoutTopFriends.visibility = if (cachedFriendList.isNotEmpty()) View.VISIBLE else View.GONE
+            }
+            R.id.chipOnlineNow -> {
+                val online = cachedFriendList.filter { it.online == true }
+                allFriendsAdapter.updateData(online, getStatusMap())
+                binding.layoutRequests.visibility = View.GONE
+                binding.layoutTopFriends.visibility = View.GONE
+            }
+            R.id.chipMutual -> {
+                // Show friends in contacts
+                val mutual = cachedFriendList.filter { it.uid in phoneContactsSet }
+                allFriendsAdapter.updateData(mutual, getStatusMap())
+                binding.layoutRequests.visibility = View.GONE
+                binding.layoutTopFriends.visibility = View.GONE
+            }
+            R.id.chipRequests -> {
+                allFriendsAdapter.updateData(emptyList(), mapOf())
+                binding.layoutRequests.visibility = View.VISIBLE
+                binding.layoutTopFriends.visibility = View.GONE
             }
         }
     }
@@ -207,6 +245,7 @@ class PeopleFragment : Fragment(), SearchableFragment {
 
     private fun loadFriendsData(ids: List<String>) {
         if (ids.isEmpty()) {
+            cachedFriendList = emptyList()
             friendsAdapter.updateData(emptyList(), getStatusMap())
             allFriendsAdapter.updateData(emptyList(), getStatusMap())
             binding.layoutTopFriends.visibility = View.GONE
@@ -219,6 +258,7 @@ class PeopleFragment : Fragment(), SearchableFragment {
                 
                 // Sort all friends alphabetically ascending by name
                 val sortedUsers = users.sortedBy { it.name.lowercase() }
+                cachedFriendList = sortedUsers
                 allFriendsAdapter.updateData(sortedUsers, getStatusMap(), friendsList)
                 
                 binding.layoutTopFriends.visibility = View.VISIBLE
@@ -242,7 +282,28 @@ class PeopleFragment : Fragment(), SearchableFragment {
                 if (_binding != null && snapshot != null) {
                     val requests = snapshot.toObjects(FriendRequest::class.java)
                     requestAdapter.updateData(requests)
-                    binding.layoutRequests.visibility = if (requests.isEmpty()) View.GONE else View.VISIBLE
+                    val count = requests.size
+                    val badge = binding.tvRequestsChipBadge
+                    if (count > 0) {
+                        badge.text = if (count > 9) "9+" else count.toString()
+                        badge.visibility = View.VISIBLE
+                        // Pulse animation on badge
+                        val pulse = android.animation.AnimatorSet().also { set ->
+                            val scaleX = android.animation.ObjectAnimator.ofFloat(badge, "scaleX", 1f, 1.4f, 1f)
+                            val scaleY = android.animation.ObjectAnimator.ofFloat(badge, "scaleY", 1f, 1.4f, 1f)
+                            set.playTogether(scaleX, scaleY)
+                            set.duration = 600
+                            set.interpolator = android.view.animation.OvershootInterpolator()
+                        }
+                        pulse.start()
+                    } else {
+                        badge.visibility = View.GONE
+                    }
+                    // Hide the layout requests section unless "Requests" chip is checked
+                    val checkedId = binding.chipGroupFilter.checkedChipId
+                    if (checkedId != R.id.chipRequests) {
+                        binding.layoutRequests.visibility = if (requests.isEmpty()) View.GONE else View.VISIBLE
+                    }
                 }
             }
     }

@@ -42,7 +42,17 @@ class ForwardActivity : BaseActivity() {
         intent?.let {
             msgContent = it.getStringExtra("msg_content") ?: ""
             msgType = it.getStringExtra("msg_type") ?: "TEXT"
-            msgMediaUrl = it.getStringExtra("msg_media_url")
+            // Read media from temp file to avoid TransactionTooLargeException
+            val mediaFilePath = it.getStringExtra("msg_media_file")
+            if (mediaFilePath != null) {
+                val file = java.io.File(mediaFilePath)
+                if (file.exists()) {
+                    msgMediaUrl = file.readText()
+                    file.delete() // clean up temp file
+                }
+            } else {
+                msgMediaUrl = it.getStringExtra("msg_media_url")
+            }
             if (it.hasExtra("msg_latitude")) {
                 msgLatitude = it.getDoubleExtra("msg_latitude", 0.0)
             }

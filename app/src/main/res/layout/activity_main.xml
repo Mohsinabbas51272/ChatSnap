@@ -85,6 +85,45 @@
                         android:visibility="gone" />
                 </FrameLayout>
 
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardActiveCallPill"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:layout_marginEnd="8dp"
+                    android:visibility="gone"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#CC00C853"
+                    app:strokeWidth="0dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/llHeaderActions"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="8dp">
+
+                        <View
+                            android:id="@+id/viewCallDot"
+                            android:layout_width="8dp"
+                            android:layout_height="8dp"
+                            android:background="@drawable/bg_online_dot" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:text="Active Call"
+                            android:textColor="#FFFFFF"
+                            android:textSize="10sp"
+                            android:fontFamily="sans-serif-black" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
                 <LinearLayout
                     android:id="@+id/llHeaderActions"
                     android:layout_width="wrap_content"
@@ -234,6 +273,21 @@
             app:backgroundTint="?attr/colorPrimary"
             app:tint="?attr/colorOnPrimary"
             app:layout_constraintBottom_toTopOf="@id/cvStatusBanner"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Round Center + Snap FAB above bottom menu bar -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btnSnapPlusFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:src="@android:drawable/ic_input_add"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
+            app:backgroundTint="?attr/colorPrimary"
+            app:tint="?attr/colorOnPrimary"
+            app:elevation="10dp"
+            app:layout_constraintBottom_toTopOf="@id/cvFloatingMenu"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Floating Menubar - Extra Compact & Theme Synced -->
