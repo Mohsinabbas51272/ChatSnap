@@ -7,11 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.viewpager2.widget.ViewPager2
+import coil.load
 import com.example.chatsnap.adapters.AuraFeedAdapter
+import com.example.chatsnap.adapters.AuraVideoGridAdapter
 import com.example.chatsnap.databinding.DialogUploadAuraVideoBinding
 import com.example.chatsnap.databinding.FragmentAuraFeedBinding
 import com.example.chatsnap.models.AuraVideo
@@ -36,6 +39,10 @@ class AuraFeedFragment : Fragment() {
     private lateinit var adapter: AuraFeedAdapter
     private var currentTab = "FOR_YOU" // FOR_YOU, FOLLOWING, MY_VIDEOS
 
+    private lateinit var gridAdapter: AuraVideoGridAdapter
+    private var myProfileVideos = mutableListOf<AuraVideo>()
+    private var activeFooterTab = "HOME" // HOME, FRIENDS, INBOX, PROFILE
+
     // Paging parameters
     private var lastTimestamp: Long? = null
     private var isLoading = false
@@ -58,8 +65,8 @@ class AuraFeedFragment : Fragment() {
 
         setupViewPager()
         setupToggles()
-        setupListeners()
-        loadFeed(clearExisting = true)
+        setupTikTokFooter()
+        selectFooterTab("HOME")
     }
 
     private fun setupViewPager() {
@@ -95,7 +102,7 @@ class AuraFeedFragment : Fragment() {
     }
 
     private fun setupToggles() {
-        binding.feedToggleGroup.addOnButtonCheckedListener { group, checkedId, isChecked ->
+        binding.feedToggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked) {
                 adapter.releaseAllPlayers()
                 when (checkedId) {
@@ -107,19 +114,159 @@ class AuraFeedFragment : Fragment() {
                         currentTab = "FOLLOWING"
                         loadFeed(clearExisting = true)
                     }
-                    R.id.btnMyVideos -> {
-                        currentTab = "MY_VIDEOS"
-                        loadFeed(clearExisting = true)
-                    }
                 }
             }
         }
     }
 
-    private fun setupListeners() {
-        binding.btnUploadVideo.setOnClickListener {
-            // Select video from gallery
+    private fun setupTikTokFooter() {
+        binding.btnTabHome.setOnClickListener {
+            selectFooterTab("HOME")
+        }
+        binding.btnTabFriends.setOnClickListener {
+            selectFooterTab("FRIENDS")
+        }
+        binding.btnTabUpload.setOnClickListener {
             videoPickerLauncher.launch("video/*")
+        }
+        binding.btnTabInbox.setOnClickListener {
+            selectFooterTab("INBOX")
+        }
+        binding.btnTabProfile.setOnClickListener {
+            selectFooterTab("PROFILE")
+        }
+    }
+
+    private fun selectFooterTab(tab: String) {
+        activeFooterTab = tab
+        updateFooterTabUI(tab)
+
+        when (tab) {
+            "HOME" -> {
+                binding.viewPagerVideos.visibility = View.VISIBLE
+                binding.layoutTopHeader.visibility = View.VISIBLE
+                binding.layoutInboxContainer.visibility = View.GONE
+                binding.layoutProfileContainer.visibility = View.GONE
+                binding.feedToggleGroup.check(R.id.btnForYou)
+                currentTab = "FOR_YOU"
+                loadFeed(clearExisting = true)
+            }
+            "FRIENDS" -> {
+                binding.viewPagerVideos.visibility = View.VISIBLE
+                binding.layoutTopHeader.visibility = View.VISIBLE
+                binding.layoutInboxContainer.visibility = View.GONE
+                binding.layoutProfileContainer.visibility = View.GONE
+                binding.feedToggleGroup.check(R.id.btnFollowing)
+                currentTab = "FOLLOWING"
+                loadFeed(clearExisting = true)
+            }
+            "INBOX" -> {
+                adapter.releaseAllPlayers()
+                binding.viewPagerVideos.visibility = View.GONE
+                binding.layoutTopHeader.visibility = View.GONE
+                binding.layoutInboxContainer.visibility = View.VISIBLE
+                binding.layoutProfileContainer.visibility = View.GONE
+                binding.layoutEmptyState.visibility = View.GONE
+            }
+            "PROFILE" -> {
+                adapter.releaseAllPlayers()
+                binding.viewPagerVideos.visibility = View.GONE
+                binding.layoutTopHeader.visibility = View.GONE
+                binding.layoutInboxContainer.visibility = View.GONE
+                binding.layoutProfileContainer.visibility = View.VISIBLE
+                binding.layoutEmptyState.visibility = View.GONE
+                loadUserProfileAndVideos()
+            }
+        }
+    }
+
+    private fun updateFooterTabUI(tab: String) {
+        val white = android.graphics.Color.WHITE
+        val gray = android.graphics.Color.parseColor("#A0A0A0")
+
+        binding.ivTabHome.setColorFilter(if (tab == "HOME") white else gray)
+        binding.tvTabHome.setTextColor(if (tab == "HOME") white else gray)
+
+        binding.ivTabFriends.setColorFilter(if (tab == "FRIENDS") white else gray)
+        binding.tvTabFriends.setTextColor(if (tab == "FRIENDS") white else gray)
+
+        binding.ivTabInbox.setColorFilter(if (tab == "INBOX") white else gray)
+        binding.tvTabInbox.setTextColor(if (tab == "INBOX") white else gray)
+
+        binding.ivTabProfile.setColorFilter(if (tab == "PROFILE") white else gray)
+        binding.tvTabProfile.setTextColor(if (tab == "PROFILE") white else gray)
+    }
+
+    private fun loadUserProfileAndVideos() {
+        val uid = auth.currentUser?.uid ?: return
+
+        firestore.collection("users").document(uid).get().addOnSuccessListener { doc ->
+            if (_binding != null && doc.exists()) {
+                val name = doc.getString("name") ?: "User"
+                val photo = doc.getString("profileImageUrl")
+                binding.tvProfileTitleName.text = name
+                binding.tvProfileDisplayName.text = name
+                binding.tvProfileHandle.text = "@${name.lowercase().replace(" ", "")}"
+
+                if (!photo.isNullOrEmpty()) {
+                    if (photo.startsWith("data:image") || photo.length > 1000) {
+                        try {
+                            val cleanBase64 = photo.substringAfter(",")
+                            val decodedString = android.util.Base64.decode(cleanBase64, android.util.Base64.DEFAULT)
+                            val decodedByte = android.graphics.BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                            binding.ivProfileAvatar.setImageBitmap(decodedByte)
+                        } catch (_: Exception) {
+                            binding.ivProfileAvatar.setImageResource(R.drawable.ic_person)
+                        }
+                    } else {
+                        binding.ivProfileAvatar.load(photo) {
+                            placeholder(R.drawable.ic_person)
+                        }
+                    }
+                } else {
+                    binding.ivProfileAvatar.setImageResource(R.drawable.ic_person)
+                }
+
+                @Suppress("UNCHECKED_CAST")
+                val friendsList = doc.get("friends") as? List<String> ?: emptyList()
+                binding.tvFollowingCount.text = friendsList.size.toString()
+            }
+        }
+
+        // Setup Grid RecyclerView
+        gridAdapter = AuraVideoGridAdapter(myProfileVideos) { _, index ->
+            currentTab = "MY_VIDEOS"
+            binding.viewPagerVideos.visibility = View.VISIBLE
+            binding.layoutTopHeader.visibility = View.VISIBLE
+            binding.layoutProfileContainer.visibility = View.GONE
+            videosList.clear()
+            videosList.addAll(myProfileVideos)
+            adapter.notifyDataSetChanged()
+            binding.viewPagerVideos.post {
+                binding.viewPagerVideos.currentItem = index
+                adapter.playVideoAt(index, binding.viewPagerVideos)
+            }
+        }
+        binding.rvMyVideosGrid.layoutManager = GridLayoutManager(requireContext(), 3)
+        binding.rvMyVideosGrid.adapter = gridAdapter
+
+        lifecycleScope.launch {
+            val userVideos = AuraFeedRepository.getMyVideos(uid)
+            myProfileVideos.clear()
+            myProfileVideos.addAll(userVideos)
+            gridAdapter.updateData(myProfileVideos)
+
+            val totalLikes = userVideos.sumOf { it.likeCount }
+            binding.tvLikesCount.text = formatCount(totalLikes)
+            binding.tvFollowersCount.text = formatCount((userVideos.size * 3).toLong())
+        }
+    }
+
+    private fun formatCount(count: Long): String {
+        return when {
+            count >= 1_000_000 -> String.format("%.1fM", count / 1_000_000.0)
+            count >= 1_000 -> String.format("%.1fK", count / 1_000.0)
+            else -> count.toString()
         }
     }
 
@@ -146,7 +293,7 @@ class AuraFeedFragment : Fragment() {
                 if (currentTab != "MY_VIDEOS") {
                     lastTimestamp = list.last().timestamp
                 } else {
-                    isLastPage = true // My videos returns all, no pagination needed for now
+                    isLastPage = true
                 }
                 
                 if (list.size < 10) {
@@ -156,7 +303,6 @@ class AuraFeedFragment : Fragment() {
                 videosList.addAll(list)
                 adapter.notifyDataSetChanged()
                 
-                // Play first video if we cleared existing lists
                 if (clearExisting && videosList.isNotEmpty()) {
                     binding.viewPagerVideos.post {
                         binding.viewPagerVideos.currentItem = 0
@@ -189,9 +335,6 @@ class AuraFeedFragment : Fragment() {
         val sizeBytes = AuraFeedRepository.getVideoSize(requireContext(), uri)
         val sizeMb = sizeBytes / (1024.0 * 1024.0)
 
-        // Validate Firestore 1MB document size limit
-        // Base64 encoding adds 33% size overhead. To ensure the final document (including metadata)
-        // stays under 1MB, the raw video file must be under 730 KB (0.71 MB).
         if (sizeMb > 0.71) {
             Toast.makeText(
                 context,
@@ -245,7 +388,6 @@ class AuraFeedFragment : Fragment() {
                     return@launch
                 }
 
-                // Fetch current user profile metadata on IO thread using await
                 val userDoc = firestore.collection("users").document(currentUid).get().await()
                 val username = userDoc.getString("name") ?: "user"
                 val photoUrl = userDoc.getString("profileImageUrl") ?: ""
@@ -267,16 +409,12 @@ class AuraFeedFragment : Fragment() {
                     timestamp = System.currentTimeMillis()
                 )
 
-                // Save to Firestore, properly awaited
                 videoRef.set(newVideo).await()
 
                 withContext(Dispatchers.Main) {
                     binding.cardUploadProgress.visibility = View.GONE
                     Toast.makeText(context, "Video published successfully! 🎉", Toast.LENGTH_SHORT).show()
-                    // Switch to My Videos tab to immediately show the upload
-                    currentTab = "MY_VIDEOS"
-                    binding.feedToggleGroup.check(R.id.btnMyVideos)
-                    loadFeed(clearExisting = true)
+                    selectFooterTab("PROFILE")
                 }
 
             } catch (e: Exception) {
@@ -295,7 +433,7 @@ class AuraFeedFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        if (videosList.isNotEmpty()) {
+        if (videosList.isNotEmpty() && activeFooterTab == "HOME") {
             binding.viewPagerVideos.post {
                 val current = binding.viewPagerVideos.currentItem
                 adapter.playVideoAt(current, binding.viewPagerVideos)

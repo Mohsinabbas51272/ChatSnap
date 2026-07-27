@@ -27,7 +27,19 @@ class MediaViewerActivity : BaseActivity() {
         if (type == "VIDEO") {
             binding.ivFullMedia.visibility = View.GONE
             binding.vvFullMedia.visibility = View.VISIBLE
-            binding.vvFullMedia.setVideoPath(url)
+            if (url.startsWith("data:video") || (url.length > 500 && !url.startsWith("http"))) {
+                try {
+                    val clean = if (url.contains(",")) url.substringAfter(",") else url
+                    val bytes = android.util.Base64.decode(clean, android.util.Base64.DEFAULT)
+                    val tmp = java.io.File.createTempFile("chat_video", ".mp4", cacheDir)
+                    java.io.FileOutputStream(tmp).use { it.write(bytes) }
+                    binding.vvFullMedia.setVideoPath(tmp.absolutePath)
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Error playing video", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                binding.vvFullMedia.setVideoURI(android.net.Uri.parse(url))
+            }
             binding.vvFullMedia.start()
         } else {
             binding.ivFullMedia.visibility = View.VISIBLE

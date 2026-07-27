@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,21 +7,23 @@
     android:background="@android:color/black"
     tools:context=".AuraFeedFragment">
 
-    <!-- Vertical Video Page Switcher -->
+    <!-- 1. Vertical Video Page Switcher (Feed View) -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPagerVideos"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@id/layoutTikTokFooter"
         android:orientation="vertical" />
 
-    <!-- Top Overlay Header for Stream Toggles -->
+    <!-- Top Overlay Header for Stream Toggles (For You / Following) -->
     <LinearLayout
+        android:id="@+id/layoutTopHeader"
         android:layout_width="match_parent"
-        android:layout_height="96dp"
+        android:layout_height="90dp"
         android:orientation="horizontal"
         android:gravity="center"
         android:background="@drawable/bg_top_gradient"
-        android:paddingTop="42dp">
+        android:paddingTop="36dp">
 
         <com.google.android.material.button.MaterialButtonToggleGroup
             android:id="@+id/feedToggleGroup"
@@ -38,7 +40,7 @@
                 android:layout_height="36dp"
                 android:text="For You"
                 android:textColor="@android:color/white"
-                android:textSize="14sp"
+                android:textSize="15sp"
                 android:fontFamily="sans-serif-black"
                 app:rippleColor="#40FFFFFF" />
 
@@ -49,21 +51,341 @@
                 android:layout_height="36dp"
                 android:text="Following"
                 android:textColor="@android:color/white"
-                android:textSize="14sp"
-                android:fontFamily="sans-serif-black"
-                app:rippleColor="#40FFFFFF" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnMyVideos"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:text="My Videos"
-                android:textColor="@android:color/white"
-                android:textSize="14sp"
+                android:textSize="15sp"
                 android:fontFamily="sans-serif-black"
                 app:rippleColor="#40FFFFFF" />
         </com.google.android.material.button.MaterialButtonToggleGroup>
+    </LinearLayout>
+
+    <!-- 2. Inbox / Activity Container -->
+    <LinearLayout
+        android:id="@+id/layoutInboxContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/layoutTikTokFooter"
+        android:orientation="vertical"
+        android:background="#121212"
+        android:visibility="gone">
+
+        <!-- Inbox Header -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="#1E1E1E"
+            android:paddingHorizontal="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Inbox &amp; Activity"
+                android:textColor="@android:color/white"
+                android:textSize="17sp"
+                android:fontFamily="sans-serif-black" />
+        </RelativeLayout>
+
+        <!-- Activity List -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="New Activity"
+                    android:textColor="#A0A0A0"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Activity Items -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingVertical="10dp">
+
+                    <ImageView
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:src="@drawable/ic_aura_feed"
+                        android:background="@drawable/bg_circle"
+                        android:padding="10dp"
+                        app:tint="@android:color/white" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="System Notification"
+                            android:textColor="@android:color/white"
+                            android:textSize="14sp"
+                            android:fontFamily="sans-serif-bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Welcome to AuraFeed! Share short videos with your friends."
+                            android:textColor="#B0B0B0"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="#2A2A2A"
+                    android:layout_marginVertical="6dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingVertical="10dp">
+
+                    <ImageView
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:src="@drawable/ic_inbox"
+                        android:background="@drawable/bg_circle"
+                        android:padding="10dp"
+                        app:tint="@android:color/white" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Video Likes &amp; Comments"
+                            android:textColor="@android:color/white"
+                            android:textSize="14sp"
+                            android:fontFamily="sans-serif-bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Your uploaded videos are getting views and reactions."
+                            android:textColor="#B0B0B0"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+    <!-- 3. Profile Container (TikTok Profile View) -->
+    <LinearLayout
+        android:id="@+id/layoutProfileContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/layoutTikTokFooter"
+        android:orientation="vertical"
+        android:background="#121212"
+        android:visibility="gone">
+
+        <!-- Profile Top Bar -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:paddingHorizontal="16dp">
+
+            <TextView
+                android:id="@+id/tvProfileTitleName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="My Profile"
+                android:textColor="@android:color/white"
+                android:textSize="17sp"
+                android:fontFamily="sans-serif-black" />
+        </RelativeLayout>
+
+        <!-- User Profile Header Info -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="16dp">
+
+            <!-- Avatar -->
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivProfileAvatar"
+                android:layout_width="86dp"
+                android:layout_height="86dp"
+                android:src="@drawable/ic_person"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
+                app:strokeColor="#33FFFFFF"
+                app:strokeWidth="2dp"
+                android:scaleType="centerCrop" />
+
+            <!-- Display Name & Handle -->
+            <TextView
+                android:id="@+id/tvProfileDisplayName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="User"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif-black" />
+
+            <TextView
+                android:id="@+id/tvProfileHandle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@username"
+                android:textColor="#A0A0A0"
+                android:textSize="13sp" />
+
+            <!-- Stats Row: Following | Followers | Likes -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:gravity="center">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingHorizontal="16dp">
+
+                    <TextView
+                        android:id="@+id/tvFollowingCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp"
+                        android:fontFamily="sans-serif-black" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Following"
+                        android:textColor="#A0A0A0"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="20dp"
+                    android:background="#33FFFFFF" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingHorizontal="16dp">
+
+                    <TextView
+                        android:id="@+id/tvFollowersCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp"
+                        android:fontFamily="sans-serif-black" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Followers"
+                        android:textColor="#A0A0A0"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="20dp"
+                    android:background="#33FFFFFF" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingHorizontal="16dp">
+
+                    <TextView
+                        android:id="@+id/tvLikesCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp"
+                        android:fontFamily="sans-serif-black" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Likes"
+                        android:textColor="#A0A0A0"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Video Grid Title Tab -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_view_grid"
+                    app:tint="@android:color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="My Videos"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif-bold" />
+            </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/white" />
+        </LinearLayout>
+
+        <!-- 3-Column Profile Videos RecyclerView Grid -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvMyVideosGrid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:padding="2dp" />
     </LinearLayout>
 
     <!-- Empty State View -->
@@ -71,7 +393,7 @@
         android:id="@+id/layoutEmptyState"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_centerInParent="true"
         android:orientation="vertical"
         android:gravity="center"
         android:visibility="gone">
@@ -93,26 +415,12 @@
             android:fontFamily="sans-serif-medium" />
     </LinearLayout>
 
-    <!-- Floating Upload Button -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btnUploadVideo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="24dp"
-        android:layout_marginBottom="72dp"
-        android:src="@android:drawable/ic_input_add"
-        app:backgroundTint="?attr/colorPrimary"
-        app:tint="?attr/colorOnPrimary"
-        app:fabSize="normal"
-        android:contentDescription="Upload Short Video" />
-
     <!-- Upload Progress Bar Overlay -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardUploadProgress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_centerInParent="true"
         android:visibility="gone"
         app:cardCornerRadius="12dp"
         app:cardElevation="8dp"
@@ -146,4 +454,154 @@
                 android:fontFamily="sans-serif-medium" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
-</FrameLayout>
+
+    <!-- 4. TikTok Style Bottom Navigation Footer -->
+    <LinearLayout
+        android:id="@+id/layoutTikTokFooter"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_alignParentBottom="true"
+        android:background="#000000"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:weightSum="5"
+        android:elevation="12dp">
+
+        <!-- Tab 1: Home -->
+        <LinearLayout
+            android:id="@+id/btnTabHome"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/ivTabHome"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_home"
+                app:tint="@android:color/white" />
+
+            <TextView
+                android:id="@+id/tvTabHome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Home"
+                android:textColor="@android:color/white"
+                android:textSize="10sp"
+                android:fontFamily="sans-serif-bold" />
+        </LinearLayout>
+
+        <!-- Tab 2: Friends -->
+        <LinearLayout
+            android:id="@+id/btnTabFriends"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/ivTabFriends"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_tiktok_friends"
+                app:tint="#A0A0A0" />
+
+            <TextView
+                android:id="@+id/tvTabFriends"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Friends"
+                android:textColor="#A0A0A0"
+                android:textSize="10sp"
+                android:fontFamily="sans-serif-bold" />
+        </LinearLayout>
+
+        <!-- Tab 3: Center TikTok '+' Upload Video -->
+        <FrameLayout
+            android:id="@+id/btnTabUpload"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="44dp"
+                android:layout_height="28dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_tiktok_plus" />
+        </FrameLayout>
+
+        <!-- Tab 4: Inbox -->
+        <LinearLayout
+            android:id="@+id/btnTabInbox"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/ivTabInbox"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_inbox"
+                app:tint="#A0A0A0" />
+
+            <TextView
+                android:id="@+id/tvTabInbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Inbox"
+                android:textColor="#A0A0A0"
+                android:textSize="10sp"
+                android:fontFamily="sans-serif-bold" />
+        </LinearLayout>
+
+        <!-- Tab 5: Profile -->
+        <LinearLayout
+            android:id="@+id/btnTabProfile"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/ivTabProfile"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_person"
+                app:tint="#A0A0A0" />
+
+            <TextView
+                android:id="@+id/tvTabProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Profile"
+                android:textColor="#A0A0A0"
+                android:textSize="10sp"
+                android:fontFamily="sans-serif-bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

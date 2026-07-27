@@ -223,6 +223,9 @@ class ChatsFragment : Fragment(), SearchableFragment {
             }
     }
 
+    private var senderMessages = listOf<Message>()
+    private var receiverMessages = listOf<Message>()
+
     private fun setupRecyclerView() {
         adapter = ConversationsAdapter(emptyList(), onClick = { conversation ->
             val intent = Intent(requireContext(), ChatActivity::class.java)
@@ -235,11 +238,7 @@ class ChatsFragment : Fragment(), SearchableFragment {
             }
             startActivity(intent)
         }, onLongClick = { conversation ->
-            if (viewMode == "SECRET") {
-                showUnhideDialog(conversation)
-            } else {
-                showQuickPreviewDialog(conversation)
-            }
+            showConversationOptionsDialog(conversation)
         })
         binding.rvConversations.layoutManager = LinearLayoutManager(requireContext())
         binding.rvConversations.adapter = adapter
@@ -288,11 +287,17 @@ class ChatsFragment : Fragment(), SearchableFragment {
 
         firestore.collection("messages").whereEqualTo("senderId", uid)
             .addSnapshotListener { snapshot, e -> 
-                if (e == null) updateConversations(snapshot?.toObjects(Message::class.java) ?: emptyList(), uid) 
+                if (e == null && snapshot != null) {
+                    senderMessages = snapshot.toObjects(Message::class.java)
+                    rebuild1On1Conversations(uid)
+                }
             }
         firestore.collection("messages").whereEqualTo("receiverId", uid)
             .addSnapshotListener { snapshot, e -> 
-                if (e == null) updateConversations(snapshot?.toObjects(Message::class.java) ?: emptyList(), uid) 
+                if (e == null && snapshot != null) {
+                    receiverMessages = snapshot.toObjects(Message::class.java)
+                    rebuild1On1Conversations(uid)
+                }
             }
         
         firestore.collection("groups")
@@ -312,6 +317,19 @@ class ChatsFragment : Fragment(), SearchableFragment {
                         }
                 }
             }
+    }
+
+    private fun rebuild1On1Conversations(currentUserId: String) {
+        val all1On1 = senderMessages + receiverMessages
+        val activePartnerIds = all1On1.map { 
+            if (it.senderId == currentUserId) it.receiverId else it.senderId 
+        }.toSet()
+
+        // Remove partner IDs from conversationMap if their messages were deleted
+        val toRemove = conversationMap.filter { (id, conv) -> !conv.isGroup && !activePartnerIds.contains(id) }.keys.toList()
+        toRemove.forEach { conversationMap.remove(it) }
+
+        updateConversations(all1On1, currentUserId)
     }
 
     private fun updateConversations(messages: List<Message>, currentUserId: String) {
@@ -495,6 +513,93 @@ class ChatsFragment : Fragment(), SearchableFragment {
             .sortedWith(compareByDescending<Conversation> { it.isPinned }
                 .thenByDescending { it.lastMessageTimestamp })
         adapter.updateData(list)
+    }
+
+    private fun showConversationOptionsDialog(conversation: Conversation) {
+        val context = context ?: return
+        val isSecret = secretPartnerIds.contains(conversation.partnerId)
+        val isPinned = getPinnedChats().contains(conversation.partnerId)
+
+        val options = mutableListOf<String>()
+        options.add("👁️ Quick Preview")
+        options.add(if (isPinned) "📌 Unpin Chat" else "📌 Pin Chat to Top")
+        if (!conversation.isGroup) {
+            options.add(if (isSecret) "🔓 Unhide Chat" else "🔒 Hide Chat (Secret Mode)")
+        }
+        options.add("🗑️ Delete Chat")
+
+        androidx.appcompat.app.AlertDialog.Builder(context)
+            .setTitle(conversation.partnerName)
+            .setItems(options.toTypedArray()) { _, which ->
+                when (options[which]) {
+                    "👁️ Quick Preview" -> showQuickPreviewDialog(conversation)
+                    "📌 Unpin Chat", "📌 Pin Chat to Top" -> togglePinChat(conversation.partnerId)
+                    "🔓 Unhide Chat" -> showUnhideDialog(conversation)
+                    "🔒 Hide Chat (Secret Mode)" -> hideChatDirectly(conversation.partnerId)
+                    "🗑️ Delete Chat" -> confirmDeleteChat(conversation)
+                }
+            }
+            .show()
+    }
+
+    private fun confirmDeleteChat(conversation: Conversation) {
+        val context = context ?: return
+        androidx.appcompat.app.AlertDialog.Builder(context)
+            .setTitle("Delete Chat?")
+            .setMessage("Are you sure you want to delete conversation with \"${conversation.partnerName}\"? All messages will be permanently deleted.")
+            .setPositiveButton("Delete") { _, _ ->
+                deleteChatFromFirestore(conversation)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun deleteChatFromFirestore(conversation: Conversation) {
+        val myUid = auth.currentUser?.uid ?: return
+        val partnerId = conversation.partnerId
+        val context = context ?: return
+
+        val collectionName = if (conversation.isGroup) "groupMessages" else "messages"
+        val query = if (conversation.isGroup) {
+            firestore.collection(collectionName).whereEqualTo("conversationId", partnerId)
+        } else {
+            val convId = if (myUid < partnerId) "${myUid}_${partnerId}" else "${partnerId}_${myUid}"
+            firestore.collection(collectionName).whereEqualTo("conversationId", convId)
+        }
+
+        android.widget.Toast.makeText(context, "Deleting chat...", android.widget.Toast.LENGTH_SHORT).show()
+
+        query.get().addOnSuccessListener { snapshot ->
+            val docs = snapshot.documents
+            if (docs.isEmpty()) {
+                conversationMap.remove(partnerId)
+                refreshAdapter()
+                android.widget.Toast.makeText(context, "Chat deleted", android.widget.Toast.LENGTH_SHORT).show()
+                return@addOnSuccessListener
+            }
+
+            val chunks = docs.chunked(500)
+            var completed = 0
+            for (chunk in chunks) {
+                val batch = firestore.batch()
+                for (doc in chunk) {
+                    batch.delete(doc.reference)
+                }
+                batch.commit().addOnSuccessListener {
+                    completed++
+                    if (completed == chunks.size) {
+                        firestore.collection("secretConversations").document("${myUid}_${partnerId}").delete()
+                        conversationMap.remove(partnerId)
+                        refreshAdapter()
+                        android.widget.Toast.makeText(context, "Chat deleted", android.widget.Toast.LENGTH_SHORT).show()
+                    }
+                }.addOnFailureListener { e ->
+                    android.widget.Toast.makeText(context, "Failed to delete: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+                }
+            }
+        }.addOnFailureListener { e ->
+            android.widget.Toast.makeText(context, "Failed to query chat: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun showUnhideDialog(conversation: Conversation) {

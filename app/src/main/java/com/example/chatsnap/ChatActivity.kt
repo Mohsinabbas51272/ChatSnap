@@ -906,13 +906,44 @@ class ChatActivity : BaseActivity() {
     }
 
     private fun uploadFile(uri: Uri, type: String) {
-        if (type == "VIDEO") {
-            Toast.makeText(this, "Videos require Firebase Storage (Paid Plan). Use Photos/Snaps for free.", Toast.LENGTH_LONG).show()
-            return
-        }
-
         binding.progressBar.visibility = View.VISIBLE
         binding.progressBar.isIndeterminate = true
+        
+        if (type == "VIDEO") {
+            val ref = storage.reference.child("chats/$chatId/${System.currentTimeMillis()}.mp4")
+            ref.putFile(uri)
+                .addOnSuccessListener {
+                    ref.downloadUrl.addOnSuccessListener { downloadUri ->
+                        binding.progressBar.visibility = View.GONE
+                        sendMessage("🎥 Video", "VIDEO", mediaUrl = downloadUri.toString())
+                    }.addOnFailureListener { e ->
+                        binding.progressBar.visibility = View.GONE
+                        Toast.makeText(this, "Failed to get video URL: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                .addOnFailureListener { e ->
+                    lifecycleScope.launch {
+                        try {
+                            val inputStream = contentResolver.openInputStream(uri)
+                            val bytes = inputStream?.readBytes()
+                            inputStream?.close()
+                            if (bytes != null && bytes.size <= 800000) {
+                                val base64 = android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT)
+                                val videoData = "data:video/mp4;base64,$base64"
+                                binding.progressBar.visibility = View.GONE
+                                sendMessage("🎥 Video", "VIDEO", mediaUrl = videoData)
+                            } else {
+                                binding.progressBar.visibility = View.GONE
+                                Toast.makeText(this@ChatActivity, "Video upload failed: ${e.message}", Toast.LENGTH_LONG).show()
+                            }
+                        } catch (ex: Exception) {
+                            binding.progressBar.visibility = View.GONE
+                            Toast.makeText(this@ChatActivity, "Upload failed: ${ex.message}", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
+            return
+        }
         
         lifecycleScope.launch {
             try {

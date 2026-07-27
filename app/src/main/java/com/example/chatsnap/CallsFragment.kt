@@ -75,7 +75,8 @@ class CallsFragment : Fragment(), SearchableFragment {
                             if (!toDelete.contains(ref.reference)) toDelete.add(ref.reference)
                         }
                         if (toDelete.isEmpty()) {
-                            androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                            val ctx = context ?: return@addOnSuccessListener
+                            androidx.appcompat.app.AlertDialog.Builder(ctx)
                                 .setMessage("No call history to clear.")
                                 .setPositiveButton("OK", null)
                                 .show()
@@ -90,7 +91,8 @@ class CallsFragment : Fragment(), SearchableFragment {
                             batch.commit().addOnSuccessListener {
                                 completed++
                                 if (completed == chunks.size) {
-                                    androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                                    val ctx = context ?: return@addOnSuccessListener
+                                    androidx.appcompat.app.AlertDialog.Builder(ctx)
                                         .setMessage("Call history cleared.")
                                         .setPositiveButton("OK", null)
                                         .show()
@@ -99,7 +101,8 @@ class CallsFragment : Fragment(), SearchableFragment {
                                     updateUI()
                                 }
                             }.addOnFailureListener { e ->
-                                androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                                val ctx = context ?: return@addOnFailureListener
+                                androidx.appcompat.app.AlertDialog.Builder(ctx)
                                     .setMessage("Failed to clear: ${e.message}")
                                     .setPositiveButton("OK", null)
                                     .show()
@@ -214,10 +217,24 @@ class CallsFragment : Fragment(), SearchableFragment {
     }
 
     private fun processSnapshot(snapshot: com.google.firebase.firestore.QuerySnapshot?) {
-        snapshot?.documents?.forEach { doc ->
-            doc.toObject(Call::class.java)?.let { call ->
-                val index = callsList.indexOfFirst { it.timestamp == call.timestamp && it.callerId == call.callerId }
-                if (index != -1) callsList[index] = call else callsList.add(call)
+        if (snapshot == null) return
+        for (change in snapshot.documentChanges) {
+            val doc = change.document
+            val call = doc.toObject(Call::class.java).copy(id = doc.id)
+            val docId = doc.id
+            when (change.type) {
+                com.google.firebase.firestore.DocumentChange.Type.ADDED,
+                com.google.firebase.firestore.DocumentChange.Type.MODIFIED -> {
+                    val index = callsList.indexOfFirst {
+                        (it.id.isNotEmpty() && it.id == docId) || (it.timestamp == call.timestamp && it.callerId == call.callerId)
+                    }
+                    if (index != -1) callsList[index] = call else callsList.add(call)
+                }
+                com.google.firebase.firestore.DocumentChange.Type.REMOVED -> {
+                    callsList.removeAll {
+                        (it.id.isNotEmpty() && it.id == docId) || (it.timestamp == call.timestamp && it.callerId == call.callerId)
+                    }
+                }
             }
         }
         updateUI()

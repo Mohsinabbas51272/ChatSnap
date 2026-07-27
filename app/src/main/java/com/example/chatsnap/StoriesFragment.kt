@@ -269,16 +269,54 @@ class StoriesFragment : Fragment(), SearchableFragment {
     private fun uploadStoryWithMusic(mediaUri: Uri, mediaType: String, musicUri: Uri?) {
         val context = context ?: return
         
-        if (mediaType == "video") {
-            Toast.makeText(context, "Videos require Firebase Storage (Paid Plan).", Toast.LENGTH_LONG).show()
-            return
-        }
-
         binding.storyProgressBar.visibility = View.VISIBLE
         Toast.makeText(context, "Processing story...", Toast.LENGTH_SHORT).show()
 
         lifecycleScope.launch {
             try {
+                // Encode music if provided
+                var musicBase64: String? = null
+                var musicTitle: String? = null
+                if (musicUri != null) {
+                    try {
+                        val musicStream = context.contentResolver.openInputStream(musicUri)
+                        val musicBytes = musicStream?.readBytes()
+                        if (musicBytes != null && musicBytes.size <= 800000) {
+                            musicBase64 = "data:audio/mp3;base64," + android.util.Base64.encodeToString(musicBytes, android.util.Base64.DEFAULT)
+                            val cursor = context.contentResolver.query(musicUri, null, null, null, null)
+                            cursor?.use {
+                                if (it.moveToFirst()) {
+                                    val idx = it.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
+                                    if (idx != -1) musicTitle = it.getString(idx).substringBeforeLast(".")
+                                }
+                            }
+                        } else {
+                            Toast.makeText(context, "Music clip too long (max ~30s)", Toast.LENGTH_SHORT).show()
+                        }
+                    } catch (e: Exception) {
+                        android.util.Log.e("StoriesFragment", "Music encode error: ${e.message}")
+                    }
+                }
+
+                if (mediaType == "video") {
+                    val uid = auth.currentUser?.uid ?: return@launch
+                    val storage = com.google.firebase.storage.FirebaseStorage.getInstance()
+                    val ref = storage.reference.child("stories/$uid/${System.currentTimeMillis()}.mp4")
+
+                    ref.putFile(mediaUri)
+                        .addOnSuccessListener {
+                            ref.downloadUrl.addOnSuccessListener { downloadUri ->
+                                saveStoryToFirestore(downloadUri.toString(), "video", musicBase64, musicTitle)
+                            }.addOnFailureListener {
+                                fallbackUploadVideoAsBase64(mediaUri, musicBase64, musicTitle)
+                            }
+                        }
+                        .addOnFailureListener {
+                            fallbackUploadVideoAsBase64(mediaUri, musicBase64, musicTitle)
+                        }
+                    return@launch
+                }
+
                 val inputStream = context.contentResolver.openInputStream(mediaUri)
                 val bytes = inputStream?.readBytes() ?: throw Exception("Read error")
                 
@@ -309,32 +347,33 @@ class StoriesFragment : Fragment(), SearchableFragment {
                         return@launch
                     }
 
-                    // Encode music if provided
-                    var musicBase64: String? = null
-                    var musicTitle: String? = null
-                    if (musicUri != null) {
-                        try {
-                            val musicStream = context.contentResolver.openInputStream(musicUri)
-                            val musicBytes = musicStream?.readBytes()
-                            if (musicBytes != null && musicBytes.size <= 800000) {
-                                musicBase64 = "data:audio/mp3;base64," + android.util.Base64.encodeToString(musicBytes, android.util.Base64.DEFAULT)
-                                // Get file name as title
-                                val cursor = context.contentResolver.query(musicUri, null, null, null, null)
-                                cursor?.use {
-                                    if (it.moveToFirst()) {
-                                        val idx = it.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
-                                        if (idx != -1) musicTitle = it.getString(idx).substringBeforeLast(".")
-                                    }
-                                }
-                            } else {
-                                Toast.makeText(context, "Music clip too long (max ~30s)", Toast.LENGTH_SHORT).show()
-                            }
-                        } catch (e: Exception) {
-                            android.util.Log.e("StoriesFragment", "Music encode error: ${e.message}")
-                        }
-                    }
-
                     saveStoryToFirestore(finalData, "image", musicBase64, musicTitle)
+                }
+            } catch (e: Exception) {
+                if (isAdded) {
+                    binding.storyProgressBar.visibility = View.GONE
+                    Toast.makeText(context, "Upload Failed: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    private fun fallbackUploadVideoAsBase64(mediaUri: Uri, musicBase64: String?, musicTitle: String?) {
+        val context = context ?: return
+        lifecycleScope.launch {
+            try {
+                val inputStream = context.contentResolver.openInputStream(mediaUri)
+                val bytes = inputStream?.readBytes()
+                inputStream?.close()
+                if (bytes != null && bytes.size <= 800000) {
+                    val base64 = android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT)
+                    val finalData = "data:video/mp4;base64,$base64"
+                    saveStoryToFirestore(finalData, "video", musicBase64, musicTitle)
+                } else {
+                    if (isAdded) {
+                        binding.storyProgressBar.visibility = View.GONE
+                        Toast.makeText(context, "Video upload failed: storage unavailable or file too large.", Toast.LENGTH_LONG).show()
+                    }
                 }
             } catch (e: Exception) {
                 if (isAdded) {

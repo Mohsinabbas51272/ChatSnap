@@ -101,7 +101,7 @@
                             android:layout_marginEnd="4dp"
                             android:layout_marginBottom="4dp"
                             android:background="@drawable/bg_icon_circle"
-                            android:backgroundTint="?attr/colorSuccess" />
+                            android:backgroundTint="@color/colorSuccess" />
                     </FrameLayout>
 
                     <!-- Name / Status / Phone Number inside vertical layout -->
@@ -241,7 +241,7 @@
                         android:layout_below="@id/balanceRow"
                         android:layout_marginTop="4dp"
                         android:text="PKR 0.00"
-                        android:textColor="?attr/colorSuccess"
+                        android:textColor="@color/colorSuccess"
                         android:textSize="11sp"
                         android:textStyle="bold" />
 

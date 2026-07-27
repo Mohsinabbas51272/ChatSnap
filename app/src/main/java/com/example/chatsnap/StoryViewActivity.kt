@@ -421,8 +421,16 @@ class StoryViewActivity : BaseActivity() {
 
     private fun playVideo(videoUrl: String) {
         try {
-            val uri = Uri.parse(videoUrl)
-            binding.vvStory.setVideoURI(uri)
+            if (videoUrl.startsWith("data:video") || (videoUrl.length > 500 && !videoUrl.startsWith("http"))) {
+                val clean = if (videoUrl.contains(",")) videoUrl.substringAfter(",") else videoUrl
+                val bytes = Base64.decode(clean, Base64.DEFAULT)
+                val tmp = File.createTempFile("story_video", ".mp4", cacheDir)
+                FileOutputStream(tmp).use { it.write(bytes) }
+                binding.vvStory.setVideoPath(tmp.absolutePath)
+            } else {
+                val uri = Uri.parse(videoUrl)
+                binding.vvStory.setVideoURI(uri)
+            }
             binding.vvStory.setOnPreparedListener { mp ->
                 mp.isLooping = false
                 binding.vvStory.start()
