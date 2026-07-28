@@ -354,19 +354,23 @@ class MainActivity : BaseActivity() {
     }
 
     private fun showNewChatMenu(view: View) {
-        val options = arrayOf("New Private Chat", "New Group")
-        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
-            .setTitle("Start Chat")
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> {
-                        loadFragment(PeopleFragment(), "Contacts")
-                        updateNavUI(binding.navPeople)
-                    }
-                    1 -> startActivity(Intent(this, CreateGroupActivity::class.java))
-                }
-            }
-            .show()
+        val dialog = com.google.android.material.bottomsheet.BottomSheetDialog(this)
+        val sheetView = layoutInflater.inflate(R.layout.dialog_start_chat_picker, null)
+        dialog.setContentView(sheetView)
+        dialog.window?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)?.setBackgroundResource(android.R.color.transparent)
+
+        sheetView.findViewById<View>(R.id.btnNewPrivateChat)?.setOnClickListener {
+            loadFragment(PeopleFragment(), "Contacts")
+            updateNavUI(binding.navPeople)
+            dialog.dismiss()
+        }
+
+        sheetView.findViewById<View>(R.id.btnNewGroup)?.setOnClickListener {
+            startActivity(Intent(this, CreateGroupActivity::class.java))
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun loadHeaderProfile() {
