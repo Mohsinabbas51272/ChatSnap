@@ -76,6 +76,8 @@ class ChatActivity : BaseActivity() {
     private var amplitudeRunnable: Runnable? = null
     private var micDownX: Float = 0f
     private var isCancelSlide: Boolean = false
+    private var recordingStartTime: Long = 0L
+    private var pulseAnimator: android.animation.ObjectAnimator? = null
 
     private var pendingMediaUri: Uri? = null
     private var pendingMediaType: String? = null
@@ -246,16 +248,17 @@ class ChatActivity : BaseActivity() {
         val sheetView = layoutInflater.inflate(R.layout.dialog_emoji_picker, null)
         dialog.setContentView(sheetView)
 
-        // Make it expanded immediately
-        dialog.behavior.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
+        // Compact 3-row emoji picker height (~210dp)
+        val density = resources.displayMetrics.density
+        val targetHeight = (210 * density).toInt()
 
-        val storedHeight = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("keyboard_height", 0)
-        if (storedHeight > 0) {
-            sheetView.post {
-                val params = sheetView.layoutParams
-                params.height = storedHeight
-                sheetView.layoutParams = params
-            }
+        dialog.behavior.peekHeight = targetHeight
+        dialog.behavior.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
+
+        sheetView.post {
+            val params = sheetView.layoutParams
+            params.height = targetHeight
+            sheetView.layoutParams = params
         }
 
         val gridView = sheetView.findViewById<android.widget.GridView>(R.id.emojiGridView)
@@ -723,6 +726,9 @@ class ChatActivity : BaseActivity() {
         val dialog = BottomSheetDialog(this)
         val bottomSheetBinding = BottomSheetAttachBinding.inflate(layoutInflater)
         dialog.setContentView(bottomSheetBinding.root)
+
+        // Ensure bottom sheet container background is transparent so theme surface color shines through with rounded corners
+        dialog.window?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)?.setBackgroundResource(android.R.color.transparent)
 
         bottomSheetBinding.btnImage.setOnClickListener {
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
@@ -1341,10 +1347,12 @@ class ChatActivity : BaseActivity() {
                     if (deltaX < -150 && !isCancelSlide) {
                         isCancelSlide = true
                         binding.tvRecordingHint.text = "Release to cancel"
+                        binding.waveformView.setWaveColor(android.graphics.Color.RED)
                         binding.ivRecordingMic.setColorFilter(android.graphics.Color.RED)
                     } else if (deltaX > -100 && isCancelSlide) {
                         isCancelSlide = false
-                        binding.tvRecordingHint.text = "Slide left to cancel"
+                        binding.tvRecordingHint.text = "‹ Slide left to cancel"
+                        binding.waveformView.setWaveColor(android.graphics.Color.parseColor("#00A884"))
                         binding.ivRecordingMic.clearColorFilter()
                     }
                 }
@@ -1359,13 +1367,30 @@ class ChatActivity : BaseActivity() {
 
     private fun showRecordingOverlay() {
         binding.recordingOverlay.visibility = View.VISIBLE
+        binding.waveformView.clear()
+        binding.waveformView.setWaveColor(android.graphics.Color.parseColor("#00A884"))
+        binding.waveformView.startRecordingAnimation()
+        binding.tvRecordingTimer.text = "0:00"
+        recordingStartTime = System.currentTimeMillis()
+
+        pulseAnimator?.cancel()
+        pulseAnimator = android.animation.ObjectAnimator.ofFloat(binding.ivRecDot, "alpha", 1.0f, 0.2f, 1.0f).apply {
+            duration = 800
+            repeatCount = android.animation.ObjectAnimator.INFINITE
+            start()
+        }
+
         startAmplitudePolling()
     }
 
     private fun hideRecordingOverlay() {
         binding.recordingOverlay.visibility = View.GONE
+        pulseAnimator?.cancel()
+        pulseAnimator = null
+        binding.ivRecDot.alpha = 1.0f
         binding.ivRecordingMic.clearColorFilter()
-        binding.tvRecordingHint.text = "Slide left to cancel"
+        binding.tvRecordingHint.text = "‹ Slide left to cancel"
+        binding.waveformView.stopRecordingAnimation()
         stopAmplitudePolling()
     }
 
@@ -1375,15 +1400,28 @@ class ChatActivity : BaseActivity() {
         amplitudeRunnable = object : Runnable {
             override fun run() {
                 try {
-                    val amp = mediaRecorder?.maxAmplitude ?: 0
-                    // Map amplitude (0..32767) to scale 1.0..1.8
-                    val normalized = (amp / 32767f).coerceIn(0f, 1f)
-                    val scale = 1.0f + (normalized * 0.8f)
-                    binding.ivRecordingMic.scaleX = scale
-                    binding.ivRecordingMic.scaleY = scale
+                    if (isRecordingActive && mediaRecorder != null) {
+                        val amp = mediaRecorder?.maxAmplitude ?: 0
+                        val normalized = (amp / 32767f).coerceIn(0f, 1f)
+                        
+                        // Pass live audio frequency amplitude to WhatsApp waveform visualizer
+                        binding.waveformView.addAmplitude(normalized)
+
+                        // Subtle mic scale animation
+                        val scale = 1.0f + (normalized * 0.25f)
+                        binding.ivRecordingMic.scaleX = scale
+                        binding.ivRecordingMic.scaleY = scale
+
+                        // Update live recording timer
+                        val elapsedSeconds = (System.currentTimeMillis() - recordingStartTime) / 1000
+                        val mins = elapsedSeconds / 60
+                        val secs = elapsedSeconds % 60
+                        binding.tvRecordingTimer.text = String.format("%d:%02d", mins, secs)
+                    }
                 } catch (e: Exception) {
+                    android.util.Log.e("VOICE_REC", "Amplitude polling error: ${e.message}")
                 }
-                recordingHandler?.postDelayed(this, 120)
+                recordingHandler?.postDelayed(this, 70)
             }
         }
         recordingHandler?.post(amplitudeRunnable!!)

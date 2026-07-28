@@ -57,9 +57,15 @@ class AiChatActivity : BaseActivity() {
             hint = "Enter Groq API Key"
             setText(GeminiApiClient.apiKey)
             setPadding(40, 40, 40, 40)
+            val tv1 = android.util.TypedValue()
+            theme.resolveAttribute(android.R.attr.textColorPrimary, tv1, true)
+            setTextColor(tv1.data)
+            val tv2 = android.util.TypedValue()
+            theme.resolveAttribute(android.R.attr.textColorSecondary, tv2, true)
+            setHintTextColor(tv2.data)
         }
 
-        AlertDialog.Builder(this)
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
             .setTitle("Set Groq API Key")
             .setMessage("Enter your Groq API key. Get one free from console.groq.com")
             .setView(input)

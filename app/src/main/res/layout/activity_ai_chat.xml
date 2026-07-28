@@ -49,6 +49,7 @@
         android:layout_margin="12dp"
         app:cardCornerRadius="24dp"
         app:cardElevation="4dp"
+        app:cardBackgroundColor="?attr/colorSurface"
         app:strokeWidth="1dp"
         app:strokeColor="?attr/colorOutlineVariant"
         app:layout_constraintBottom_toBottomOf="parent">
@@ -72,7 +73,8 @@
                 android:maxLines="4"
                 android:inputType="textMultiLine"
                 android:textSize="15sp"
-                android:textColor="?attr/colorOnSurface" />
+                android:textColor="?android:attr/textColorPrimary"
+                android:textColorHint="?android:attr/textColorSecondary" />
 
             <ImageButton
                 android:id="@+id/btnSendPrompt"

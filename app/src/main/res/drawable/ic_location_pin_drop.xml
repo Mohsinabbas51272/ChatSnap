@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    
+    <!-- Shadow under pin drop -->
+    <path
+        android:fillColor="#33000000"
+        android:pathData="M24,42m-10,0a10,3 0,1 0,20 0a10,3 0,1 0,-20 0" />
+
+    <!-- Red Pin Drop Body -->
+    <path
+        android:fillColor="#FF3B30"
+        android:pathData="M24,4 C15.16,4 8,11.16 8,20 C8,31.25 24,44 24,44 C24,44 40,31.25 40,20 C40,11.16 32.84,4 24,4 Z" />
+
+    <!-- Darker outline/accent on Pin -->
+    <path
+        android:fillColor="#E53935"
+        android:pathData="M24,4 C24,4 32.84,4 40,20 C40,31.25 24,44 24,44 Z" />
+
+    <!-- Inner White Circle -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,20m-5.5,0a5.5,5.5 0,1 0,11 0a5.5,5.5 0,1 0,-11 0" />
+</vector>

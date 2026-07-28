@@ -337,7 +337,7 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Recording overlay shown while user holds mic -->
+    <!-- Recording overlay shown while user holds mic (WhatsApp style frequency animation) -->
     <FrameLayout
         android:id="@+id/recordingOverlay"
         android:layout_width="match_parent"
@@ -349,32 +349,80 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#80000000" />
+            android:background="#33000000" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_gravity="center"
-            android:gravity="center">
+            android:layout_gravity="bottom"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-            <ImageView
-                android:id="@+id/ivRecordingMic"
-                android:layout_width="96dp"
-                android:layout_height="96dp"
-                android:src="@android:drawable/ic_btn_speak_now"
-                android:tint="?attr/themeAccentColor"
-                android:contentDescription="Recording" />
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                app:cardCornerRadius="28dp"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="?attr/colorSurface">
 
-            <TextView
-                android:id="@+id/tvRecordingHint"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Slide left to cancel"
-                android:textColor="@android:color/white"
-                android:textSize="14sp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="14dp">
+
+                    <View
+                        android:id="@+id/ivRecDot"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:background="@drawable/bg_recording_dot" />
+
+                    <TextView
+                        android:id="@+id/tvRecordingTimer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="0:00"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <com.example.chatsnap.views.VoiceWaveformView
+                        android:id="@+id/waveformView"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_weight="1"
+                        android:layout_marginHorizontal="8dp" />
+
+                    <TextView
+                        android:id="@+id/tvRecordingHint"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="‹ Slide left to cancel"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <FrameLayout
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_marginStart="6dp">
+
+                <ImageView
+                    android:id="@+id/ivRecordingMic"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_recording_mic_circle"
+                    android:padding="13dp"
+                    android:src="@android:drawable/presence_audio_online"
+                    app:tint="@android:color/white"
+                    android:contentDescription="Recording Mic" />
+            </FrameLayout>
         </LinearLayout>
     </FrameLayout>
 

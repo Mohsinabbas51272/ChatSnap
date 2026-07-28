@@ -217,7 +217,7 @@ class EarnFragment : Fragment() {
 
     private fun showFriendSelectionDialog(friends: List<String>) {
         val items = friends.toTypedArray()
-        android.app.AlertDialog.Builder(requireContext())
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
             .setTitle("Send a Snap")
             .setItems(items) { _, which ->
                 val selected = items[which]

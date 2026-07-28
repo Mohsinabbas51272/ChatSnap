@@ -684,16 +684,21 @@ class MainActivity : BaseActivity() {
     }
 
     private fun showSnapCreationDialog() {
-        val options = arrayOf("📸 Take a Photo Snap", "🖼️ Choose Snap from Gallery")
-        AlertDialog.Builder(this)
-            .setTitle("Send a Snap ✨")
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> openCameraForSnap()
-                    1 -> pickSnapLauncher.launch(androidx.activity.result.PickVisualMediaRequest(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageAndVideo))
-                }
-            }
-            .show()
+        val dialog = com.google.android.material.bottomsheet.BottomSheetDialog(this)
+        val sheetView = layoutInflater.inflate(R.layout.dialog_send_snap_picker, null)
+        dialog.setContentView(sheetView)
+        dialog.window?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)?.setBackgroundResource(android.R.color.transparent)
+
+        sheetView.findViewById<View>(R.id.btnCameraSnap)?.setOnClickListener {
+            openCameraForSnap()
+            dialog.dismiss()
+        }
+        sheetView.findViewById<View>(R.id.btnGallerySnap)?.setOnClickListener {
+            pickSnapLauncher.launch(androidx.activity.result.PickVisualMediaRequest(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageAndVideo))
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun openCameraForSnap() {

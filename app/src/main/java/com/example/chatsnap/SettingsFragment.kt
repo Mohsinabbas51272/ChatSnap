@@ -75,9 +75,7 @@ class SettingsFragment : Fragment() {
             startActivity(Intent(requireContext(), QRProfileActivity::class.java))
         }
 
-        binding.btnPrivacyScore.setOnClickListener { handleAdminTap() }
-        // Also attach to children just in case they consume the click
-        binding.btnPrivacyScore.getChildAt(0).setOnClickListener { handleAdminTap() }
+        binding.ivProfile.setOnClickListener { handleAdminTap() }
 
         binding.btnLogout.setOnClickListener {
             performLogout()
@@ -289,17 +287,6 @@ class SettingsFragment : Fragment() {
             .addSnapshotListener { snapshot, _ ->
                 // Snaps change listener
             }
-
-        walletListener = firestore.collection("users").document(uid)
-            .collection("wallet").document("data")
-            .addSnapshotListener { snapshot, e ->
-                if (e != null) return@addSnapshotListener
-                if (snapshot != null && snapshot.exists() && _binding != null) {
-                    val balance = snapshot.getLong("balance") ?: 0L
-                    binding.tvBalance.text = balance.toString()
-                    binding.tvBalancePkr.text = String.format("Est. PKR: %.2f", balance.toDouble() / 30.0)
-                }
-            }
     }
 
     private fun listenToUserData() {
@@ -418,11 +405,9 @@ class SettingsFragment : Fragment() {
         userListener?.remove()
         friendsListener?.remove()
         snapsListener?.remove()
-        walletListener?.remove()
         userListener = null
         friendsListener = null
         snapsListener = null
-        walletListener = null
     }
 
     override fun onStop() {

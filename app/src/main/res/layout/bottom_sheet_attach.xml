@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:background="@drawable/bottom_sheet_bg"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="18dp">
 
     <TextView
         android:layout_width="match_parent"
@@ -19,7 +19,7 @@
     <GridLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:columnCount="3"
+        android:columnCount="4"
         android:alignmentMode="alignMargins"
         android:rowOrderPreserved="false">
 
@@ -30,20 +30,22 @@
             android:layout_columnWeight="1"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="8dp">
+            android:padding="6dp">
             <com.google.android.material.imageview.ShapeableImageView
-                android:layout_width="56dp"
-                android:layout_height="56dp"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
                 android:padding="12dp"
                 android:src="@android:drawable/ic_menu_camera"
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
-                android:background="#FFEB3B"
+                android:background="#FFD600"
                 app:tint="#000000" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Snap"
-                android:layout_marginTop="4dp" />
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="12sp"
+                android:layout_marginTop="6dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -53,10 +55,10 @@
             android:layout_columnWeight="1"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="8dp">
+            android:padding="6dp">
             <com.google.android.material.imageview.ShapeableImageView
-                android:layout_width="56dp"
-                android:layout_height="56dp"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
                 android:padding="12dp"
                 android:src="@android:drawable/ic_menu_gallery"
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
@@ -66,7 +68,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Gallery"
-                android:layout_marginTop="4dp" />
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="12sp"
+                android:layout_marginTop="6dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -76,10 +80,10 @@
             android:layout_columnWeight="1"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="8dp">
+            android:padding="6dp">
             <com.google.android.material.imageview.ShapeableImageView
-                android:layout_width="56dp"
-                android:layout_height="56dp"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
                 android:padding="12dp"
                 android:src="@android:drawable/ic_menu_save"
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
@@ -89,7 +93,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Document"
-                android:layout_marginTop="4dp" />
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="12sp"
+                android:layout_marginTop="6dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -99,11 +105,10 @@
             android:layout_columnWeight="1"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="8dp"
-            android:layout_marginTop="16dp">
+            android:padding="6dp">
             <com.google.android.material.imageview.ShapeableImageView
-                android:layout_width="56dp"
-                android:layout_height="56dp"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
                 android:padding="12dp"
                 android:src="@android:drawable/ic_menu_mapmode"
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
@@ -113,7 +118,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Location"
-                android:layout_marginTop="4dp" />
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="12sp"
+                android:layout_marginTop="6dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -123,11 +130,11 @@
             android:layout_columnWeight="1"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="8dp"
-            android:layout_marginTop="16dp">
+            android:padding="6dp"
+            android:layout_marginTop="12dp">
             <com.google.android.material.imageview.ShapeableImageView
-                android:layout_width="56dp"
-                android:layout_height="56dp"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
                 android:padding="12dp"
                 android:src="@android:drawable/ic_menu_camera"
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
@@ -137,7 +144,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Camera"
-                android:layout_marginTop="4dp" />
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="12sp"
+                android:layout_marginTop="6dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -147,11 +156,11 @@
             android:layout_columnWeight="1"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="8dp"
-            android:layout_marginTop="16dp">
+            android:padding="6dp"
+            android:layout_marginTop="12dp">
             <com.google.android.material.imageview.ShapeableImageView
-                android:layout_width="56dp"
-                android:layout_height="56dp"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
                 android:padding="12dp"
                 android:src="@android:drawable/ic_menu_sort_by_size"
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
@@ -161,7 +170,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Poll"
-                android:layout_marginTop="4dp" />
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="12sp"
+                android:layout_marginTop="6dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -171,11 +182,11 @@
             android:layout_columnWeight="1"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="8dp"
-            android:layout_marginTop="16dp">
+            android:padding="6dp"
+            android:layout_marginTop="12dp">
             <com.google.android.material.imageview.ShapeableImageView
-                android:layout_width="56dp"
-                android:layout_height="56dp"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
                 android:padding="12dp"
                 android:src="@android:drawable/ic_menu_crop"
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
@@ -185,7 +196,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Scan"
-                android:layout_marginTop="4dp" />
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="12sp"
+                android:layout_marginTop="6dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -195,11 +208,11 @@
             android:layout_columnWeight="1"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="8dp"
-            android:layout_marginTop="16dp">
+            android:padding="6dp"
+            android:layout_marginTop="12dp">
             <com.google.android.material.imageview.ShapeableImageView
-                android:layout_width="56dp"
-                android:layout_height="56dp"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
                 android:padding="12dp"
                 android:src="@android:drawable/ic_menu_my_calendar"
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Circle"
@@ -209,7 +222,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Schedule"
-                android:layout_marginTop="4dp" />
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="12sp"
+                android:layout_marginTop="6dp" />
         </LinearLayout>
 
     </GridLayout>

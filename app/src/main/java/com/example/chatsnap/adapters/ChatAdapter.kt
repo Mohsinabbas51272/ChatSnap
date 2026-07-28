@@ -177,17 +177,7 @@ class ChatAdapter(
                 binding.tvMessage.text = message.pollQuestion
                 renderPoll(binding.pollContainer, message)
             } else if (message.type == "LOCATION") {
-                binding.ivMessageImage.visibility = View.VISIBLE
-                binding.ivMessageImage.imageTintList = null
-                val mapUrl = "https://static-maps.yandex.ru/1.x/?ll=${message.longitude},${message.latitude}&z=15&l=map&size=350,350&pt=${message.longitude},${message.latitude},pm2rdm"
-                binding.ivMessageImage.load(mapUrl) {
-                    placeholder(R.drawable.ic_location)
-                    error(R.drawable.ic_location)
-                }
-                binding.tvMessage.text = "📍 Location Shared\n(Tap to view on Map)"
-                val tv1 = android.util.TypedValue()
-                binding.root.context.theme.resolveAttribute(com.example.chatsnap.R.attr.colorLink, tv1, true)
-                binding.tvMessage.setTextColor(tv1.data)
+                renderLocationMessage(binding.ivMessageImage, binding.tvMessage, message.latitude, message.longitude)
             } else if (message.type == "AUDIO") {
                 binding.ivMessageImage.visibility = View.GONE
                 if (playingMessageId == message.messageId) {
@@ -287,17 +277,7 @@ class ChatAdapter(
                 binding.tvMessage.text = message.pollQuestion
                 renderPoll(binding.pollContainer, message)
             } else if (message.type == "LOCATION") {
-                binding.ivMessageImage.visibility = View.VISIBLE
-                binding.ivMessageImage.imageTintList = null
-                val mapUrl = "https://static-maps.yandex.ru/1.x/?ll=${message.longitude},${message.latitude}&z=15&l=map&size=350,350&pt=${message.longitude},${message.latitude},pm2rdm"
-                binding.ivMessageImage.load(mapUrl) {
-                    placeholder(R.drawable.ic_location)
-                    error(R.drawable.ic_location)
-                }
-                binding.tvMessage.text = "📍 Location Shared\n(Tap to view on Map)"
-                val tv4 = android.util.TypedValue()
-                binding.root.context.theme.resolveAttribute(com.example.chatsnap.R.attr.colorLink, tv4, true)
-                binding.tvMessage.setTextColor(tv4.data)
+                renderLocationMessage(binding.ivMessageImage, binding.tvMessage, message.latitude, message.longitude)
             } else if (message.type == "AUDIO") {
                 binding.ivMessageImage.visibility = View.GONE
                 if (playingMessageId == message.messageId) {
@@ -611,5 +591,66 @@ class ChatAdapter(
         } catch (e: Exception) {
             Toast.makeText(context, "Failed to open document: ${e.message}", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun renderLocationMessage(
+        imageView: com.google.android.material.imageview.ShapeableImageView,
+        tvMessage: TextView,
+        latitude: Double?,
+        longitude: Double?
+    ) {
+        imageView.visibility = View.VISIBLE
+        imageView.imageTintList = null
+        val density = imageView.resources.displayMetrics.density
+        val lp = imageView.layoutParams
+        lp.width = (220 * density).toInt()
+        lp.height = (130 * density).toInt()
+        imageView.layoutParams = lp
+
+        val lat = latitude ?: 0.0
+        val lon = longitude ?: 0.0
+
+        val primaryMapUrl = "https://static-maps.yandex.ru/1.x/?ll=$lon,$lat&z=15&l=map&size=450,260&pt=$lon,$lat,pm2rdm"
+        val fallbackMapUrl = "https://staticmap.openstreetmap.de/staticmap.php?center=$lat,$lon&zoom=15&size=450x260&maptype=mapnik&markers=$lat,$lon,red-pushpin"
+
+        val pinOverlayTransformation = object : coil.transform.Transformation {
+            override val cacheKey: String = "WhatsAppPinOverlay_${lat}_${lon}"
+
+            override suspend fun transform(input: android.graphics.Bitmap, size: coil.size.Size): android.graphics.Bitmap {
+                val output = input.copy(android.graphics.Bitmap.Config.ARGB_8888, true)
+                val canvas = android.graphics.Canvas(output)
+                val pinDrawable = ContextCompat.getDrawable(imageView.context, R.drawable.ic_location_pin_drop)
+                pinDrawable?.let {
+                    val pinSize = (40 * density).toInt()
+                    val left = (canvas.width - pinSize) / 2
+                    val top = (canvas.height / 2) - pinSize + (6 * density).toInt()
+                    val right = left + pinSize
+                    val bottom = top + pinSize
+                    it.setBounds(left, top, right, bottom)
+                    it.draw(canvas)
+                }
+                return output
+            }
+        }
+
+        imageView.load(primaryMapUrl) {
+            transformations(pinOverlayTransformation)
+            placeholder(R.drawable.bg_map_placeholder)
+            error(R.drawable.bg_map_placeholder)
+            listener(
+                onError = { _, _ ->
+                    imageView.load(fallbackMapUrl) {
+                        transformations(pinOverlayTransformation)
+                        placeholder(R.drawable.bg_map_placeholder)
+                        error(R.drawable.bg_map_placeholder)
+                    }
+                }
+            )
+        }
+
+        tvMessage.text = "📍 Live Location Shared\n(Tap to open in Maps)"
+        val tvColor = android.util.TypedValue()
+        tvMessage.context.theme.resolveAttribute(R.attr.colorLink, tvColor, true)
+        tvMessage.setTextColor(tvColor.data)
     }
 }
