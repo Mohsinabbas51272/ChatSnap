@@ -51,6 +51,7 @@ class SettingsFragment : Fragment() {
         val viewsToAnimate = listOf(
             binding.itemNotifications.root,
             binding.itemGhostMode.root,
+            binding.itemMediaHub.root,
             binding.itemVault.root,
             binding.itemDownloader.root,
             binding.itemScanner.root,
@@ -104,6 +105,16 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setupSettingItems() {
+        // Local Media Hub
+        binding.itemMediaHub.apply {
+            ivItemIcon.setImageResource(android.R.drawable.ic_media_play)
+            tvItemTitle.text = "Local Media Hub"
+            tvItemValue.text = "Browse, search & play videos & audio"
+            root.setOnClickListener {
+                startActivity(Intent(requireContext(), com.example.chatsnap.media.ui.MediaHubActivity::class.java))
+            }
+        }
+
         // Notifications
         binding.itemNotifications.apply {
             ivItemIcon.setImageResource(android.R.drawable.ic_lock_idle_alarm)

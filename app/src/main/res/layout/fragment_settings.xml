@@ -198,6 +198,10 @@
                 android:layout_marginBottom="24dp">
 
                 <include
+                    android:id="@+id/itemMediaHub"
+                    layout="@layout/view_setting_item" />
+
+                <include
                     android:id="@+id/itemTheme"
                     layout="@layout/view_setting_item" />
 

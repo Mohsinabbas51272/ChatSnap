@@ -3,8 +3,10 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.services)
     alias(libs.plugins.ksp)
+    id("kotlin-parcelize")
 }
 
 val envProperties = Properties().apply {
@@ -69,6 +71,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        compose = true
         // Optimization: Disable features you don't use
         buildConfig = true
         aidl = false
@@ -89,9 +92,21 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
+    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.biometric)
     implementation(libs.androidx.swiperefreshlayout)
+
+    // Compose
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.graphics)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    implementation(libs.coil.compose)
+    implementation(libs.coil.video)
 
     // Firebase
     implementation(platform(libs.firebase.bom))
@@ -101,10 +116,18 @@ dependencies {
     implementation(libs.firebase.storage)
     implementation(libs.firebase.messaging)
 
-    // Media Handling
+    // Media Handling (Legacy + Media3)
     implementation(libs.coil)
     implementation(libs.exoplayer)
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.ui)
+    implementation(libs.media3.session)
     implementation(libs.compressor)
+
+    // Paging
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
+
 
     // Architecture & Coroutines
     implementation(libs.kotlinx.coroutines.android)
