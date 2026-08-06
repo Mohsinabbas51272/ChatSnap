@@ -116,12 +116,34 @@ class SettingsFragment : Fragment() {
         }
 
         // Notifications
+        val sharedPrefs = requireContext().getSharedPreferences("chatsnap_prefs", android.content.Context.MODE_PRIVATE)
+        val initialNotifEnabled = sharedPrefs.getBoolean("notifications_enabled", true)
+
         binding.itemNotifications.apply {
             ivItemIcon.setImageResource(android.R.drawable.ic_lock_idle_alarm)
             tvItemTitle.text = "Notifications"
-            tvItemValue.text = "Alerts & Sounds enabled"
             switchItem.visibility = View.VISIBLE
-            switchItem.isChecked = true
+            switchItem.setOnCheckedChangeListener(null)
+            switchItem.isChecked = initialNotifEnabled
+            tvItemValue.text = if (initialNotifEnabled) "Alerts & Sounds enabled" else "Notifications disabled"
+
+            switchItem.setOnCheckedChangeListener { _, isChecked ->
+                sharedPrefs.edit().putBoolean("notifications_enabled", isChecked).apply()
+                tvItemValue.text = if (isChecked) "Alerts & Sounds enabled" else "Notifications disabled"
+
+                val uid = auth.currentUser?.uid
+                if (uid != null) {
+                    firestore.collection("users").document(uid).update("notificationsEnabled", isChecked)
+                }
+
+                if (isChecked) {
+                    checkAndRequestNotificationPermission()
+                    Toast.makeText(context, "Notifications Enabled", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Notifications Muted", Toast.LENGTH_SHORT).show()
+                }
+            }
+
             root.setOnClickListener { switchItem.toggle() }
             root.setOnLongClickListener {
                 sendTestNotification()
@@ -358,15 +380,20 @@ class SettingsFragment : Fragment() {
     private fun showThemeStoreDialog() {
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_theme_store, null)
         val rvThemes = dialogView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvThemes)
-        
-        val dialog = android.app.AlertDialog.Builder(requireContext())
-            .setView(dialogView)
-            .setTitle("Theme Store (All Free)")
-            .create()
+        val btnClose = dialogView.findViewById<android.widget.ImageButton>(R.id.btnCloseDialog)
 
+        val dialog = com.google.android.material.bottomsheet.BottomSheetDialog(requireContext())
+        dialog.setContentView(dialogView)
+        dialog.window?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+            ?.setBackgroundResource(android.R.color.transparent)
+
+        btnClose?.setOnClickListener { dialog.dismiss() }
+
+        val currentTheme = com.example.chatsnap.utils.ThemeManager.getTheme(requireContext())
         val themes = com.example.chatsnap.utils.ThemeManager.AppTheme.values().toList()
+
         rvThemes.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(requireContext())
-        rvThemes.adapter = com.example.chatsnap.adapters.ThemeAdapter(themes) { selectedTheme ->
+        rvThemes.adapter = com.example.chatsnap.adapters.ThemeAdapter(themes, currentTheme) { selectedTheme ->
             com.example.chatsnap.utils.ThemeManager.setTheme(requireContext(), selectedTheme)
             com.example.chatsnap.utils.ThemeManager.syncThemeToFirestore(requireContext(), selectedTheme)
             dialog.dismiss()
@@ -470,7 +497,34 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    private fun checkAndRequestNotificationPermission() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            val granted = androidx.core.content.ContextCompat.checkSelfPermission(
+                requireContext(),
+                android.Manifest.permission.POST_NOTIFICATIONS
+            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+
+            if (!granted) {
+                androidx.core.app.ActivityCompat.requestPermissions(
+                    requireActivity(),
+                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                    104
+                )
+            }
+        }
+    }
+
     private fun sendTestNotification() {
+        val sharedPrefs = requireContext().getSharedPreferences("chatsnap_prefs", android.content.Context.MODE_PRIVATE)
+        val isNotifEnabled = sharedPrefs.getBoolean("notifications_enabled", true)
+
+        if (!isNotifEnabled) {
+            Toast.makeText(context, "Notifications are turned off in settings", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        checkAndRequestNotificationPermission()
+
         val channelId = "chat_notifications"
         val notificationManager = requireContext().getSystemService(android.content.Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
 

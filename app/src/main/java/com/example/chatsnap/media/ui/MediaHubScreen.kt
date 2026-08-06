@@ -10,6 +10,8 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -33,6 +35,7 @@ import com.example.chatsnap.media.permissions.MediaPermissionManager
 import com.example.chatsnap.media.ui.components.*
 import com.example.chatsnap.media.viewmodel.AudioPlayerViewModel
 import com.example.chatsnap.media.viewmodel.MediaHubViewModel
+import kotlinx.coroutines.launch
 
 fun resolveThemeColor(context: Context, attrId: Int, defaultColor: Color): Color {
     val typedValue = TypedValue()
@@ -79,6 +82,21 @@ fun MediaHubScreen(
     var hasPermissions by remember { mutableStateOf(MediaPermissionManager.hasPermissions(context)) }
     var showFilterSortSheet by remember { mutableStateOf(false) }
     var isSearchActive by remember { mutableStateOf(false) }
+
+    val coroutineScope = rememberCoroutineScope()
+    val pagerState = rememberPagerState(initialPage = hubState.selectedTab) { 2 }
+
+    LaunchedEffect(pagerState.currentPage) {
+        if (pagerState.currentPage != hubState.selectedTab) {
+            mediaHubViewModel.selectTab(pagerState.currentPage)
+        }
+    }
+
+    LaunchedEffect(hubState.selectedTab) {
+        if (pagerState.currentPage != hubState.selectedTab) {
+            pagerState.animateScrollToPage(hubState.selectedTab)
+        }
+    }
 
     val handleBackPress: () -> Unit = {
         if (audioState.isExpanded) {
@@ -263,54 +281,62 @@ fun MediaHubScreen(
 
                 // 2 Tabs: Video Directories & Audio Directories
                 TabRow(
-                    selectedTabIndex = hubState.selectedTab,
+                    selectedTabIndex = pagerState.currentPage,
                     containerColor = Color.Transparent,
                     contentColor = primaryColor,
                     indicator = { tabPositions ->
                         TabRowDefaults.SecondaryIndicator(
-                            modifier = Modifier.tabIndicatorOffset(tabPositions[hubState.selectedTab]),
+                            modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
                             color = primaryColor,
                             height = 3.dp
                         )
                     }
                 ) {
                     Tab(
-                        selected = hubState.selectedTab == 0,
-                        onClick = { mediaHubViewModel.selectTab(0) },
+                        selected = pagerState.currentPage == 0,
+                        onClick = {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(0)
+                            }
+                        },
                         text = {
                             Text(
                                 text = "Video Directories",
                                 fontWeight = FontWeight.Bold,
-                                color = if (hubState.selectedTab == 0) primaryColor else onSurfaceColor.copy(alpha = 0.7f)
+                                color = if (pagerState.currentPage == 0) primaryColor else onSurfaceColor.copy(alpha = 0.7f)
                             )
                         }
                     )
                     Tab(
-                        selected = hubState.selectedTab == 1,
-                        onClick = { mediaHubViewModel.selectTab(1) },
+                        selected = pagerState.currentPage == 1,
+                        onClick = {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(1)
+                            }
+                        },
                         text = {
                             Text(
                                 text = "Audio Directories",
                                 fontWeight = FontWeight.Bold,
-                                color = if (hubState.selectedTab == 1) primaryColor else onSurfaceColor.copy(alpha = 0.7f)
+                                color = if (pagerState.currentPage == 1) primaryColor else onSurfaceColor.copy(alpha = 0.7f)
                             )
                         }
                     )
                 }
 
-                // Main Content Area
-                Box(
+                // Swipeable Main Content Pager Area
+                HorizontalPager(
+                    state = pagerState,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
-                ) {
+                ) { page ->
                     if (hubState.isLoading) {
-                        CircularProgressIndicator(
-                            color = primaryColor,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(color = primaryColor)
+                        }
                     } else {
-                        when (hubState.selectedTab) {
+                        when (page) {
                             0 -> {
                                 if (hubState.selectedFolder == null) {
                                     val filteredFolders = if (hubState.searchQuery.isBlank()) {

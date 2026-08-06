@@ -32,6 +32,13 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         super.onMessageReceived(remoteMessage)
         android.util.Log.d("FCM_TEST", "Message received from: ${remoteMessage.from}")
 
+        val sharedPrefs = getSharedPreferences("chatsnap_prefs", Context.MODE_PRIVATE)
+        val isNotifEnabled = sharedPrefs.getBoolean("notifications_enabled", true)
+        if (!isNotifEnabled) {
+            android.util.Log.d("FCM_TEST", "Notifications disabled by user in settings. Skipping.")
+            return
+        }
+
         val senderId = remoteMessage.data["senderId"]
         val currentUid = FirebaseAuth.getInstance().currentUser?.uid
         if (senderId != null && senderId == currentUid) {

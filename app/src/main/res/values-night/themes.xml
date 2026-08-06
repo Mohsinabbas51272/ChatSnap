@@ -1,10 +1,57 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!-- Base application theme for night mode. -->
     <style name="Base.Theme.ChatSnap" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
-        <item name="android:popupBackground">?attr/colorSurface</item>
+        <!-- Main Brand Colors -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/white</item>
+
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondaryContainer">@color/secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/on_surface</item>
+
+        <item name="colorTertiary">#E966FF</item>
+        <item name="colorOnTertiary">@color/white</item>
+
+        <item name="android:windowBackground">@color/black_bg</item>
+        <item name="colorSurface">@color/black_surface</item>
+        <item name="colorOnSurface">@color/white</item>
+        <item name="colorSurfaceVariant">@color/black_primary</item>
+        <item name="colorOnSurfaceVariant">#B0B0B0</item>
+
+        <item name="colorOutline">@color/outline</item>
+        <item name="colorOutlineVariant">#333333</item>
+
+        <!-- Text Colors -->
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">#B0B0B0</item>
+        <item name="android:textColorHint">?attr/colorOutline</item>
+
+        <!-- System Bars -->
+        <item name="android:statusBarColor">@color/black_bg</item>
+        <item name="android:windowLightStatusBar">false</item>
+
+        <!-- Custom Attributes -->
+        <item name="chatBubbleSentColor">#303030</item>
+        <item name="chatBubbleReceivedColor">#1E1E1E</item>
+        <item name="chatBubbleSentTextColor">@color/white</item>
+        <item name="chatBubbleReceivedTextColor">@color/white</item>
+        <item name="themeAccentColor">@color/primary</item>
+        <item name="android:popupBackground">@drawable/bg_popup_menu</item>
         <item name="android:itemBackground">?attr/colorSurface</item>
+
+        <!-- Semantic status colors -->
+        <item name="colorSuccess">#30D158</item>
+        <item name="colorWarning">#FF9F0A</item>
+        <item name="colorError">#FF453A</item>
+        <item name="colorLink">#0A84FF</item>
+        <item name="colorCardElevated">#1E1E1E</item>
+
+        <item name="editTextStyle">@style/Widget.Material3.TextInputEditText.OutlinedBox</item>
+        <item name="textInputStyle">@style/Widget.Material3.TextInputLayout.OutlinedBox</item>
+        <item name="android:windowAnimationStyle">@style/Animation.Activity</item>
     </style>
 
     <style name="ShapeAppearance.Circle" parent="ShapeAppearance.MaterialComponents.SmallComponent">

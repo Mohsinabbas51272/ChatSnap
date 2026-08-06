@@ -23,6 +23,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
@@ -916,38 +918,21 @@ class ChatActivity : BaseActivity() {
         binding.progressBar.isIndeterminate = true
         
         if (type == "VIDEO") {
-            val ref = storage.reference.child("chats/$chatId/${System.currentTimeMillis()}.mp4")
-            ref.putFile(uri)
-                .addOnSuccessListener {
-                    ref.downloadUrl.addOnSuccessListener { downloadUri ->
-                        binding.progressBar.visibility = View.GONE
-                        sendMessage("🎥 Video", "VIDEO", mediaUrl = downloadUri.toString())
-                    }.addOnFailureListener { e ->
-                        binding.progressBar.visibility = View.GONE
-                        Toast.makeText(this, "Failed to get video URL: ${e.message}", Toast.LENGTH_SHORT).show()
+            lifecycleScope.launch(Dispatchers.IO) {
+                val uploadedUrl = com.example.chatsnap.utils.CloudinaryUploader.uploadMedia(
+                    context = this@ChatActivity,
+                    uri = uri,
+                    resourceType = "video"
+                )
+                withContext(Dispatchers.Main) {
+                    binding.progressBar.visibility = View.GONE
+                    if (uploadedUrl != null) {
+                        sendMessage("🎥 Video", "VIDEO", mediaUrl = uploadedUrl)
+                    } else {
+                        Toast.makeText(this@ChatActivity, "Video upload failed. Please check network.", Toast.LENGTH_SHORT).show()
                     }
                 }
-                .addOnFailureListener { e ->
-                    lifecycleScope.launch {
-                        try {
-                            val inputStream = contentResolver.openInputStream(uri)
-                            val bytes = inputStream?.readBytes()
-                            inputStream?.close()
-                            if (bytes != null && bytes.size <= 800000) {
-                                val base64 = android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT)
-                                val videoData = "data:video/mp4;base64,$base64"
-                                binding.progressBar.visibility = View.GONE
-                                sendMessage("🎥 Video", "VIDEO", mediaUrl = videoData)
-                            } else {
-                                binding.progressBar.visibility = View.GONE
-                                Toast.makeText(this@ChatActivity, "Video upload failed: ${e.message}", Toast.LENGTH_LONG).show()
-                            }
-                        } catch (ex: Exception) {
-                            binding.progressBar.visibility = View.GONE
-                            Toast.makeText(this@ChatActivity, "Upload failed: ${ex.message}", Toast.LENGTH_LONG).show()
-                        }
-                    }
-                }
+            }
             return
         }
         

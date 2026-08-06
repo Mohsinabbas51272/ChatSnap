@@ -19,9 +19,10 @@ import com.example.chatsnap.R
 import com.example.chatsnap.databinding.ItemAuraVideoBinding
 import com.example.chatsnap.models.AuraVideo
 import com.example.chatsnap.utils.AuraFeedRepository
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.DefaultLoadControl
+import androidx.media3.exoplayer.ExoPlayer
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
@@ -184,57 +185,18 @@ class AuraFeedAdapter(
         private fun startVinylAnimation() {
             binding.ivMusicVinyl.animate()
                 .rotationBy(360f)
-                .setDuration(3000)
+                .setDuration(4000)
                 .setInterpolator(android.view.animation.LinearInterpolator())
                 .withEndAction {
                     if (binding.ivMusicVinyl.isAttachedToWindow) {
                         startVinylAnimation()
-                        showFloatingMusicNote()
                     }
                 }
                 .start()
         }
 
         private fun showFloatingMusicNote() {
-            val container = binding.root as? ViewGroup ?: return
-            val noteView = android.widget.TextView(context).apply {
-                text = if (java.util.Random().nextBoolean()) "🎵" else "🎶"
-                textSize = 18f
-                alpha = 0.9f
-                layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-            }
-            container.addView(noteView)
-
-            val vinylLoc = IntArray(2)
-            binding.flVinylContainer.getLocationInWindow(vinylLoc)
-            val rootLoc = IntArray(2)
-            container.getLocationInWindow(rootLoc)
-
-            val startX = (vinylLoc[0] - rootLoc[0] + 10).toFloat()
-            val startY = (vinylLoc[1] - rootLoc[1]).toFloat()
-
-            noteView.x = startX
-            noteView.y = startY
-
-            val moveY = android.animation.ObjectAnimator.ofFloat(noteView, "translationY", 0f, -220f)
-            val moveX = android.animation.ObjectAnimator.ofFloat(noteView, "translationX", 0f, -50f)
-            val fade = android.animation.ObjectAnimator.ofFloat(noteView, "alpha", 0.9f, 0f)
-            val scaleX = android.animation.ObjectAnimator.ofFloat(noteView, "scaleX", 0.7f, 1.4f)
-            val scaleY = android.animation.ObjectAnimator.ofFloat(noteView, "scaleY", 0.7f, 1.4f)
-
-            android.animation.AnimatorSet().apply {
-                playTogether(moveY, moveX, fade, scaleX, scaleY)
-                duration = 1600
-                addListener(object : android.animation.AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: android.animation.Animator) {
-                        container.removeView(noteView)
-                    }
-                })
-                start()
-            }
+            // Disabled view creation loop to maintain 60 FPS UI performance
         }
 
         private fun showHeartPopUp(x: Float, y: Float) {
@@ -461,7 +423,20 @@ class AuraFeedAdapter(
         private fun setupExoPlayer(videoUri: Uri) {
             if (player != null) return
 
-            player = ExoPlayer.Builder(context).build().apply {
+            val loadControl = DefaultLoadControl.Builder()
+                .setBufferDurationsMs(
+                    1000, // minBufferMs
+                    4000, // maxBufferMs
+                    500,  // bufferForPlaybackMs
+                    1000  // bufferForPlaybackAfterRebufferMs
+                )
+                .setPrioritizeTimeOverSizeThresholds(true)
+                .build()
+
+            player = ExoPlayer.Builder(context)
+                .setLoadControl(loadControl)
+                .build()
+                .apply {
                 repeatMode = Player.REPEAT_MODE_ONE
                 setMediaItem(MediaItem.fromUri(videoUri))
                 prepare()

@@ -1,52 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="16dp"
-    android:gravity="center_vertical"
-    android:background="?attr/selectableItemBackground">
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="?attr/colorSurface"
+    app:strokeWidth="0dp">
 
     <LinearLayout
-        android:id="@+id/viewColorPreview"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:padding="6dp">
-
-        <!-- Small color circles preview -->
-        <View
-            android:layout_width="10dp"
-            android:layout_height="10dp"
-            android:layout_margin="2dp"
-            android:background="@drawable/bg_color_circle"
-            android:backgroundTint="#FF7F50" />
-
-        <View
-            android:layout_width="10dp"
-            android:layout_height="10dp"
-            android:layout_margin="2dp"
-            android:background="@drawable/bg_color_circle"
-            android:backgroundTint="#00BCD4" />
-
-        <View
-            android:layout_width="10dp"
-            android:layout_height="10dp"
-            android:layout_margin="2dp"
-            android:background="@drawable/bg_color_circle"
-            android:backgroundTint="#1ABC9C" />
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/tvThemeName"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:text="Theme Name"
-        android:textSize="16sp"
-        android:fontFamily="sans-serif-medium"
-        android:textColor="?android:attr/textColorPrimary" />
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground">
 
-</LinearLayout>
+        <!-- Single Solid Color Box Swatch for Theme (3 dots removed) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardColorPreview"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="1.5dp"
+            app:strokeColor="#33FFFFFF" />
+
+        <TextView
+            android:id="@+id/tvThemeName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="16dp"
+            android:text="Theme Name"
+            android:textSize="15sp"
+            android:fontFamily="sans-serif-bold"
+            android:textColor="?android:attr/textColorPrimary" />
+
+        <ImageView
+            android:id="@+id/ivSelectedCheck"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@android:drawable/checkbox_on_background"
+            app:tint="?attr/colorPrimary"
+            android:visibility="gone" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

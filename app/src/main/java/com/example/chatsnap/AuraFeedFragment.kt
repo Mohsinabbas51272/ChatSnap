@@ -89,9 +89,15 @@ class AuraFeedFragment : Fragment() {
         binding.viewPagerVideos.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                
-                // Triggers autoplay for current page and pauses others
-                adapter.playVideoAt(position, binding.viewPagerVideos)
+
+                val mainActivity = activity as? MainActivity
+                val isAuraTabActive = mainActivity?.isAuraFeedActive() == true
+
+                if (isAuraTabActive && activeFooterTab == "HOME") {
+                    adapter.playVideoAt(position, binding.viewPagerVideos)
+                } else {
+                    adapter.releaseAllPlayers()
+                }
 
                 // Paginate when reaching near the end
                 if (position == videosList.size - 2 && !isLoading && !isLastPage && currentTab != "MY_VIDEOS") {
@@ -244,7 +250,12 @@ class AuraFeedFragment : Fragment() {
             adapter.notifyDataSetChanged()
             binding.viewPagerVideos.post {
                 binding.viewPagerVideos.currentItem = index
-                adapter.playVideoAt(index, binding.viewPagerVideos)
+                val mainActivity = activity as? MainActivity
+                if (mainActivity?.isAuraFeedActive() == true) {
+                    adapter.playVideoAt(index, binding.viewPagerVideos)
+                } else {
+                    adapter.releaseAllPlayers()
+                }
             }
         }
         binding.rvMyVideosGrid.layoutManager = GridLayoutManager(requireContext(), 3)
@@ -306,7 +317,12 @@ class AuraFeedFragment : Fragment() {
                 if (clearExisting && videosList.isNotEmpty()) {
                     binding.viewPagerVideos.post {
                         binding.viewPagerVideos.currentItem = 0
-                        adapter.playVideoAt(0, binding.viewPagerVideos)
+                        val mainActivity = activity as? MainActivity
+                        if (mainActivity?.isAuraFeedActive() == true && activeFooterTab == "HOME") {
+                            adapter.playVideoAt(0, binding.viewPagerVideos)
+                        } else {
+                            adapter.releaseAllPlayers()
+                        }
                     }
                 }
             } else {
@@ -335,10 +351,10 @@ class AuraFeedFragment : Fragment() {
         val sizeBytes = AuraFeedRepository.getVideoSize(requireContext(), uri)
         val sizeMb = sizeBytes / (1024.0 * 1024.0)
 
-        if (sizeMb > 0.71) {
+        if (sizeMb > 50.0) {
             Toast.makeText(
                 context,
-                "Selected video is too large (%.2f MB). Please choose a video smaller than 730 KB (e.g. 3-5 seconds long).".format(sizeMb),
+                "Selected video is too large (%.2f MB). Please choose a video smaller than 50 MB.".format(sizeMb),
                 Toast.LENGTH_LONG
             ).show()
             return
@@ -374,20 +390,40 @@ class AuraFeedFragment : Fragment() {
 
     private fun publishVideo(uri: Uri, caption: String, hashtagsInput: String, musicInput: String) {
         binding.cardUploadProgress.visibility = View.VISIBLE
-        binding.tvUploadStatus.text = "Compressing & Encoding Video..."
+        binding.tvUploadStatus.text = "Uploading Video to Cloudinary..."
 
         lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val base64Video = AuraFeedRepository.encodeVideoToBase64(requireContext(), uri)
+            val uploadedUrl = com.example.chatsnap.utils.CloudinaryUploader.uploadMedia(
+                context = requireContext(),
+                uri = uri,
+                resourceType = "video",
+                onProgress = { progress ->
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        binding.tvUploadStatus.text = "Uploading Video... $progress%"
+                    }
+                }
+            )
 
-                if (base64Video == null) {
+            if (uploadedUrl != null) {
+                saveAuraVideoToFirestore(uploadedUrl, caption, hashtagsInput, musicInput)
+            } else {
+                // Fallback: If Cloudinary fails, attempt Base64 upload if video is small enough (<900KB)
+                val base64Video = AuraFeedRepository.encodeVideoToBase64(requireContext(), uri)
+                if (base64Video != null && base64Video.length <= 950000) {
+                    saveAuraVideoToFirestore(base64Video, caption, hashtagsInput, musicInput)
+                } else {
                     withContext(Dispatchers.Main) {
                         binding.cardUploadProgress.visibility = View.GONE
-                        Toast.makeText(context, "Failed to process video file", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Upload failed. Please check network/Cloudinary.", Toast.LENGTH_LONG).show()
                     }
-                    return@launch
                 }
+            }
+        }
+    }
 
+    private fun saveAuraVideoToFirestore(videoUrl: String, caption: String, hashtagsInput: String, musicInput: String) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
                 val userDoc = firestore.collection("users").document(currentUid).get().await()
                 val username = userDoc.getString("name") ?: "user"
                 val photoUrl = userDoc.getString("profileImageUrl") ?: ""
@@ -402,7 +438,7 @@ class AuraFeedFragment : Fragment() {
                     creatorUid = currentUid,
                     creatorUsername = username,
                     creatorPhotoUrl = photoUrl,
-                    videoUrl = base64Video,
+                    videoUrl = videoUrl,
                     caption = caption,
                     hashtags = tags,
                     musicName = musicInput.ifEmpty { "Original Sound - $username" },
@@ -420,30 +456,50 @@ class AuraFeedFragment : Fragment() {
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     binding.cardUploadProgress.visibility = View.GONE
-                    Toast.makeText(context, "Upload failed: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "Failed to save video details: ${e.message}", Toast.LENGTH_LONG).show()
                 }
             }
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        adapter.releaseAllPlayers()
+    fun pausePlayback() {
+        if (_binding != null) {
+            adapter.releaseAllPlayers()
+        }
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (videosList.isNotEmpty() && activeFooterTab == "HOME") {
+    fun resumePlayback() {
+        val mainActivity = activity as? MainActivity
+        val isAuraTabActive = mainActivity?.isAuraFeedActive() == true
+
+        if (_binding != null && isAuraTabActive && videosList.isNotEmpty() && activeFooterTab == "HOME") {
             binding.viewPagerVideos.post {
                 val current = binding.viewPagerVideos.currentItem
                 adapter.playVideoAt(current, binding.viewPagerVideos)
             }
+        } else {
+            pausePlayback()
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        pausePlayback()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        pausePlayback()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        resumePlayback()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        adapter.releaseAllPlayers()
+        pausePlayback()
         _binding = null
     }
 }

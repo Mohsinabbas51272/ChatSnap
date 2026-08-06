@@ -299,21 +299,16 @@ class StoriesFragment : Fragment(), SearchableFragment {
                 }
 
                 if (mediaType == "video") {
-                    val uid = auth.currentUser?.uid ?: return@launch
-                    val storage = com.google.firebase.storage.FirebaseStorage.getInstance()
-                    val ref = storage.reference.child("stories/$uid/${System.currentTimeMillis()}.mp4")
-
-                    ref.putFile(mediaUri)
-                        .addOnSuccessListener {
-                            ref.downloadUrl.addOnSuccessListener { downloadUri ->
-                                saveStoryToFirestore(downloadUri.toString(), "video", musicBase64, musicTitle)
-                            }.addOnFailureListener {
-                                fallbackUploadVideoAsBase64(mediaUri, musicBase64, musicTitle)
-                            }
-                        }
-                        .addOnFailureListener {
-                            fallbackUploadVideoAsBase64(mediaUri, musicBase64, musicTitle)
-                        }
+                    val uploadedUrl = com.example.chatsnap.utils.CloudinaryUploader.uploadMedia(
+                        context = requireContext(),
+                        uri = mediaUri,
+                        resourceType = "video"
+                    )
+                    if (uploadedUrl != null) {
+                        saveStoryToFirestore(uploadedUrl, "video", musicBase64, musicTitle)
+                    } else {
+                        fallbackUploadVideoAsBase64(mediaUri, musicBase64, musicTitle)
+                    }
                     return@launch
                 }
 

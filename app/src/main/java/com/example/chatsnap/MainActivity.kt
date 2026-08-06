@@ -74,6 +74,7 @@ class MainActivity : BaseActivity() {
             return
         }
 
+        setupViewPager()
         setupBottomNavigation()
         loadHeaderProfile()
         syncSystemNavigationColor()
@@ -89,17 +90,12 @@ class MainActivity : BaseActivity() {
         checkMaintenanceMode()
         listenForActiveCall()
 
-        if (savedInstanceState == null) {
-            loadFragment(ChatsFragment(), "Chats")
-            updateNavUI(binding.navChats)
-        }
-
         binding.btnSearch.setOnClickListener {
             toggleSearchHeader()
         }
 
         binding.btnClearCallsHeader.setOnClickListener {
-            (currentFragment as? CallsFragment)?.showClearCallsDialog()
+            (getCurrentFragment() as? CallsFragment)?.showClearCallsDialog()
         }
 
         binding.btnMainFab.setOnClickListener {
@@ -115,8 +111,7 @@ class MainActivity : BaseActivity() {
         }
 
         binding.ivHeaderProfile.setOnClickListener {
-            loadFragment(SettingsFragment(), "Settings")
-            updateNavUI(binding.navSettings)
+            binding.viewPagerMain.setCurrentItem(6, true)
         }
 
         binding.btnEditStatus.setOnClickListener {
@@ -126,11 +121,48 @@ class MainActivity : BaseActivity() {
         setupBackNavigation()
     }
 
+    inner class MainPagerAdapter(activity: androidx.fragment.app.FragmentActivity) : androidx.viewpager2.adapter.FragmentStateAdapter(activity) {
+        override fun getItemCount(): Int = 7
+        override fun createFragment(position: Int): Fragment {
+            return when (position) {
+                0 -> ChatsFragment()
+                1 -> StoriesFragment()
+                2 -> CallsFragment()
+                3 -> PeopleFragment()
+                4 -> EarnFragment()
+                5 -> AuraFeedFragment()
+                6 -> SettingsFragment()
+                else -> ChatsFragment()
+            }
+        }
+    }
+
+    fun isAuraFeedActive(): Boolean {
+        return ::binding.isInitialized && binding.viewPagerMain.currentItem == 5
+    }
+
+    private fun getCurrentFragment(): Fragment? {
+        return supportFragmentManager.findFragmentByTag("f${binding.viewPagerMain.currentItem}")
+    }
+
+    private fun setupViewPager() {
+        val pagerAdapter = MainPagerAdapter(this)
+        binding.viewPagerMain.adapter = pagerAdapter
+        binding.viewPagerMain.offscreenPageLimit = 3
+
+        binding.viewPagerMain.registerOnPageChangeCallback(object : androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                onPageChanged(position)
+            }
+        })
+    }
+
     private fun setupHeaderSearch() {
         binding.etHeaderSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                (currentFragment as? SearchableFragment)?.onSearch(s.toString())
+                (getCurrentFragment() as? SearchableFragment)?.onSearch(s.toString())
             }
             override fun afterTextChanged(s: Editable?) {}
         })
@@ -153,11 +185,12 @@ class MainActivity : BaseActivity() {
     }
 
     private fun handleFabClick() {
-        when (val fragment = currentFragment) {
-            is ChatsFragment -> showNewChatMenu(binding.btnMainFab)
-            is StoriesFragment -> fragment.showMediaPickerOptions()
-            is PeopleFragment -> toggleSearchHeader()
-            is CallsFragment -> navigateTo(PeopleFragment(), "Contacts", binding.navPeople)
+        val fragment = getCurrentFragment()
+        when (binding.viewPagerMain.currentItem) {
+            0 -> showNewChatMenu(binding.btnMainFab)
+            1 -> (fragment as? StoriesFragment)?.showMediaPickerOptions()
+            3 -> toggleSearchHeader()
+            2 -> binding.viewPagerMain.setCurrentItem(3, true)
         }
     }
 
@@ -168,9 +201,8 @@ class MainActivity : BaseActivity() {
                     toggleSearchHeader()
                     return
                 }
-                if (currentFragment !is ChatsFragment) {
-                    loadFragment(ChatsFragment(), "Chats")
-                    updateNavUI(binding.navChats)
+                if (binding.viewPagerMain.currentItem != 0) {
+                    binding.viewPagerMain.setCurrentItem(0, true)
                 } else {
                     isEnabled = false
                     onBackPressedDispatcher.onBackPressed()
@@ -360,8 +392,7 @@ class MainActivity : BaseActivity() {
         dialog.window?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)?.setBackgroundResource(android.R.color.transparent)
 
         sheetView.findViewById<View>(R.id.btnNewPrivateChat)?.setOnClickListener {
-            loadFragment(PeopleFragment(), "Contacts")
-            updateNavUI(binding.navPeople)
+            binding.viewPagerMain.setCurrentItem(3, true)
             dialog.dismiss()
         }
 
@@ -395,19 +426,13 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setupBottomNavigation() {
-        binding.navChats.setOnClickListener { navigateTo(ChatsFragment(), "Chats", it as ImageButton) }
-        binding.navStories.setOnClickListener { navigateTo(StoriesFragment(), "Stories", it as ImageButton) }
-        binding.navCalls.setOnClickListener { navigateTo(CallsFragment(), "Calls", it as ImageButton) }
-        binding.navPeople.setOnClickListener { navigateTo(PeopleFragment(), "Contacts", it as ImageButton) }
-        binding.navEarn.setOnClickListener { navigateTo(EarnFragment(), "Earn", it as ImageButton) }
-        binding.navSettings.setOnClickListener { navigateTo(SettingsFragment(), "Settings", it as ImageButton) }
-        binding.navAuraFeed.setOnClickListener { navigateTo(AuraFeedFragment(), "AuraFeed", it as ImageButton) }
-    }
-
-    private fun navigateTo(fragment: Fragment, title: String, button: ImageButton) {
-        if (currentFragment != null && fragment::class == currentFragment!!::class) return
-        loadFragment(fragment, title)
-        updateNavUI(button)
+        binding.navChats.setOnClickListener { binding.viewPagerMain.setCurrentItem(0, true) }
+        binding.navStories.setOnClickListener { binding.viewPagerMain.setCurrentItem(1, true) }
+        binding.navCalls.setOnClickListener { binding.viewPagerMain.setCurrentItem(2, true) }
+        binding.navPeople.setOnClickListener { binding.viewPagerMain.setCurrentItem(3, true) }
+        binding.navEarn.setOnClickListener { binding.viewPagerMain.setCurrentItem(4, true) }
+        binding.navAuraFeed.setOnClickListener { binding.viewPagerMain.setCurrentItem(5, true) }
+        binding.navSettings.setOnClickListener { binding.viewPagerMain.setCurrentItem(6, true) }
     }
 
     private fun updateNavUI(activeButton: ImageButton) {
@@ -430,17 +455,56 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun loadFragment(fragment: Fragment, title: String) {
-        binding.tvHeaderTitle.text = title
-        currentFragment = fragment
+    private fun onPageChanged(position: Int) {
+        val title = when (position) {
+            0 -> "Chats"
+            1 -> "Stories"
+            2 -> "Calls"
+            3 -> "Contacts"
+            4 -> "Earn"
+            5 -> "AuraFeed"
+            6 -> "Settings"
+            else -> "Chats"
+        }
 
-        val isAura = fragment is AuraFeedFragment
+        val activeButton = when (position) {
+            0 -> binding.navChats
+            1 -> binding.navStories
+            2 -> binding.navCalls
+            3 -> binding.navPeople
+            4 -> binding.navEarn
+            5 -> binding.navAuraFeed
+            6 -> binding.navSettings
+            else -> binding.navChats
+        }
+
+        binding.tvHeaderTitle.text = title
+        updateNavUI(activeButton)
+
+        val isAura = position == 5
+        val isEarn = position == 4
+        val isSettings = position == 6
+        val isCalls = position == 2
+
+        // Pause/resume AuraFeed video playback depending on active tab
+        supportFragmentManager.fragments.forEach { fragment ->
+            if (fragment is AuraFeedFragment) {
+                if (isAura) {
+                    fragment.resumePlayback()
+                } else {
+                    fragment.pausePlayback()
+                }
+            }
+        }
+
+        // Disable swipe gestures on ViewPager2 when on Aura Feed to prevent horizontal swipe conflicts
+        binding.viewPagerMain.isUserInputEnabled = !isAura
 
         // Header: hide completely for AuraFeed
         binding.appBarLayout.visibility = if (isAura) View.GONE else View.VISIBLE
 
-        binding.btnSearch.visibility = if (fragment is EarnFragment || fragment is SettingsFragment || isAura) View.GONE else View.VISIBLE
-        binding.btnClearCallsHeader.visibility = if (fragment is CallsFragment) View.VISIBLE else View.GONE
+        binding.btnSearch.visibility = if (isEarn || isSettings || isAura) View.GONE else View.VISIBLE
+        binding.btnClearCallsHeader.visibility = if (isCalls) View.VISIBLE else View.GONE
 
         // Manage CoordinatorLayout behavior and system windows fitting for immersive mode
         val params = binding.mainContentLayout.layoutParams as? androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams
@@ -472,29 +536,29 @@ class MainActivity : BaseActivity() {
                 .start()
         }
 
-        when (fragment) {
-            is ChatsFragment -> {
+        when (position) {
+            0 -> {
                 binding.btnMainFab.visibility = View.VISIBLE
                 binding.btnMainFab.setImageResource(R.drawable.ic_chat)
                 binding.btnSnapPlusFab.visibility = View.VISIBLE
                 binding.btnAiAssistantFab.visibility = View.VISIBLE
                 binding.cvStatusBanner.visibility = View.GONE
             }
-            is StoriesFragment -> {
+            1 -> {
                 binding.btnMainFab.visibility = View.VISIBLE
                 binding.btnMainFab.setImageResource(android.R.drawable.ic_menu_camera)
                 binding.btnSnapPlusFab.visibility = View.GONE
                 binding.btnAiAssistantFab.visibility = View.GONE
                 binding.cvStatusBanner.visibility = View.VISIBLE
             }
-            is CallsFragment -> {
+            2 -> {
                 binding.btnMainFab.visibility = View.VISIBLE
                 binding.btnMainFab.setImageResource(android.R.drawable.ic_menu_call)
                 binding.btnSnapPlusFab.visibility = View.GONE
                 binding.btnAiAssistantFab.visibility = View.GONE
                 binding.cvStatusBanner.visibility = View.GONE
             }
-            is PeopleFragment -> {
+            3 -> {
                 binding.btnMainFab.visibility = View.VISIBLE
                 binding.btnMainFab.setImageResource(android.R.drawable.ic_input_add)
                 binding.btnSnapPlusFab.visibility = View.GONE
@@ -508,11 +572,6 @@ class MainActivity : BaseActivity() {
                 binding.cvStatusBanner.visibility = View.GONE
             }
         }
-
-        supportFragmentManager.beginTransaction()
-            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-            .replace(R.id.fragmentContainer, fragment)
-            .commit()
     }
 
     private fun syncThemeFromFirestore() {

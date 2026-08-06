@@ -55,6 +55,11 @@ object FcmNotificationSender {
                     Log.w(TAG, "Recipient $receiverId has no FCM token stored")
                     return@addOnSuccessListener
                 }
+                val notifEnabled = userDoc.getBoolean("notificationsEnabled") ?: true
+                if (!notifEnabled) {
+                    Log.d(TAG, "Recipient $receiverId has muted notifications in settings. Skipping push notification.")
+                    return@addOnSuccessListener
+                }
 
                 // 2. Fetch service account credentials from Firestore
                 db.collection("config").document("admin").get()

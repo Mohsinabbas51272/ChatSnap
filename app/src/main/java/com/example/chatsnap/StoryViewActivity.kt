@@ -433,6 +433,9 @@ class StoryViewActivity : BaseActivity() {
             }
             binding.vvStory.setOnPreparedListener { mp ->
                 mp.isLooping = false
+                try {
+                    mp.setVideoScalingMode(android.media.MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING)
+                } catch (_: Exception) {}
                 binding.vvStory.start()
             }
             binding.vvStory.setOnErrorListener { _, _, _ ->
