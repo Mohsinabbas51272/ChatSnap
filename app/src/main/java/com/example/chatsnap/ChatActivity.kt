@@ -98,15 +98,23 @@ class ChatActivity : BaseActivity() {
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
         
-        // Capture keyboard height for responsive emoji picker
+        // Capture keyboard height and adjust system bar / soft keyboard IME bottom padding dynamically
         androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
+            val systemBars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+            val ime = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime())
             val imeVisible = insets.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime())
-            if (imeVisible) {
-                val imeHeight = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime()).bottom
-                if (imeHeight > 0) {
-                    getSharedPreferences("app_prefs", MODE_PRIVATE).edit().putInt("keyboard_height", imeHeight).apply()
-                }
+
+            if (imeVisible && ime.bottom > 0) {
+                getSharedPreferences("app_prefs", MODE_PRIVATE).edit().putInt("keyboard_height", ime.bottom).apply()
             }
+
+            val bottomInset = if (imeVisible) ime.bottom else systemBars.bottom
+            binding.root.setPadding(
+                systemBars.left,
+                systemBars.top,
+                systemBars.right,
+                bottomInset
+            )
             insets
         }
 
@@ -1479,6 +1487,25 @@ class ChatActivity : BaseActivity() {
         )
         binding.chatRecyclerView.layoutManager = LinearLayoutManager(this).apply { stackFromEnd = true }
         binding.chatRecyclerView.adapter = chatAdapter
+
+        // Auto-scroll when keyboard opens or layout resizes while typing
+        binding.chatRecyclerView.addOnLayoutChangeListener { _, _, _, _, bottom, _, _, _, oldBottom ->
+            if (bottom < oldBottom && messages.isNotEmpty()) {
+                binding.chatRecyclerView.post {
+                    binding.chatRecyclerView.scrollToPosition(messages.size - 1)
+                }
+            }
+        }
+        
+        binding.etMessage.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus && messages.isNotEmpty()) {
+                binding.chatRecyclerView.postDelayed({
+                    if (messages.isNotEmpty()) {
+                        binding.chatRecyclerView.scrollToPosition(messages.size - 1)
+                    }
+                }, 150)
+            }
+        }
     }
 
     private fun listenForMessages() {

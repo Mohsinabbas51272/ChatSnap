@@ -105,6 +105,21 @@ class NoteEditorActivity : AppCompatActivity() {
             binding = ActivityNoteEditorBinding.inflate(layoutInflater)
             setContentView(binding.root)
 
+            androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
+                val systemBars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+                val ime = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime())
+                val imeVisible = insets.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime())
+
+                val bottomInset = if (imeVisible) ime.bottom else systemBars.bottom
+                binding.root.setPadding(
+                    systemBars.left,
+                    systemBars.top,
+                    systemBars.right,
+                    bottomInset
+                )
+                insets
+            }
+
             val noteId = intent.getLongExtra("note_id", -1L)
             Log.d(TAG, "onCreate: noteId=$noteId")
 

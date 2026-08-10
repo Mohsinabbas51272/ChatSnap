@@ -44,7 +44,8 @@ class EarnFragment : Fragment() {
         checkDailyClaimStatus()
 
         binding.btnWithdraw.setOnClickListener {
-            startActivity(Intent(requireContext(), WalletActivity::class.java))
+            val safeContext = context ?: return@setOnClickListener
+            startActivity(Intent(safeContext, WalletActivity::class.java))
         }
 
         binding.btnInvite.setOnClickListener {
@@ -54,18 +55,25 @@ class EarnFragment : Fragment() {
 
     private fun loadConfig() {
         firestore.collection("config").document("admin").get().addOnSuccessListener { doc ->
-            if (doc.exists()) {
+            if (_binding != null && doc != null && doc.exists()) {
                 rewardLogin = doc.getLong("rewardLogin") ?: 10L
                 rewardStory = doc.getLong("rewardStory") ?: 15L
                 rewardMessage = doc.getLong("rewardMessage") ?: 20L
                 rewardCall = doc.getLong("rewardCall") ?: 30L
                 rewardInvite = doc.getLong("rewardInvite") ?: 25L
             }
-            setupQuests()
-        }.addOnFailureListener { setupQuests() }
+            if (_binding != null) {
+                setupQuests()
+            }
+        }.addOnFailureListener {
+            if (_binding != null) {
+                setupQuests()
+            }
+        }
     }
 
     private fun setupQuests() {
+        if (_binding == null) return
         binding.cardDailyLogin.tvQuestTitle.text = "Daily check-in"
         binding.cardDailyLogin.tvQuestReward.text = "+$rewardLogin Coins"
 
@@ -170,30 +178,32 @@ class EarnFragment : Fragment() {
         onActionClick: () -> Unit,
         onClaimClick: () -> Unit
     ) {
+        val safeContext = context ?: return
         if (claimed) {
             button.text = "Claimed"
             button.isEnabled = false
             button.alpha = 0.5f
             button.setOnClickListener(null)
-            button.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.darker_gray))
+            button.setBackgroundColor(ContextCompat.getColor(safeContext, android.R.color.darker_gray))
         } else if (taskDone) {
             button.text = "Claim Now"
             button.isEnabled = true
             button.alpha = 1.0f
             button.setOnClickListener { onClaimClick() }
-            button.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.primary))
+            button.setBackgroundColor(ContextCompat.getColor(safeContext, R.color.primary))
         } else {
             button.text = actionLabel
             button.isEnabled = true
             button.alpha = 1.0f
             button.setOnClickListener { onActionClick() }
-            button.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.secondary))
+            button.setBackgroundColor(ContextCompat.getColor(safeContext, R.color.secondary))
         }
     }
 
     private fun showSendSnapSimulationDialog() {
         val uid = auth.currentUser?.uid ?: return
         firestore.collection("users").document(uid).get().addOnSuccessListener { doc ->
+            if (_binding == null || !isAdded) return@addOnSuccessListener
             val friendsList = doc.get("friends") as? List<String> ?: emptyList()
             
             val friendNames = mutableListOf<String>()
@@ -204,62 +214,73 @@ class EarnFragment : Fragment() {
                 showFriendSelectionDialog(friendNames)
             } else {
                 firestore.collection("users").whereIn("uid", friendsList).get().addOnSuccessListener { snapshot ->
+                    if (_binding == null || !isAdded) return@addOnSuccessListener
                     snapshot.documents.forEach { fDoc ->
                         fDoc.getString("name")?.let { friendNames.add(it) }
                     }
                     showFriendSelectionDialog(friendNames)
                 }.addOnFailureListener {
-                    showFriendSelectionDialog(friendNames)
+                    if (_binding != null && isAdded) {
+                        showFriendSelectionDialog(friendNames)
+                    }
                 }
             }
         }
     }
 
     private fun showFriendSelectionDialog(friends: List<String>) {
+        val safeContext = context ?: return
         val items = friends.toTypedArray()
-        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(safeContext)
             .setTitle("Send a Snap")
             .setItems(items) { _, which ->
                 val selected = items[which]
-                Toast.makeText(requireContext(), "📸 Sending snap to $selected...", Toast.LENGTH_SHORT).show()
+                val ctx = context ?: return@setItems
+                Toast.makeText(ctx, "📸 Sending snap to $selected...", Toast.LENGTH_SHORT).show()
                 
+                val currentUid = auth.currentUser?.uid ?: return@setItems
                 val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-                val walletRef = firestore.collection("users").document(auth.uid!!).collection("wallet").document("data")
+                val walletRef = firestore.collection("users").document(currentUid).collection("wallet").document("data")
                 walletRef.update("pendingTask2Date", today)
                     .addOnSuccessListener {
-                        Toast.makeText(requireContext(), "Snap sent! Task completed! 🎉", Toast.LENGTH_SHORT).show()
+                        val c = context ?: return@addOnSuccessListener
+                        Toast.makeText(c, "Snap sent! Task completed! 🎉", Toast.LENGTH_SHORT).show()
                     }
             }
             .show()
     }
 
     private fun showReferralFormDialog() {
-        val rootLayout = android.widget.LinearLayout(requireContext()).apply {
+        val safeContext = context ?: return
+        val rootLayout = android.widget.LinearLayout(safeContext).apply {
             orientation = android.widget.LinearLayout.VERTICAL
             val pad = (20 * resources.displayMetrics.density).toInt()
             setPadding(pad, pad, pad, pad)
         }
 
-        val input = android.widget.EditText(requireContext()).apply {
+        val input = android.widget.EditText(safeContext).apply {
             hint = "Enter Referral Code or Email"
             inputType = android.text.InputType.TYPE_CLASS_TEXT
         }
         rootLayout.addView(input)
 
-        android.app.AlertDialog.Builder(requireContext())
+        android.app.AlertDialog.Builder(safeContext)
             .setTitle("Submit Referral Form")
             .setView(rootLayout)
             .setPositiveButton("Submit") { _, _ ->
                 val code = input.text.toString().trim()
                 if (code.isNotEmpty()) {
+                    val currentUid = auth.currentUser?.uid ?: return@setPositiveButton
                     val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-                    val walletRef = firestore.collection("users").document(auth.uid!!).collection("wallet").document("data")
+                    val walletRef = firestore.collection("users").document(currentUid).collection("wallet").document("data")
                     walletRef.update("pendingTask3Date", today)
                         .addOnSuccessListener {
-                            Toast.makeText(requireContext(), "Referral submitted! Task completed! 🎉", Toast.LENGTH_SHORT).show()
+                            val c = context ?: return@addOnSuccessListener
+                            Toast.makeText(c, "Referral submitted! Task completed! 🎉", Toast.LENGTH_SHORT).show()
                         }
                 } else {
-                    Toast.makeText(requireContext(), "Referral code cannot be empty.", Toast.LENGTH_SHORT).show()
+                    val c = context ?: return@setPositiveButton
+                    Toast.makeText(c, "Referral code cannot be empty.", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancel", null)
@@ -267,7 +288,8 @@ class EarnFragment : Fragment() {
     }
 
     private fun showAdViewerSimulatorDialog() {
-        val progressDialog = android.app.ProgressDialog(requireContext()).apply {
+        val safeContext = context ?: return
+        val progressDialog = android.app.ProgressDialog(safeContext).apply {
             setTitle("Loading Daily Sponsors")
             setMessage("Watching Ad 1 of 3...")
             setProgressStyle(android.app.ProgressDialog.STYLE_SPINNER)
@@ -276,17 +298,26 @@ class EarnFragment : Fragment() {
         }
 
         android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+            if (_binding == null || !isAdded) {
+                progressDialog.dismiss()
+                return@postDelayed
+            }
             progressDialog.setMessage("Watching Ad 2 of 3...")
             android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                if (_binding == null || !isAdded) {
+                    progressDialog.dismiss()
+                    return@postDelayed
+                }
                 progressDialog.setMessage("Watching Ad 3 of 3...")
                 android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                     progressDialog.dismiss()
-                    
+                    val uid = auth.currentUser?.uid ?: return@postDelayed
                     val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-                    val walletRef = firestore.collection("users").document(auth.uid!!).collection("wallet").document("data")
+                    val walletRef = firestore.collection("users").document(uid).collection("wallet").document("data")
                     walletRef.update("pendingTask4Date", today)
                         .addOnSuccessListener {
-                            Toast.makeText(requireContext(), "Watched all ads! Task completed! 📺🎉", Toast.LENGTH_SHORT).show()
+                            val c = context ?: return@addOnSuccessListener
+                            Toast.makeText(c, "Watched all ads! Task completed! 📺🎉", Toast.LENGTH_SHORT).show()
                         }
                 }, 2000)
             }, 2000)
@@ -294,17 +325,20 @@ class EarnFragment : Fragment() {
     }
 
     private fun shareReferralLink() {
+        val safeContext = context ?: return
+        val currentUid = auth.currentUser?.uid ?: return
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, "Join ChatSnap and earn rewards! My referral link: https://chatsnap.app/invite/${auth.uid}")
+            putExtra(Intent.EXTRA_TEXT, "Join ChatSnap and earn rewards! My referral link: https://chatsnap.app/invite/$currentUid")
         }
         startActivity(Intent.createChooser(shareIntent, "Invite via"))
         
         val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-        val walletRef = firestore.collection("users").document(auth.uid!!).collection("wallet").document("data")
+        val walletRef = firestore.collection("users").document(currentUid).collection("wallet").document("data")
         walletRef.update("pendingTask5Date", today)
             .addOnSuccessListener {
-                Toast.makeText(requireContext(), "Link shared! Task completed! 🎉", Toast.LENGTH_SHORT).show()
+                val c = context ?: return@addOnSuccessListener
+                Toast.makeText(c, "Link shared! Task completed! 🎉", Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -325,12 +359,11 @@ class EarnFragment : Fragment() {
                 throw Exception("Already claimed today")
             }
 
-            if (!walletDoc.exists()) {
-                transaction.set(walletRef, mapOf("balance" to amount, dateField to today))
-            } else {
-                transaction.update(walletRef, "balance", currentBalance + amount)
-                transaction.update(walletRef, dateField, today)
-            }
+            val updates = hashMapOf<String, Any>(
+                "balance" to (currentBalance + amount),
+                dateField to today
+            )
+            transaction.set(walletRef, updates, SetOptions.merge())
             
             val txRef = firestore.collection("users").document(uid).collection("transactions").document()
             transaction.set(txRef, hashMapOf(
@@ -342,32 +375,39 @@ class EarnFragment : Fragment() {
                 "referenceId" to com.example.chatsnap.models.Transaction.generateRefId()
             ))
         }.addOnSuccessListener {
-            if (_binding != null) {
-                Toast.makeText(context, "Claimed $amount coins!", Toast.LENGTH_SHORT).show()
+            if (_binding != null && isAdded) {
+                val safeContext = context ?: return@addOnSuccessListener
+                Toast.makeText(safeContext, "Claimed $amount coins! 🎉", Toast.LENGTH_SHORT).show()
                 updateButtonStatus(button, true, true, "", {}, {})
                 showCoinBurst(button)
             }
         }.addOnFailureListener { e ->
-            if (_binding != null) {
-                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+            if (_binding != null && isAdded) {
                 button.isEnabled = true
+                val safeContext = context ?: return@addOnFailureListener
+                val msg = if (e.message?.contains("Already claimed") == true) "Already claimed today!" else "Error: ${e.message}"
+                Toast.makeText(safeContext, msg, Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     private fun showCoinBurst(anchorView: android.view.View) {
-        val rootView = binding.root as? android.view.ViewGroup ?: return
+        val safeContext = context ?: return
+        val container = (activity?.findViewById<android.view.ViewGroup>(android.R.id.content))
+            ?: (binding.root.getChildAt(0) as? android.view.ViewGroup)
+            ?: return
+
         val location = IntArray(2)
         anchorView.getLocationInWindow(location)
-        val rootLocation = IntArray(2)
-        rootView.getLocationInWindow(rootLocation)
-        val startX = (location[0] - rootLocation[0] + anchorView.width / 2).toFloat()
-        val startY = (location[1] - rootLocation[1] + anchorView.height / 2).toFloat()
+        val containerLocation = IntArray(2)
+        container.getLocationInWindow(containerLocation)
+        val startX = (location[0] - containerLocation[0] + anchorView.width / 2).toFloat()
+        val startY = (location[1] - containerLocation[1] + anchorView.height / 2).toFloat()
 
         val emojis = listOf("🪙", "💰", "✨", "⭐", "🪙", "💫", "🪙")
         val random = java.util.Random()
         emojis.forEachIndexed { index, emoji ->
-            val tv = android.widget.TextView(requireContext()).apply {
+            val tv = android.widget.TextView(safeContext).apply {
                 text = emoji
                 textSize = 22f
                 layoutParams = android.view.ViewGroup.LayoutParams(
@@ -378,7 +418,7 @@ class EarnFragment : Fragment() {
                 y = startY
                 alpha = 1f
             }
-            rootView.addView(tv)
+            container.addView(tv)
 
             val dx = (random.nextFloat() - 0.5f) * 400f
             val dy = -(random.nextFloat() * 300f + 100f)
@@ -396,7 +436,7 @@ class EarnFragment : Fragment() {
                 interpolator = android.view.animation.DecelerateInterpolator()
                 addListener(object : android.animation.AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: android.animation.Animator) {
-                        rootView.removeView(tv)
+                        container.removeView(tv)
                     }
                 })
                 start()
@@ -409,4 +449,3 @@ class EarnFragment : Fragment() {
         _binding = null
     }
 }
-

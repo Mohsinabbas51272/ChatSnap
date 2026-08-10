@@ -46,6 +46,22 @@ class AiChatActivity : BaseActivity() {
             sendMessage()
         }
 
+        // Apply responsive window insets for status bar and soft keyboard IME
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
+            val systemBars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+            val ime = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime())
+            val imeVisible = insets.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime())
+
+            val bottomInset = if (imeVisible) ime.bottom else systemBars.bottom
+            binding.root.setPadding(
+                systemBars.left,
+                systemBars.top,
+                systemBars.right,
+                bottomInset
+            )
+            insets
+        }
+
         val draftMsg = intent.getStringExtra("draft_text")
         if (!draftMsg.isNullOrEmpty()) {
             binding.etAiPrompt.setText(draftMsg)
@@ -110,6 +126,24 @@ class AiChatActivity : BaseActivity() {
         }
         binding.rvAiMessages.layoutManager = LinearLayoutManager(this)
         binding.rvAiMessages.adapter = adapter
+
+        binding.rvAiMessages.addOnLayoutChangeListener { _, _, _, _, bottom, _, _, _, oldBottom ->
+            if (bottom < oldBottom && messages.isNotEmpty()) {
+                binding.rvAiMessages.post {
+                    binding.rvAiMessages.scrollToPosition(messages.size - 1)
+                }
+            }
+        }
+        
+        binding.etAiPrompt.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus && messages.isNotEmpty()) {
+                binding.rvAiMessages.postDelayed({
+                    if (messages.isNotEmpty()) {
+                        binding.rvAiMessages.scrollToPosition(messages.size - 1)
+                    }
+                }, 150)
+            }
+        }
     }
 
     private fun sendMessage() {

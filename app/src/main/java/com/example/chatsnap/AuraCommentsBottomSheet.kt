@@ -50,6 +50,18 @@ class AuraCommentsBottomSheet(
         return binding.root
     }
 
+    @Suppress("DEPRECATION")
+    override fun onStart() {
+        super.onStart()
+        dialog?.window?.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+        val bottomSheet = dialog?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+        bottomSheet?.let { sheet ->
+            val behavior = com.google.android.material.bottomsheet.BottomSheetBehavior.from(sheet)
+            behavior.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
+            behavior.skipCollapsed = true
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -59,6 +71,16 @@ class AuraCommentsBottomSheet(
 
         binding.btnCloseComments.setOnClickListener { dismiss() }
         binding.btnSendComment.setOnClickListener { postComment() }
+
+        binding.etCommentInput.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus && commentsList.isNotEmpty()) {
+                binding.rvComments.postDelayed({
+                    if (commentsList.isNotEmpty()) {
+                        binding.rvComments.scrollToPosition(commentsList.size - 1)
+                    }
+                }, 150)
+            }
+        }
     }
 
     private fun setupRecyclerView() {
