@@ -2,7 +2,6 @@ package com.example.chatsnap.media.ui.components
 
 import android.content.ContentUris
 import android.net.Uri
-import android.provider.MediaStore
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -30,6 +29,9 @@ import com.example.chatsnap.media.model.LocalMediaItem
 @Composable
 fun AudioTabContent(
     audioList: List<LocalMediaItem>,
+    primaryColor: Color = MaterialTheme.colorScheme.primary,
+    onSurfaceColor: Color = MaterialTheme.colorScheme.onSurface,
+    surfaceColor: Color = MaterialTheme.colorScheme.surface,
     onAudioClick: (List<LocalMediaItem>, Int) -> Unit,
     onToggleFavorite: (LocalMediaItem) -> Unit
 ) {
@@ -40,7 +42,7 @@ fun AudioTabContent(
         ) {
             Text(
                 text = "No audio files found in directory",
-                color = Color.Gray,
+                color = onSurfaceColor.copy(alpha = 0.5f),
                 fontSize = 15.sp
             )
         }
@@ -53,6 +55,9 @@ fun AudioTabContent(
             itemsIndexed(audioList, key = { _, item -> item.id }) { index, audio ->
                 AudioCardItem(
                     audio = audio,
+                    primaryColor = primaryColor,
+                    onSurfaceColor = onSurfaceColor,
+                    surfaceColor = surfaceColor,
                     onClick = { onAudioClick(audioList, index) },
                     onFavoriteClick = { onToggleFavorite(audio) }
                 )
@@ -64,6 +69,9 @@ fun AudioTabContent(
 @Composable
 fun AudioCardItem(
     audio: LocalMediaItem,
+    primaryColor: Color = MaterialTheme.colorScheme.primary,
+    onSurfaceColor: Color = MaterialTheme.colorScheme.onSurface,
+    surfaceColor: Color = MaterialTheme.colorScheme.surface,
     onClick: () -> Unit,
     onFavoriteClick: () -> Unit
 ) {
@@ -78,7 +86,7 @@ fun AudioCardItem(
 
     Card(
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E2E)),
+        colors = CardDefaults.cardColors(containerColor = surfaceColor),
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() }
@@ -94,7 +102,7 @@ fun AudioCardItem(
                 modifier = Modifier
                     .size(54.dp)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(Color(0xFF00D2FF).copy(alpha = 0.2f)),
+                    .background(primaryColor.copy(alpha = 0.15f)),
                 contentAlignment = Alignment.Center
             ) {
                 AsyncImage(
@@ -106,7 +114,7 @@ fun AudioCardItem(
                 Icon(
                     imageVector = Icons.Default.MusicNote,
                     contentDescription = null,
-                    tint = Color(0xFFFFFC00).copy(alpha = 0.8f),
+                    tint = primaryColor.copy(alpha = 0.85f),
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -119,7 +127,7 @@ fun AudioCardItem(
             ) {
                 Text(
                     text = audio.title,
-                    color = Color.White,
+                    color = onSurfaceColor,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
@@ -128,7 +136,7 @@ fun AudioCardItem(
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = "${audio.artist} • ${audio.album}",
-                    color = Color.Gray,
+                    color = onSurfaceColor.copy(alpha = 0.6f),
                     fontSize = 12.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -136,7 +144,7 @@ fun AudioCardItem(
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = "${audio.formattedDuration} | ${audio.formattedSize}",
-                    color = Color(0xFF00D2FF),
+                    color = primaryColor,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
@@ -152,7 +160,7 @@ fun AudioCardItem(
                 Icon(
                     imageVector = if (audio.isFavorite) Icons.Default.Star else Icons.Outlined.StarBorder,
                     contentDescription = "Favorite",
-                    tint = if (audio.isFavorite) Color(0xFFFFFC00) else Color.Gray,
+                    tint = if (audio.isFavorite) primaryColor else onSurfaceColor.copy(alpha = 0.4f),
                     modifier = Modifier.size(20.dp)
                 )
             }

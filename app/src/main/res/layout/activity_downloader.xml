@@ -135,38 +135,47 @@
                     <!-- Input block with Paste Button inside -->
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="56dp"
                         android:orientation="horizontal"
                         android:background="@drawable/bg_input_field"
-                        android:padding="6dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
                         android:gravity="center_vertical"
                         android:layout_marginBottom="16dp">
 
                         <EditText
                             android:id="@+id/etUrl"
                             android:layout_width="0dp"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:layout_gravity="center_vertical"
                             android:background="@android:color/transparent"
-                            android:hint="https://youtube.com/watch?v=..."
+                            android:hint="Paste video or audio link here..."
                             android:textColor="?android:attr/textColorPrimary"
-                            android:textColorHint="?attr/colorOutline"
+                            android:textColorHint="?android:attr/textColorSecondary"
                             android:textSize="13sp"
-                            android:paddingHorizontal="8dp"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="4dp"
+                            android:paddingTop="0dp"
+                            android:paddingBottom="0dp"
                             android:inputType="textUri"
-                            android:singleLine="true" />
+                            android:singleLine="true"
+                            android:ellipsize="end" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnPaste"
-                            style="@style/Widget.Material3.Button.TextButton"
+                            style="@style/Widget.Material3.Button"
                             android:layout_width="wrap_content"
-                            android:layout_height="36dp"
+                            android:layout_height="38dp"
                             android:text="Paste"
-                            android:textColor="?attr/colorPrimary"
+                            android:textColor="@color/white"
+                            app:backgroundTint="?attr/themeAccentColor"
                             android:textSize="12sp"
+                            android:textStyle="bold"
                             app:cornerRadius="12dp"
                             android:insetTop="0dp"
-                            android:insetBottom="0dp" />
+                            android:insetBottom="0dp"
+                            android:paddingHorizontal="14dp" />
                     </LinearLayout>
 
                     <!-- Format & Quality Option Dropdown -->
@@ -221,7 +230,7 @@
                         android:textColor="#FFFFFF"
                         android:textSize="14sp"
                         android:fontFamily="sans-serif-black"
-                        app:backgroundTint="?attr/colorPrimary"
+                        app:backgroundTint="?attr/themeAccentColor"
                         app:cornerRadius="24dp"
                         android:insetTop="0dp"
                         android:insetBottom="0dp" />
@@ -234,14 +243,14 @@
                         android:layout_height="48dp"
                         android:layout_marginTop="8dp"
                         android:text="Import Links from File"
-                        android:textColor="?attr/colorPrimary"
+                        android:textColor="?attr/themeAccentColor"
                         android:textSize="14sp"
                         android:fontFamily="sans-serif-black"
                         app:cornerRadius="24dp"
-                        app:strokeColor="?attr/colorPrimary"
+                        app:strokeColor="?attr/themeAccentColor"
                         app:icon="@android:drawable/ic_menu_add"
                         app:iconSize="20dp"
-                        app:iconTint="?attr/colorPrimary"
+                        app:iconTint="?attr/themeAccentColor"
                         android:insetTop="0dp"
                         android:insetBottom="0dp" />
 
@@ -253,11 +262,11 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="Update yt-dlp Engine"
-                        android:textColor="?attr/colorPrimary"
+                        android:textColor="?attr/themeAccentColor"
                         android:textSize="12sp"
                         app:icon="@android:drawable/stat_sys_download"
                         app:iconSize="16dp"
-                        app:iconTint="?attr/colorPrimary" />
+                        app:iconTint="?attr/themeAccentColor" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

@@ -15,10 +15,11 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
             app:navigationIcon="@drawable/ic_back"
-            app:navigationIconTint="?attr/themeAccentColor"
+            app:navigationIconTint="?attr/colorOnPrimary"
             app:title="Admin Control Panel"
-            app:titleTextColor="?attr/themeAccentColor">
+            app:titleTextColor="?attr/colorOnPrimary">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -27,7 +28,7 @@
                 android:text="ROOT"
                 android:textSize="10sp"
                 android:fontFamily="sans-serif-black"
-                android:textColor="?android:attr/textColorSecondary" />
+                android:textColor="?attr/colorOnPrimary" />
         </com.google.android.material.appbar.MaterialToolbar>
 
         <com.google.android.material.tabs.TabLayout

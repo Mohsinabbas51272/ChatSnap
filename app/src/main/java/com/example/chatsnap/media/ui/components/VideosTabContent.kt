@@ -28,6 +28,9 @@ import com.example.chatsnap.media.model.LocalMediaItem
 @Composable
 fun VideosTabContent(
     videos: List<LocalMediaItem>,
+    primaryColor: Color = MaterialTheme.colorScheme.primary,
+    onSurfaceColor: Color = MaterialTheme.colorScheme.onSurface,
+    surfaceColor: Color = MaterialTheme.colorScheme.surface,
     onVideoClick: (LocalMediaItem) -> Unit,
     onToggleFavorite: (LocalMediaItem) -> Unit
 ) {
@@ -38,7 +41,7 @@ fun VideosTabContent(
         ) {
             Text(
                 text = "No videos found in directory",
-                color = Color.Gray,
+                color = onSurfaceColor.copy(alpha = 0.5f),
                 fontSize = 15.sp
             )
         }
@@ -51,6 +54,9 @@ fun VideosTabContent(
             items(videos, key = { it.id }) { video ->
                 SmallVideoCardItem(
                     video = video,
+                    primaryColor = primaryColor,
+                    onSurfaceColor = onSurfaceColor,
+                    surfaceColor = surfaceColor,
                     onClick = { onVideoClick(video) },
                     onFavoriteClick = { onToggleFavorite(video) }
                 )
@@ -62,12 +68,15 @@ fun VideosTabContent(
 @Composable
 fun SmallVideoCardItem(
     video: LocalMediaItem,
+    primaryColor: Color = MaterialTheme.colorScheme.primary,
+    onSurfaceColor: Color = MaterialTheme.colorScheme.onSurface,
+    surfaceColor: Color = MaterialTheme.colorScheme.surface,
     onClick: () -> Unit,
     onFavoriteClick: () -> Unit
 ) {
     Card(
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E2E)),
+        colors = CardDefaults.cardColors(containerColor = surfaceColor),
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() }
@@ -84,7 +93,7 @@ fun SmallVideoCardItem(
                     .width(90.dp)
                     .height(65.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFF2B2B3D))
+                    .background(onSurfaceColor.copy(alpha = 0.08f))
             ) {
                 AsyncImage(
                     model = video.uri,
@@ -105,12 +114,12 @@ fun SmallVideoCardItem(
                         .size(26.dp)
                         .align(Alignment.Center)
                         .clip(CircleShape)
-                        .background(Color(0xFFFFFC00))
+                        .background(primaryColor)
                 ) {
                     Icon(
                         imageVector = Icons.Default.PlayArrow,
                         contentDescription = "Play",
-                        tint = Color.Black,
+                        tint = Color.White,
                         modifier = Modifier
                             .size(16.dp)
                             .align(Alignment.Center)
@@ -143,7 +152,7 @@ fun SmallVideoCardItem(
             ) {
                 Text(
                     text = video.title,
-                    color = Color.White,
+                    color = onSurfaceColor,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
@@ -156,13 +165,13 @@ fun SmallVideoCardItem(
                 ) {
                     Text(
                         text = video.formattedSize,
-                        color = Color.Gray,
+                        color = onSurfaceColor.copy(alpha = 0.6f),
                         fontSize = 11.sp
                     )
                     if (video.resolutionText.isNotEmpty()) {
                         Text(
                             text = video.resolutionText,
-                            color = Color(0xFF00D2FF),
+                            color = primaryColor,
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Medium
                         )
@@ -178,11 +187,10 @@ fun SmallVideoCardItem(
                 Icon(
                     imageVector = if (video.isFavorite) Icons.Default.Star else Icons.Outlined.StarBorder,
                     contentDescription = "Favorite",
-                    tint = if (video.isFavorite) Color(0xFFFFFC00) else Color.Gray,
+                    tint = if (video.isFavorite) primaryColor else onSurfaceColor.copy(alpha = 0.4f),
                     modifier = Modifier.size(20.dp)
                 )
             }
         }
     }
 }
-

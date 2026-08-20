@@ -141,48 +141,6 @@ class WebVideoDownloaderActivity : BaseActivity() {
         binding.btnBrowserExit.setOnClickListener {
             finish()
         }
-
-        binding.btnWebBack.setOnClickListener {
-            if (binding.webView.canGoBack()) {
-                binding.webView.goBack()
-            }
-        }
-
-        binding.btnWebForward.setOnClickListener {
-            if (binding.webView.canGoForward()) {
-                binding.webView.goForward()
-            }
-        }
-
-        binding.btnWebRefresh.setOnClickListener {
-            binding.webView.reload()
-        }
-
-        binding.btnWebHome.setOnClickListener {
-            showDashboard()
-        }
-
-        // Address EditText actions
-        binding.etWebUrl.setOnEditorActionListener { textView, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_GO || actionId == EditorInfo.IME_ACTION_DONE) {
-                var url = textView.text.toString().trim()
-                if (url.isNotEmpty()) {
-                    if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                        // If it doesn't contain a dot, treat as search query
-                        url = if (url.contains(".") && !url.contains(" ")) {
-                            "https://$url"
-                        } else {
-                            "https://www.google.com/search?q=" + Uri.encode(url)
-                        }
-                    }
-                    loadUrlInWebView(url)
-                    hideKeyboard()
-                }
-                true
-            } else {
-                false
-            }
-        }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -238,7 +196,6 @@ class WebVideoDownloaderActivity : BaseActivity() {
                 binding.pbLoader.visibility = View.VISIBLE
                 binding.pbLoader.progress = 10
                 url?.let {
-                    binding.etWebUrl.setText(it)
                     updateUserAgentForUrl(it)
                     
                     try {
@@ -261,7 +218,7 @@ class WebVideoDownloaderActivity : BaseActivity() {
                 super.onPageFinished(view, url)
                 binding.pbLoader.visibility = View.GONE
                 url?.let {
-                    binding.etWebUrl.setText(it)
+                    // URL updated internally (address bar removed)
                 }
 
                 // If a user switch was detected, clear localStorage/sessionStorage now that page is loaded
@@ -343,7 +300,6 @@ class WebVideoDownloaderActivity : BaseActivity() {
         binding.webView.loadUrl("about:blank")
         binding.webView.visibility = View.GONE
         binding.scrollDashboard.visibility = View.VISIBLE
-        binding.etWebUrl.setText("")
         hideDownloadButton()
     }
 
@@ -908,7 +864,7 @@ class WebVideoDownloaderActivity : BaseActivity() {
 
     private fun hideKeyboard() {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(binding.etWebUrl.windowToken, 0)
+        imm.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
     }
 
     // Keep track of active base64 blob transfers

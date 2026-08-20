@@ -182,6 +182,17 @@ class DownloaderActivity : BaseActivity() {
         limitAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spnConcurrentLimit.adapter = limitAdapter
         binding.spnConcurrentLimit.setSelection(1) // Default 2 concurrent tasks
+        maxConcurrentTasks = concurrentLimits[1]
+
+        binding.spnConcurrentLimit.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (position in concurrentLimits.indices) {
+                    maxConcurrentTasks = concurrentLimits[position]
+                    checkAndStartQueuedDownloads()
+                }
+            }
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
+        }
 
         // Setup Queue RecyclerView
         taskAdapter = DownloadTaskAdapter(downloadTasks)
@@ -770,16 +781,17 @@ class DownloaderActivity : BaseActivity() {
     }
 
     private fun checkAndStartQueuedDownloads() {
-        // Count active tasks (downloading via service)
+        val selectedPos = binding.spnConcurrentLimit.selectedItemPosition
+        if (selectedPos in concurrentLimits.indices) {
+            maxConcurrentTasks = concurrentLimits[selectedPos]
+        }
         val activeCount = downloadTasks.count { it.status == DownloadTask.Status.DOWNLOADING }
-        if (activeCount >= maxConcurrentTasks) return
+        val availableSlots = maxConcurrentTasks - activeCount
+        if (availableSlots <= 0) return
 
-        // Take next queued task
-        val nextTask = downloadTasks.firstOrNull { it.status == DownloadTask.Status.QUEUED }
-        if (nextTask != null) {
-            startDownloadService(nextTask)
-            // Recursively start another if limit allows
-            checkAndStartQueuedDownloads()
+        val queuedTasks = downloadTasks.filter { it.status == DownloadTask.Status.QUEUED }.take(availableSlots)
+        for (task in queuedTasks) {
+            startDownloadService(task)
         }
     }
 

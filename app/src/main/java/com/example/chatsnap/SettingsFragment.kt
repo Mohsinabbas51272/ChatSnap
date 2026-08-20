@@ -117,26 +117,32 @@ class SettingsFragment : Fragment() {
 
         // Notifications
         val sharedPrefs = requireContext().getSharedPreferences("chatsnap_prefs", android.content.Context.MODE_PRIVATE)
+        if (!sharedPrefs.contains("notifications_enabled")) {
+            sharedPrefs.edit().putBoolean("notifications_enabled", true).apply()
+        }
         val initialNotifEnabled = sharedPrefs.getBoolean("notifications_enabled", true)
 
         binding.itemNotifications.apply {
             ivItemIcon.setImageResource(android.R.drawable.ic_lock_idle_alarm)
             tvItemTitle.text = "Notifications"
-            switchItem.visibility = View.VISIBLE
+            switchItem.visibility = View.GONE
             switchItem.setOnCheckedChangeListener(null)
             switchItem.isChecked = initialNotifEnabled
             tvItemValue.text = if (initialNotifEnabled) "Alerts & Sounds enabled" else "Notifications disabled"
 
-            switchItem.setOnCheckedChangeListener { _, isChecked ->
-                sharedPrefs.edit().putBoolean("notifications_enabled", isChecked).apply()
-                tvItemValue.text = if (isChecked) "Alerts & Sounds enabled" else "Notifications disabled"
+            root.setOnClickListener {
+                val current = sharedPrefs.getBoolean("notifications_enabled", true)
+                val newState = !current
+                sharedPrefs.edit().putBoolean("notifications_enabled", newState).apply()
+                switchItem.isChecked = newState
+                tvItemValue.text = if (newState) "Alerts & Sounds enabled" else "Notifications disabled"
 
                 val uid = auth.currentUser?.uid
                 if (uid != null) {
-                    firestore.collection("users").document(uid).update("notificationsEnabled", isChecked)
+                    firestore.collection("users").document(uid).update("notificationsEnabled", newState)
                 }
 
-                if (isChecked) {
+                if (newState) {
                     checkAndRequestNotificationPermission()
                     Toast.makeText(context, "Notifications Enabled", Toast.LENGTH_SHORT).show()
                 } else {
@@ -144,7 +150,6 @@ class SettingsFragment : Fragment() {
                 }
             }
 
-            root.setOnClickListener { switchItem.toggle() }
             root.setOnLongClickListener {
                 sendTestNotification()
                 true
@@ -351,6 +356,13 @@ class SettingsFragment : Fragment() {
                             }
                         }
                     }
+
+                    val notifEnabled = doc.getBoolean("notificationsEnabled") ?: true
+                    val prefs = requireContext().getSharedPreferences("chatsnap_prefs", android.content.Context.MODE_PRIVATE)
+                    prefs.edit().putBoolean("notifications_enabled", notifEnabled).apply()
+                    binding.itemNotifications.switchItem.setOnCheckedChangeListener(null)
+                    binding.itemNotifications.switchItem.isChecked = notifEnabled
+                    binding.itemNotifications.tvItemValue.text = if (notifEnabled) "Alerts & Sounds enabled" else "Notifications disabled"
 
                     binding.itemGhostMode.switchItem.isChecked = doc.getBoolean("ghostMode") ?: false
                     binding.itemGhostMode.tvItemValue.text = if (binding.itemGhostMode.switchItem.isChecked) "Stealth browsing active" else "Online status visible"

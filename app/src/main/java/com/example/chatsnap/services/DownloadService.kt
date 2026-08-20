@@ -133,41 +133,32 @@ class DownloadService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_START_DOWNLOAD -> {
-                val taskId = intent.getStringExtra(EXTRA_TASK_ID) ?: return START_NOT_STICKY
-                val url = intent.getStringExtra(EXTRA_URL) ?: return START_NOT_STICKY
-                val formatLabel = intent.getStringExtra(EXTRA_FORMAT_LABEL) ?: "Best"
-                val formatOption = intent.getStringExtra(EXTRA_FORMAT_OPTION) ?: "bestvideo+bestaudio/best"
-                val isPlaylist = intent.getBooleanExtra(EXTRA_IS_PLAYLIST, false)
-                val userId = intent.getStringExtra(EXTRA_USER_ID) ?: ""
-                val thumbnailUrl = intent.getStringExtra(EXTRA_THUMBNAIL_URL)
+                val taskId = intent.getStringExtra(EXTRA_TASK_ID)
+                if (taskId != null) {
+                    val existing = sharedTasks.find { it.id == taskId }
+                    if (existing == null) {
+                        val url = intent.getStringExtra(EXTRA_URL) ?: return START_NOT_STICKY
+                        val formatLabel = intent.getStringExtra(EXTRA_FORMAT_LABEL) ?: "Best"
+                        val formatOption = intent.getStringExtra(EXTRA_FORMAT_OPTION) ?: "bestvideo+bestaudio/best"
+                        val isPlaylist = intent.getBooleanExtra(EXTRA_IS_PLAYLIST, false)
+                        val userId = intent.getStringExtra(EXTRA_USER_ID) ?: ""
+                        val thumbnailUrl = intent.getStringExtra(EXTRA_THUMBNAIL_URL)
 
-                val taskInfo = TaskInfo(
-                    taskId = taskId,
-                    url = url,
-                    formatLabel = formatLabel,
-                    formatOption = formatOption,
-                    isPlaylist = isPlaylist,
-                    notificationId = notificationIdCounter.getAndIncrement(),
-                    userId = userId,
-                    thumbnailUrl = thumbnailUrl
-                )
-                activeTasks[taskId] = taskInfo
-
-                // Start as foreground with summary notification
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    startForeground(
-                        FOREGROUND_NOTIFICATION_ID,
-                        buildSummaryNotification(),
-                        android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
-                    )
-                } else {
-                    startForeground(FOREGROUND_NOTIFICATION_ID, buildSummaryNotification())
+                        val newTask = com.example.chatsnap.models.DownloadTask(
+                            id = taskId,
+                            url = url,
+                            formatLabel = formatLabel,
+                            formatOption = formatOption,
+                            isPlaylist = isPlaylist,
+                            status = com.example.chatsnap.models.DownloadTask.Status.QUEUED,
+                            title = "Queued Video...",
+                            thumbnailUrl = thumbnailUrl,
+                            userId = userId
+                        )
+                        sharedTasks.add(newTask)
+                    }
                 }
-
-                // Launch download coroutine
-                serviceScope.launch {
-                    executeDownload(taskInfo)
-                }
+                checkAndStartQueuedDownloads()
             }
             ACTION_CANCEL_DOWNLOAD -> {
                 val taskId = intent.getStringExtra(EXTRA_TASK_ID) ?: return START_NOT_STICKY
@@ -1239,32 +1230,45 @@ class DownloadService : Service() {
         }
     }
 
+    @Synchronized
     private fun checkAndStartQueuedDownloads() {
-        val activeCount = activeTasks.size
-        if (activeCount >= maxConcurrentTasks) return
+        val currentlyRunning = activeTasks.size
+        val availableSlots = maxConcurrentTasks - currentlyRunning
+        if (availableSlots <= 0) return
 
-        val nextTask = sharedTasks.firstOrNull { it.status == DownloadTask.Status.QUEUED }
-        if (nextTask != null) {
-            nextTask.status = DownloadTask.Status.DOWNLOADING
-            
-            val intent = Intent(this, DownloadService::class.java).apply {
-                action = ACTION_START_DOWNLOAD
-                putExtra(EXTRA_TASK_ID, nextTask.id)
-                putExtra(EXTRA_URL, nextTask.url)
-                putExtra(EXTRA_FORMAT_LABEL, nextTask.formatLabel)
-                putExtra(EXTRA_FORMAT_OPTION, nextTask.formatOption)
-                putExtra(EXTRA_IS_PLAYLIST, nextTask.isPlaylist)
-                putExtra(EXTRA_USER_ID, nextTask.userId ?: "")
-                putExtra(EXTRA_THUMBNAIL_URL, nextTask.thumbnailUrl)
-            }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(intent)
+        val queuedTasks = sharedTasks.filter { it.status == DownloadTask.Status.QUEUED }.take(availableSlots)
+        for (task in queuedTasks) {
+            if (activeTasks.containsKey(task.id)) continue
+
+            task.status = DownloadTask.Status.DOWNLOADING
+
+            val taskInfo = TaskInfo(
+                taskId = task.id,
+                url = task.url,
+                formatLabel = task.formatLabel,
+                formatOption = task.formatOption,
+                isPlaylist = task.isPlaylist,
+                notificationId = notificationIdCounter.getAndIncrement(),
+                userId = task.userId ?: "",
+                thumbnailUrl = task.thumbnailUrl
+            )
+            activeTasks[task.id] = taskInfo
+
+            // Start as foreground with summary notification
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startForeground(
+                    FOREGROUND_NOTIFICATION_ID,
+                    buildSummaryNotification(),
+                    android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+                )
             } else {
-                startService(intent)
+                startForeground(FOREGROUND_NOTIFICATION_ID, buildSummaryNotification())
             }
-            
-            // Recursively start more if slots allow
-            checkAndStartQueuedDownloads()
+
+            // Launch download coroutine
+            serviceScope.launch {
+                executeDownload(taskInfo)
+            }
         }
     }
 
@@ -1502,6 +1506,8 @@ class DownloadService : Service() {
             putExtra(EXTRA_TITLE, task?.title ?: "Download")
         }
         LocalBroadcastManager.getInstance(this).sendBroadcast(cancelIntent)
+
+        checkAndStartQueuedDownloads()
 
         if (activeTasks.isEmpty()) {
             stopForeground(STOP_FOREGROUND_REMOVE)

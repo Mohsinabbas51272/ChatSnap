@@ -11,12 +11,12 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorSurface"
+        android:background="?attr/colorPrimary"
         android:elevation="4dp"
         app:title="Document Scanner"
-        app:titleTextColor="?attr/colorOnSurface"
+        app:titleTextColor="?attr/colorOnPrimary"
         app:navigationIcon="@android:drawable/ic_menu_close_clear_cancel"
-        app:navigationIconTint="?attr/colorOnSurface"
+        app:navigationIconTint="?attr/colorOnPrimary"
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- 1. DASHBOARD VIEW -->

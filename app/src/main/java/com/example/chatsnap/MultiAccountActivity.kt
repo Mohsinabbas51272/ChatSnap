@@ -79,13 +79,16 @@ class MultiAccountActivity : BaseActivity() {
             AppLockActivity.isUnlocked = false
             auth.signInWithEmailAndPassword(account.email, password)
                 .addOnSuccessListener {
-                    binding.progressBar.visibility = View.GONE
-                    Toast.makeText(this, "Logged in as ${account.name}", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this, MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    val uid = auth.currentUser?.uid ?: account.uid
+                    com.example.chatsnap.utils.SessionManager.startNewSession(this, uid) {
+                        binding.progressBar.visibility = View.GONE
+                        Toast.makeText(this, "Logged in as ${account.name}", Toast.LENGTH_SHORT).show()
+                        val intent = Intent(this, MainActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        }
+                        startActivity(intent)
+                        finish()
                     }
-                    startActivity(intent)
-                    finish()
                 }
                 .addOnFailureListener { e ->
                     binding.progressBar.visibility = View.GONE

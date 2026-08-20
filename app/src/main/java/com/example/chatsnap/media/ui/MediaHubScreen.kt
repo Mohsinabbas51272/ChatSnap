@@ -348,6 +348,9 @@ fun MediaHubScreen(
                                     }
                                     FoldersTabContent(
                                         folders = filteredFolders,
+                                        primaryColor = primaryColor,
+                                        onSurfaceColor = onSurfaceColor,
+                                        surfaceColor = surfaceColor,
                                         onFolderClick = { folder ->
                                             mediaHubViewModel.selectFolder(folder)
                                         }
@@ -355,6 +358,9 @@ fun MediaHubScreen(
                                 } else {
                                     VideosTabContent(
                                         videos = hubState.displayedMedia,
+                                        primaryColor = primaryColor,
+                                        onSurfaceColor = onSurfaceColor,
+                                        surfaceColor = surfaceColor,
                                         onVideoClick = { video ->
                                             val intent = Intent(context, VideoPlayerActivity::class.java).apply {
                                                 putExtra("EXTRA_MEDIA_ITEM", video)
@@ -376,6 +382,9 @@ fun MediaHubScreen(
                                     }
                                     FoldersTabContent(
                                         folders = filteredFolders,
+                                        primaryColor = primaryColor,
+                                        onSurfaceColor = onSurfaceColor,
+                                        surfaceColor = surfaceColor,
                                         onFolderClick = { folder ->
                                             mediaHubViewModel.selectFolder(folder)
                                         }
@@ -383,6 +392,9 @@ fun MediaHubScreen(
                                 } else {
                                     AudioTabContent(
                                         audioList = hubState.displayedMedia,
+                                        primaryColor = primaryColor,
+                                        onSurfaceColor = onSurfaceColor,
+                                        surfaceColor = surfaceColor,
                                         onAudioClick = { tracks, startIndex ->
                                             audioPlayerViewModel.playTrackList(tracks, startIndex)
                                         },
@@ -436,6 +448,9 @@ fun MediaHubScreen(
             FilterSortBottomSheet(
                 currentSort = hubState.sortOption,
                 currentFilter = hubState.filterOption,
+                primaryColor = primaryColor,
+                surfaceColor = surfaceColor,
+                onSurfaceColor = onSurfaceColor,
                 onSortSelected = { sort ->
                     mediaHubViewModel.updateSortOption(sort)
                     showFilterSortSheet = false

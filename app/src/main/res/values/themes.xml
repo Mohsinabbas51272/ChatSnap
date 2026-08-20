@@ -86,7 +86,7 @@
 
         <item name="android:textColorPrimary">@color/white</item>
         <item name="android:textColorSecondary">#B0B0B0</item>
-        <item name="android:statusBarColor">@color/black_bg</item>
+        <item name="android:statusBarColor">@color/black_primary</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:navigationBarColor">@color/black_bg</item>
 
@@ -117,6 +117,7 @@
         <item name="colorOnSurface">@color/black</item>
         <item name="colorSurfaceVariant">#F5F5F5</item>
         <item name="colorOnSurfaceVariant">#666666</item>
+        <item name="colorOutlineVariant">#E5E5EA</item>
 
         <item name="android:textColorPrimary">@color/black</item>
         <item name="android:textColorSecondary">#666666</item>
@@ -152,7 +153,7 @@
 
         <item name="android:textColorPrimary">@color/sage_mint_text_primary</item>
         <item name="android:textColorSecondary">@color/sage_mint_text_secondary</item>
-        <item name="android:statusBarColor">@color/sage_mint_bg</item>
+        <item name="android:statusBarColor">@color/sage_mint_primary</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:navigationBarColor">@color/sage_mint_bg</item>
 
@@ -184,7 +185,7 @@
 
         <item name="android:textColorPrimary">@color/maroon_text</item>
         <item name="android:textColorSecondary">@color/maroon_text_secondary</item>
-        <item name="android:statusBarColor">@color/maroon_bg</item>
+        <item name="android:statusBarColor">@color/maroon_primary</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:navigationBarColor">@color/maroon_bg</item>
 
@@ -216,7 +217,7 @@
 
         <item name="android:textColorPrimary">@color/ocean_sky_text</item>
         <item name="android:textColorSecondary">@color/ocean_sky_text_secondary</item>
-        <item name="android:statusBarColor">@color/ocean_sky_bg</item>
+        <item name="android:statusBarColor">@color/ocean_sky_primary</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:navigationBarColor">@color/ocean_sky_bg</item>
 
@@ -248,7 +249,7 @@
 
         <item name="android:textColorPrimary">@color/teal_text</item>
         <item name="android:textColorSecondary">@color/teal_text_secondary</item>
-        <item name="android:statusBarColor">@color/teal_bg</item>
+        <item name="android:statusBarColor">@color/teal_primary</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:navigationBarColor">@color/teal_bg</item>
 
@@ -280,7 +281,7 @@
 
         <item name="android:textColorPrimary">@color/coral_text</item>
         <item name="android:textColorSecondary">@color/coral_text_secondary</item>
-        <item name="android:statusBarColor">@color/coral_bg</item>
+        <item name="android:statusBarColor">@color/coral_primary</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:navigationBarColor">@color/coral_bg</item>
 
@@ -312,7 +313,7 @@
 
         <item name="android:textColorPrimary">@color/sakura_text_primary</item>
         <item name="android:textColorSecondary">@color/sakura_text_secondary</item>
-        <item name="android:statusBarColor">@color/sakura_bg</item>
+        <item name="android:statusBarColor">@color/sakura_primary</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:navigationBarColor">@color/sakura_bg</item>
 
@@ -344,7 +345,7 @@
 
         <item name="android:textColorPrimary">@color/deep_pink_text_primary</item>
         <item name="android:textColorSecondary">@color/deep_pink_text_secondary</item>
-        <item name="android:statusBarColor">@color/deep_pink_bg</item>
+        <item name="android:statusBarColor">@color/deep_pink_primary</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:navigationBarColor">@color/deep_pink_bg</item>
 

@@ -10,7 +10,7 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorSurface"
+        android:background="?attr/colorPrimary"
         app:elevation="0dp">
 
         <!-- Search & Control Header -->
@@ -35,7 +35,7 @@
                     android:layout_height="40dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@android:drawable/ic_menu_revert"
-                    app:tint="?attr/colorOnSurface"
+                    app:tint="?attr/colorOnPrimary"
                     android:contentDescription="Back" />
 
                 <!-- Search bar wrapper -->
@@ -97,7 +97,7 @@
                     android:layout_height="40dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/ic_view_list"
-                    app:tint="?attr/colorOnSurface"
+                    app:tint="?attr/colorOnPrimary"
                     android:contentDescription="Toggle View" />
 
                 <!-- Sort Button -->
@@ -107,7 +107,7 @@
                     android:layout_height="40dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@android:drawable/ic_menu_manage"
-                    app:tint="?attr/colorOnSurface"
+                    app:tint="?attr/colorOnPrimary"
                     android:contentDescription="Sort" />
 
             </LinearLayout>

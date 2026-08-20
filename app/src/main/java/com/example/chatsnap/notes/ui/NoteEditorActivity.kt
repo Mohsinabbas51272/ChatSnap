@@ -18,13 +18,13 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.chatsnap.BaseActivity
 import com.example.chatsnap.MediaViewerActivity
 import com.example.chatsnap.R
 import com.example.chatsnap.databinding.ActivityNoteEditorBinding
@@ -36,7 +36,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
-class NoteEditorActivity : AppCompatActivity() {
+class NoteEditorActivity : BaseActivity() {
 
     companion object {
         private const val TAG = "NoteEditorActivity"

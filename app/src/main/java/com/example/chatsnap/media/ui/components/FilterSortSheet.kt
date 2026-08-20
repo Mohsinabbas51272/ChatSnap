@@ -1,9 +1,7 @@
 package com.example.chatsnap.media.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,14 +18,17 @@ import com.example.chatsnap.media.model.SortOption
 fun FilterSortBottomSheet(
     currentSort: SortOption,
     currentFilter: FilterOption,
+    primaryColor: Color = MaterialTheme.colorScheme.primary,
+    surfaceColor: Color = MaterialTheme.colorScheme.surface,
+    onSurfaceColor: Color = MaterialTheme.colorScheme.onSurface,
     onSortSelected: (SortOption) -> Unit,
     onFilterSelected: (FilterOption) -> Unit,
     onDismiss: () -> Unit
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = Color(0xFF1E1E2E),
-        dragHandle = { BottomSheetDefaults.DragHandle(color = Color.Gray) }
+        containerColor = surfaceColor,
+        dragHandle = { BottomSheetDefaults.DragHandle(color = onSurfaceColor.copy(alpha = 0.4f)) }
     ) {
         Column(
             modifier = Modifier
@@ -36,7 +37,7 @@ fun FilterSortBottomSheet(
         ) {
             Text(
                 text = "Sort & Filter",
-                color = Color.White,
+                color = onSurfaceColor,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -46,7 +47,7 @@ fun FilterSortBottomSheet(
             // Filter Section
             Text(
                 text = "FILTER MEDIA",
-                color = Color(0xFF00D2FF),
+                color = primaryColor,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -63,23 +64,26 @@ fun FilterSortBottomSheet(
                     RadioButton(
                         selected = (option == currentFilter),
                         onClick = { onFilterSelected(option) },
-                        colors = RadioButtonDefaults.colors(selectedColor = Color(0xFFFFFC00))
+                        colors = RadioButtonDefaults.colors(selectedColor = primaryColor)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = option.displayName,
-                        color = Color.White,
+                        color = onSurfaceColor,
                         fontSize = 14.sp
                     )
                 }
             }
 
-            Divider(color = Color.Gray.copy(alpha = 0.2f), modifier = Modifier.padding(vertical = 12.dp))
+            HorizontalDivider(
+                color = onSurfaceColor.copy(alpha = 0.12f),
+                modifier = Modifier.padding(vertical = 12.dp)
+            )
 
             // Sort Section
             Text(
                 text = "SORT BY",
-                color = Color(0xFF00D2FF),
+                color = primaryColor,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -96,12 +100,12 @@ fun FilterSortBottomSheet(
                     RadioButton(
                         selected = (option == currentSort),
                         onClick = { onSortSelected(option) },
-                        colors = RadioButtonDefaults.colors(selectedColor = Color(0xFFFFFC00))
+                        colors = RadioButtonDefaults.colors(selectedColor = primaryColor)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = option.displayName,
-                        color = Color.White,
+                        color = onSurfaceColor,
                         fontSize = 14.sp
                     )
                 }

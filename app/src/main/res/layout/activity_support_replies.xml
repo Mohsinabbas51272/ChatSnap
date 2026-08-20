@@ -10,8 +10,11 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
         app:navigationIcon="@android:drawable/ic_menu_revert"
-        app:title="Support Tickets" />
+        app:navigationIconTint="?attr/colorOnPrimary"
+        app:title="Support Tickets"
+        app:titleTextColor="?attr/colorOnPrimary" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvSupportRequests"

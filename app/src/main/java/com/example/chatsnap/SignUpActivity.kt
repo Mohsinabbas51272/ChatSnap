@@ -43,6 +43,7 @@ class SignUpActivity : BaseActivity() {
                             "email" to email,
                             "uid" to userId,
                             "profileCompleted" to false,
+                            "notificationsEnabled" to true,
                             "friends" to arrayListOf<String>()
                         )
 

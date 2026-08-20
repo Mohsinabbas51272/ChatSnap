@@ -21,5 +21,6 @@ data class User(
     val sessionId: String? = null,
     val lastSeen: Long? = null,
     val fcmToken: String? = null,
-    val selectedTheme: String? = null
+    val selectedTheme: String? = null,
+    val notificationsEnabled: Boolean = true
 )

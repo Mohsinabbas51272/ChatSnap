@@ -14,14 +14,15 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorSurface"
+        android:background="?attr/colorPrimary"
         app:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:navigationIcon="@drawable/ic_back">
+            app:navigationIcon="@drawable/ic_back"
+            app:navigationIconTint="?attr/colorOnPrimary">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -29,7 +30,7 @@
                 android:layout_gravity="center"
                 android:fontFamily="sans-serif-black"
                 android:text="Privacy"
-                android:textColor="?attr/colorOnSurface"
+                android:textColor="?attr/colorOnPrimary"
                 android:textSize="20sp" />
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>

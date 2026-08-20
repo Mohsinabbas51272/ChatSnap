@@ -158,55 +158,143 @@ class ChatsFragment : Fragment(), SearchableFragment {
     }
 
     private fun showSecretSetupDialog() {
-        val input = android.widget.EditText(requireContext())
-        input.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-        input.hint = "Enter 4+ characters"
-        
-        android.app.AlertDialog.Builder(requireContext())
-            .setTitle("Setup Secret Lock")
-            .setMessage("Set a password to protect your hidden chats.")
-            .setView(input)
-            .setPositiveButton("Save") { _, _ ->
-                val pwd = input.text.toString()
-                if (pwd.length >= 4) {
-                    val uid = auth.currentUser?.uid ?: return@setPositiveButton
+        val context = context ?: return
+        val view = LayoutInflater.from(context).inflate(R.layout.dialog_secret_lock, null)
+
+        val tvTitle = view.findViewById<android.widget.TextView>(R.id.tvSecretDialogTitle)
+        val tvSubtitle = view.findViewById<android.widget.TextView>(R.id.tvSecretDialogSubtitle)
+        val tilPassword = view.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.tilSecretPassword)
+        val etPassword = view.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etSecretPassword)
+        val btnCancel = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnSecretCancel)
+        val btnAction = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnSecretAction)
+
+        tvTitle.text = "Setup Secret Lock"
+        tvSubtitle.text = "Set a password (4+ characters) to protect your hidden chats."
+        tilPassword.hint = "New Password (4+ chars)"
+        btnAction.text = "Save"
+
+        val dialog = android.app.Dialog(context)
+        dialog.setContentView(view)
+        dialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
+        val dialogWidth = (resources.displayMetrics.widthPixels * 0.88).toInt()
+        dialog.window?.setLayout(dialogWidth, android.view.ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        var isSuccess = false
+
+        val savePasswordAction = {
+            val pwd = etPassword.text?.toString()?.trim() ?: ""
+            if (pwd.length >= 4) {
+                val uid = auth.currentUser?.uid
+                if (uid != null) {
+                    btnAction.isEnabled = false
                     firestore.collection("users").document(uid).update("secretPassword", pwd)
                         .addOnSuccessListener {
+                            currentUser = currentUser?.copy(secretPassword = pwd)
+                            isSuccess = true
                             viewMode = "SECRET"
                             refreshAdapter()
+                            dialog.dismiss()
+                            android.widget.Toast.makeText(context, "Secret Lock set successfully!", android.widget.Toast.LENGTH_SHORT).show()
                         }
-                } else {
-                    android.widget.Toast.makeText(context, "Password too short", android.widget.Toast.LENGTH_SHORT).show()
-                    binding.toggleGroup.check(R.id.btnTabChats)
+                        .addOnFailureListener { e ->
+                            btnAction.isEnabled = true
+                            android.widget.Toast.makeText(context, "Failed to save: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+                        }
                 }
+            } else {
+                tilPassword.error = "Password must be at least 4 characters"
             }
-            .setNegativeButton("Cancel") { _, _ ->
+        }
+
+        btnAction.setOnClickListener {
+            savePasswordAction()
+        }
+
+        etPassword.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE) {
+                savePasswordAction()
+                true
+            } else {
+                false
+            }
+        }
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.setOnDismissListener {
+            if (!isSuccess && viewMode != "SECRET") {
                 binding.toggleGroup.check(R.id.btnTabChats)
             }
-            .show()
+        }
+
+        dialog.show()
+        etPassword.requestFocus()
     }
 
     private fun showSecretLoginDialog() {
-        val input = android.widget.EditText(requireContext())
-        input.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-        input.hint = "Password"
-        
-        android.app.AlertDialog.Builder(requireContext())
-            .setTitle("Unlock Secret Chats")
-            .setView(input)
-            .setPositiveButton("Unlock") { _, _ ->
-                if (input.text.toString() == currentUser?.secretPassword) {
-                    viewMode = "SECRET"
-                    refreshAdapter()
-                } else {
-                    android.widget.Toast.makeText(context, "Incorrect password", android.widget.Toast.LENGTH_SHORT).show()
-                    binding.toggleGroup.check(R.id.btnTabChats)
-                }
+        val context = context ?: return
+        val view = LayoutInflater.from(context).inflate(R.layout.dialog_secret_lock, null)
+
+        val tvTitle = view.findViewById<android.widget.TextView>(R.id.tvSecretDialogTitle)
+        val tvSubtitle = view.findViewById<android.widget.TextView>(R.id.tvSecretDialogSubtitle)
+        val tilPassword = view.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.tilSecretPassword)
+        val etPassword = view.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etSecretPassword)
+        val btnCancel = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnSecretCancel)
+        val btnAction = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnSecretAction)
+
+        tvTitle.text = "Unlock Secret Chats"
+        tvSubtitle.text = "Enter your secret password to view hidden chats"
+        tilPassword.hint = "Password"
+        btnAction.text = "Unlock"
+
+        val dialog = android.app.Dialog(context)
+        dialog.setContentView(view)
+        dialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
+        val dialogWidth = (resources.displayMetrics.widthPixels * 0.88).toInt()
+        dialog.window?.setLayout(dialogWidth, android.view.ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        var isSuccess = false
+
+        val unlockAction = {
+            val pwd = etPassword.text?.toString() ?: ""
+            if (pwd == currentUser?.secretPassword) {
+                isSuccess = true
+                viewMode = "SECRET"
+                refreshAdapter()
+                dialog.dismiss()
+            } else {
+                tilPassword.error = "Incorrect password"
+                android.widget.Toast.makeText(context, "Incorrect password", android.widget.Toast.LENGTH_SHORT).show()
             }
-            .setNegativeButton("Cancel") { _, _ ->
+        }
+
+        btnAction.setOnClickListener {
+            unlockAction()
+        }
+
+        etPassword.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE) {
+                unlockAction()
+                true
+            } else {
+                false
+            }
+        }
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.setOnDismissListener {
+            if (!isSuccess && viewMode != "SECRET") {
                 binding.toggleGroup.check(R.id.btnTabChats)
             }
-            .show()
+        }
+
+        dialog.show()
+        etPassword.requestFocus()
     }
 
     private fun loadSecretConversations() {
@@ -528,7 +616,7 @@ class ChatsFragment : Fragment(), SearchableFragment {
         }
         options.add("🗑️ Delete Chat")
 
-        androidx.appcompat.app.AlertDialog.Builder(context)
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(context)
             .setTitle(conversation.partnerName)
             .setItems(options.toTypedArray()) { _, which ->
                 when (options[which]) {
@@ -544,14 +632,16 @@ class ChatsFragment : Fragment(), SearchableFragment {
 
     private fun confirmDeleteChat(conversation: Conversation) {
         val context = context ?: return
-        androidx.appcompat.app.AlertDialog.Builder(context)
-            .setTitle("Delete Chat?")
-            .setMessage("Are you sure you want to delete conversation with \"${conversation.partnerName}\"? All messages will be permanently deleted.")
-            .setPositiveButton("Delete") { _, _ ->
+        com.example.chatsnap.utils.UIUtils.showCustomDialog(
+            context = context,
+            title = "Delete Chat?",
+            message = "Are you sure you want to delete conversation with \"${conversation.partnerName}\"? All messages will be permanently deleted.",
+            positiveText = "Delete",
+            negativeText = "Cancel",
+            onPositive = {
                 deleteChatFromFirestore(conversation)
             }
-            .setNegativeButton("Cancel", null)
-            .show()
+        )
     }
 
     private fun deleteChatFromFirestore(conversation: Conversation) {
@@ -604,24 +694,26 @@ class ChatsFragment : Fragment(), SearchableFragment {
 
     private fun showUnhideDialog(conversation: Conversation) {
         val uid = auth.currentUser?.uid ?: return
-        android.app.AlertDialog.Builder(requireContext())
-            .setTitle("Unhide Chat")
-            .setMessage("Move \"${conversation.partnerName}\" back to Friends tab?")
-            .setPositiveButton("Unhide") { _, _ ->
+        val context = context ?: return
+        com.example.chatsnap.utils.UIUtils.showCustomDialog(
+            context = context,
+            title = "Unhide Chat",
+            message = "Move \"${conversation.partnerName}\" back to Friends tab?",
+            positiveText = "Unhide",
+            negativeText = "Cancel",
+            onPositive = {
                 firestore.collection("secretConversations")
                     .document("${uid}_${conversation.partnerId}")
                     .delete()
                     .addOnSuccessListener {
                         android.widget.Toast.makeText(context, "Chat unhidden", android.widget.Toast.LENGTH_SHORT).show()
+                        refreshAdapter()
                     }
-            }
-            .setNegativeButton("Cancel") { _, _ ->
+            },
+            onNegative = {
                 refreshAdapter()
             }
-            .setOnCancelListener {
-                refreshAdapter()
-            }
-            .show()
+        )
     }
 
     private fun getPinnedChats(): Set<String> {

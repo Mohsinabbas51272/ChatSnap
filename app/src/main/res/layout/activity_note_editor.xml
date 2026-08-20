@@ -18,8 +18,9 @@
             android:id="@+id/editorToolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
             app:navigationIcon="@android:drawable/ic_menu_revert"
-            app:navigationIconTint="?attr/colorOnSurface">
+            app:navigationIconTint="?attr/colorOnPrimary">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -35,7 +36,7 @@
                     android:layout_height="40dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@android:drawable/ic_menu_today"
-                    app:tint="?attr/colorOnSurface"
+                    app:tint="?attr/colorOnPrimary"
                     android:contentDescription="Pin Note" />
 
                 <!-- Favorite Toggle Button -->
@@ -45,7 +46,7 @@
                     android:layout_height="40dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@android:drawable/btn_star_big_off"
-                    app:tint="?attr/colorOnSurface"
+                    app:tint="?attr/colorOnPrimary"
                     android:contentDescription="Favorite Note" />
 
                 <!-- Share Button -->
@@ -55,7 +56,7 @@
                     android:layout_height="40dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@android:drawable/ic_menu_share"
-                    app:tint="?attr/colorOnSurface"
+                    app:tint="?attr/colorOnPrimary"
                     android:contentDescription="Share Note" />
 
                 <!-- Delete Button -->
@@ -65,7 +66,7 @@
                     android:layout_height="40dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@android:drawable/ic_menu_delete"
-                    app:tint="?attr/colorError"
+                    app:tint="?attr/colorOnPrimary"
                     android:contentDescription="Delete Note" />
 
             </LinearLayout>

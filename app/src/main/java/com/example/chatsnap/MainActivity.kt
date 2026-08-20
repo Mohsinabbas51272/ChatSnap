@@ -666,15 +666,27 @@ class MainActivity : BaseActivity() {
 
     private fun initializeFcmToken() {
         val uid = auth.currentUser?.uid ?: return
+        val sharedPrefs = getSharedPreferences("chatsnap_prefs", android.content.Context.MODE_PRIVATE)
+        if (!sharedPrefs.contains("notifications_enabled")) {
+            sharedPrefs.edit().putBoolean("notifications_enabled", true).apply()
+        }
         com.google.firebase.messaging.FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
             android.util.Log.d("FCM_TEST", "Token: $token")
-            firestore.collection("users").document(uid).set(mapOf("fcmToken" to token), com.google.firebase.firestore.SetOptions.merge())
-                .addOnSuccessListener {
-                    android.util.Log.d("FCM_TEST", "Token updated in Firestore")
+            val data = mutableMapOf<String, Any>("fcmToken" to token)
+            firestore.collection("users").document(uid).get().addOnSuccessListener { doc ->
+                if (!doc.contains("notificationsEnabled")) {
+                    data["notificationsEnabled"] = true
                 }
-                .addOnFailureListener {
-                    android.util.Log.e("FCM_TEST", "Failed to update token: ${it.message}")
-                }
+                firestore.collection("users").document(uid).set(data, com.google.firebase.firestore.SetOptions.merge())
+                    .addOnSuccessListener {
+                        android.util.Log.d("FCM_TEST", "Token & notification status updated in Firestore")
+                    }
+                    .addOnFailureListener {
+                        android.util.Log.e("FCM_TEST", "Failed to update token: ${it.message}")
+                    }
+            }.addOnFailureListener {
+                firestore.collection("users").document(uid).set(data, com.google.firebase.firestore.SetOptions.merge())
+            }
         }
     }
 

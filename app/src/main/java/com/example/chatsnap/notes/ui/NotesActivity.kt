@@ -6,13 +6,13 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.example.chatsnap.BaseActivity
 import com.example.chatsnap.R
 import com.example.chatsnap.databinding.ActivityNotesBinding
 import com.example.chatsnap.notes.data.Note
@@ -20,7 +20,7 @@ import com.google.android.material.chip.Chip
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class NotesActivity : AppCompatActivity() {
+class NotesActivity : BaseActivity() {
 
     private lateinit var binding: ActivityNotesBinding
     private val viewModel: NotesViewModel by viewModels()

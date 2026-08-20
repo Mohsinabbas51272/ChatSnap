@@ -26,6 +26,9 @@ import com.example.chatsnap.media.model.FolderItem
 @Composable
 fun FoldersTabContent(
     folders: List<FolderItem>,
+    primaryColor: Color = MaterialTheme.colorScheme.primary,
+    onSurfaceColor: Color = MaterialTheme.colorScheme.onSurface,
+    surfaceColor: Color = MaterialTheme.colorScheme.surface,
     onFolderClick: (FolderItem) -> Unit
 ) {
     if (folders.isEmpty()) {
@@ -35,7 +38,7 @@ fun FoldersTabContent(
         ) {
             Text(
                 text = "No media folders found",
-                color = Color.Gray,
+                color = onSurfaceColor.copy(alpha = 0.5f),
                 fontSize = 15.sp
             )
         }
@@ -47,11 +50,14 @@ fun FoldersTabContent(
             itemsIndexed(folders, key = { _, folder -> folder.folderPath }) { index, folder ->
                 FolderListItem(
                     folder = folder,
+                    primaryColor = primaryColor,
+                    onSurfaceColor = onSurfaceColor,
+                    surfaceColor = surfaceColor,
                     onClick = { onFolderClick(folder) }
                 )
                 if (index < folders.size - 1) {
                     HorizontalDivider(
-                        color = Color.White.copy(alpha = 0.08f),
+                        color = onSurfaceColor.copy(alpha = 0.08f),
                         thickness = 0.5.dp,
                         modifier = Modifier.padding(start = 76.dp, end = 16.dp)
                     )
@@ -64,6 +70,9 @@ fun FoldersTabContent(
 @Composable
 fun FolderListItem(
     folder: FolderItem,
+    primaryColor: Color = MaterialTheme.colorScheme.primary,
+    onSurfaceColor: Color = MaterialTheme.colorScheme.onSurface,
+    surfaceColor: Color = MaterialTheme.colorScheme.surface,
     onClick: () -> Unit
 ) {
     Surface(
@@ -82,8 +91,8 @@ fun FolderListItem(
             Box(
                 modifier = Modifier
                     .size(48.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFFFFFC00).copy(alpha = 0.15f)),
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(primaryColor.copy(alpha = 0.15f)),
                 contentAlignment = Alignment.Center
             ) {
                 if (folder.thumbnailUri != null) {
@@ -96,14 +105,14 @@ fun FolderListItem(
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Color.Black.copy(alpha = 0.3f))
+                            .background(Color.Black.copy(alpha = 0.35f))
                     )
                 }
 
                 Icon(
                     imageVector = Icons.Default.Folder,
                     contentDescription = "Folder",
-                    tint = Color(0xFFFFFC00),
+                    tint = primaryColor,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -116,16 +125,16 @@ fun FolderListItem(
             ) {
                 Text(
                     text = folder.folderName,
-                    color = Color.White,
+                    color = onSurfaceColor,
                     fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = "${folder.itemCount} items • ${folder.formattedSize}",
-                    color = Color.Gray,
+                    color = onSurfaceColor.copy(alpha = 0.6f),
                     fontSize = 12.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -136,10 +145,9 @@ fun FolderListItem(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = "Open Folder",
-                tint = Color.Gray,
+                tint = onSurfaceColor.copy(alpha = 0.4f),
                 modifier = Modifier.size(20.dp)
             )
         }
     }
 }
-

@@ -25,6 +25,7 @@ abstract class BaseActivity : AppCompatActivity() {
         }
 
         checkMaintenanceModeCommon()
+        syncHeaderAndStatusBarColor()
     }
 
     override fun finish() {
@@ -39,8 +40,45 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        syncHeaderAndStatusBarColor()
         updateUserPresence(true)
         checkSessionCommon()
+    }
+
+    protected fun syncHeaderAndStatusBarColor() {
+        val currentClassName = this::class.java.simpleName
+        val darkActivities = setOf("StoryViewActivity", "CallActivity", "IncomingCallActivity", "VideoPlayerActivity", "QRScannerActivity", "MediaViewerActivity")
+        
+        val decorView = window.peekDecorView()
+        
+        if (currentClassName in darkActivities) {
+            @Suppress("DEPRECATION")
+            window.statusBarColor = android.graphics.Color.BLACK
+            if (decorView != null) {
+                androidx.core.view.WindowCompat.getInsetsController(window, decorView).isAppearanceLightStatusBars = false
+            }
+            return
+        }
+
+        val typedValue = android.util.TypedValue()
+        theme.resolveAttribute(com.google.android.material.R.attr.colorPrimary, typedValue, true)
+        val headerColor = if (typedValue.resourceId != 0) {
+            androidx.core.content.ContextCompat.getColor(this, typedValue.resourceId)
+        } else {
+            typedValue.data
+        }
+
+        @Suppress("DEPRECATION")
+        window.statusBarColor = headerColor
+
+        if (decorView != null) {
+            androidx.core.view.WindowCompat.getInsetsController(window, decorView).isAppearanceLightStatusBars = isColorLight(headerColor)
+        }
+    }
+
+    private fun isColorLight(color: Int): Boolean {
+        val darkness = 1 - (0.299 * android.graphics.Color.red(color) + 0.587 * android.graphics.Color.green(color) + 0.114 * android.graphics.Color.blue(color)) / 255
+        return darkness < 0.5
     }
 
     override fun onPause() {
@@ -79,20 +117,17 @@ abstract class BaseActivity : AppCompatActivity() {
 
     private fun checkSessionCommon() {
         val currentClassName = this::class.java.simpleName
-        val bypassList = setOf("LoginActivity", "SignUpActivity", "SplashActivity", "LandingActivity", "AdminActivity")
+        val bypassList = setOf("LoginActivity", "SignUpActivity", "SplashActivity", "LandingActivity", "AdminActivity", "MultiAccountActivity")
         if (currentClassName in bypassList) return
 
         val auth = com.google.firebase.auth.FirebaseAuth.getInstance()
         val currentUid = auth.currentUser?.uid ?: return
+        val currentDeviceId = com.example.chatsnap.utils.SessionManager.getDeviceId(this)
 
         // 1. If local session ID is empty/null, initialize it
-        val localSessionId = com.example.chatsnap.utils.SessionManager.getLocalSessionId(this)
+        val localSessionId = com.example.chatsnap.utils.SessionManager.getLocalSessionId(this, currentUid)
         if (localSessionId.isNullOrEmpty()) {
-            val newSessionId = java.util.UUID.randomUUID().toString()
-            com.example.chatsnap.utils.SessionManager.saveLocalSessionId(this, newSessionId)
-            com.google.firebase.firestore.FirebaseFirestore.getInstance()
-                .collection("users").document(currentUid)
-                .update("sessionId", newSessionId)
+            com.example.chatsnap.utils.SessionManager.startNewSession(this, currentUid)
         }
 
         // 2. Listen for session ID changes in Firestore
@@ -103,26 +138,33 @@ abstract class BaseActivity : AppCompatActivity() {
                 if (e != null || snapshot == null || !snapshot.exists()) return@addSnapshotListener
                 
                 val firestoreSessionId = snapshot.getString("sessionId")
-                val currentLocalSessionId = com.example.chatsnap.utils.SessionManager.getLocalSessionId(this)
+                val firestoreDeviceId = snapshot.getString("deviceId")
+                val currentLocalSessionId = com.example.chatsnap.utils.SessionManager.getLocalSessionId(this, currentUid)
                 
                 if (firestoreSessionId != null && currentLocalSessionId != null && firestoreSessionId != currentLocalSessionId) {
-                    if (!isSignOutPending) {
-                        isSignOutPending = true
-                        auth.signOut()
-                        com.example.chatsnap.utils.SessionManager.clearLocalSessionId(this)
-                        
-                        android.widget.Toast.makeText(
-                            this,
-                            "Your account has been logged in on another device.",
-                            android.widget.Toast.LENGTH_LONG
-                        ).show()
-                        
-                        val intent = android.content.Intent(this, LoginActivity::class.java).apply {
-                            addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    if (firestoreDeviceId != null && firestoreDeviceId == currentDeviceId) {
+                        // Same physical device initiated the session change -> update local cache
+                        com.example.chatsnap.utils.SessionManager.saveLocalSessionId(this, currentUid, firestoreSessionId)
+                    } else {
+                        // Another device logged in -> terminate session here
+                        if (!isSignOutPending) {
+                            isSignOutPending = true
+                            auth.signOut()
+                            com.example.chatsnap.utils.SessionManager.clearLocalSessionId(this, currentUid)
+                            
+                            android.widget.Toast.makeText(
+                                this,
+                                "Your account has been logged in on another device.",
+                                android.widget.Toast.LENGTH_LONG
+                            ).show()
+                            
+                            val intent = android.content.Intent(this, LoginActivity::class.java).apply {
+                                addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                            }
+                            startActivity(intent)
+                            finishAffinity()
+                            isSignOutPending = false
                         }
-                        startActivity(intent)
-                        finishAffinity()
-                        isSignOutPending = false
                     }
                 }
             }
