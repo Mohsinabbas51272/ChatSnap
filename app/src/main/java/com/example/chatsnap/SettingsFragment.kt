@@ -62,6 +62,7 @@ class SettingsFragment : Fragment() {
             binding.itemWallpaper.root,
             binding.itemHelp.root,
             binding.itemPrivacyPolicy.root,
+            binding.itemDiscoverable.root,
             binding.itemContacts.root,
             binding.itemMultiAccount.root,
             binding.btnLogout
@@ -254,6 +255,28 @@ class SettingsFragment : Fragment() {
             }
         }
 
+        // Discovery & Search (Allow others to find me in search and suggestions)
+        binding.itemDiscoverable.apply {
+            ivItemIcon.setImageResource(android.R.drawable.ic_menu_search)
+            tvItemTitle.text = "Discoverable"
+            tvItemValue.text = "Visible in search & suggestions"
+            switchItem.visibility = View.VISIBLE
+            switchItem.isChecked = true
+            root.setOnClickListener {
+                switchItem.toggle()
+                val isChecked = switchItem.isChecked
+                tvItemValue.text = if (isChecked) "Visible in search & suggestions" else "Hidden from search & suggestions"
+                val uid = auth.currentUser?.uid
+                if (uid != null) {
+                    firestore.collection("users").document(uid).update("isDiscoverable", isChecked)
+                        .addOnSuccessListener {
+                            val msg = if (isChecked) "You are now searchable & visible" else "You are now hidden from search & suggestions"
+                            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                        }
+                }
+            }
+        }
+
         // Privacy Policy
         binding.itemPrivacyPolicy.apply {
             ivItemIcon.setImageResource(android.R.drawable.ic_lock_lock)
@@ -366,6 +389,10 @@ class SettingsFragment : Fragment() {
 
                     binding.itemGhostMode.switchItem.isChecked = doc.getBoolean("ghostMode") ?: false
                     binding.itemGhostMode.tvItemValue.text = if (binding.itemGhostMode.switchItem.isChecked) "Stealth browsing active" else "Online status visible"
+
+                    val isDiscoverable = doc.getBoolean("isDiscoverable") ?: true
+                    binding.itemDiscoverable.switchItem.isChecked = isDiscoverable
+                    binding.itemDiscoverable.tvItemValue.text = if (isDiscoverable) "Visible in search & suggestions" else "Hidden from search & suggestions"
 
                     // Admin UI check - dynamically show if user is admin, else keep hidden
                     val isAdmin = doc.getBoolean("isAdmin") ?: false

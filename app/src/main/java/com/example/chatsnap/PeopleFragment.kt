@@ -67,7 +67,33 @@ class PeopleFragment : Fragment(), SearchableFragment {
     }
 
     override fun onSearch(query: String) {
-        if (query.length >= 2) searchUsers(query) else syncContacts()
+        if (_binding == null) return
+        val cleanQuery = query.trim()
+
+        if (binding.layoutFriendsView.visibility == View.VISIBLE) {
+            // User is on Friends tab -> filter local friends list
+            if (cleanQuery.isEmpty()) {
+                val checkedChipId = binding.chipGroupFilter.checkedChipId
+                applyFriendFilter(checkedChipId)
+            } else {
+                val filtered = cachedFriendList.filter { friend ->
+                    friend.name.contains(cleanQuery, ignoreCase = true) ||
+                    (!friend.username.isNullOrEmpty() && friend.username.contains(cleanQuery, ignoreCase = true)) ||
+                    friend.phone.contains(cleanQuery)
+                }
+                allFriendsAdapter.updateData(filtered, getStatusMap(), friendsList)
+                binding.layoutTopFriends.visibility = View.GONE
+                binding.layoutSquads.visibility = View.GONE
+                binding.layoutRequests.visibility = View.GONE
+            }
+        } else {
+            // User is on Add Friends tab -> search global users
+            if (cleanQuery.length >= 2) {
+                searchUsers(cleanQuery)
+            } else {
+                syncContacts()
+            }
+        }
     }
 
     private fun listenForSentRequests() {
@@ -367,24 +393,58 @@ class PeopleFragment : Fragment(), SearchableFragment {
             }
         }
         phoneContactsSet = contactNumbers
-        firestore.collection("users").get().addOnSuccessListener { snapshot ->
+
+        val currentUid = auth.currentUser?.uid ?: return
+        firestore.collection("users").limit(60).get().addOnSuccessListener { snapshot ->
             if (_binding == null) return@addOnSuccessListener
             binding.progressBar.visibility = View.GONE
-            val matched = snapshot.toObjects(User::class.java).filter { 
-                contactNumbers.contains(it.phone.replace("\\D".toRegex(), "")) && it.uid != auth.currentUser?.uid
+            val allUsers = snapshot.toObjects(User::class.java).filter {
+                it.uid != currentUid && it.isBlocked != true && it.ghostMode != true && it.isDiscoverable && !friendsList.contains(it.uid)
             }
-            userAdapter.updateData(matched, getStatusMap(), friendsList)
+
+            val contactMatches = mutableListOf<User>()
+            val discoverUsers = mutableListOf<User>()
+
+            allUsers.forEach { user ->
+                val cleanPhone = user.phone.replace("\\D".toRegex(), "")
+                if (cleanPhone.isNotEmpty() && contactNumbers.contains(cleanPhone)) {
+                    contactMatches.add(user)
+                } else {
+                    discoverUsers.add(user)
+                }
+            }
+
+            // Show contact matches at the top, followed by community discover suggestions
+            val combinedSuggestions = contactMatches + discoverUsers
+            userAdapter.updateData(combinedSuggestions, getStatusMap(), friendsList)
+        }.addOnFailureListener {
+            if (_binding != null) {
+                binding.progressBar.visibility = View.GONE
+            }
         }
     }
 
     private fun searchUsers(query: String) {
-        firestore.collection("users").whereGreaterThanOrEqualTo("name", query).whereLessThanOrEqualTo("name", query + "\uf8ff")
-            .get().addOnSuccessListener { snapshot ->
-                if (_binding != null) {
-                    val users = snapshot.toObjects(User::class.java).filter { it.uid != auth.currentUser?.uid }
-                    userAdapter.updateData(users, getStatusMap(), friendsList)
+        val currentUid = auth.currentUser?.uid ?: return
+        val cleanQuery = query.trim().removePrefix("@")
+        if (cleanQuery.isEmpty()) {
+            syncContacts()
+            return
+        }
+
+        firestore.collection("users").get().addOnSuccessListener { snapshot ->
+            if (_binding != null) {
+                val matchingUsers = snapshot.toObjects(User::class.java).filter { user ->
+                    user.uid != currentUid &&
+                    user.isBlocked != true &&
+                    user.ghostMode != true &&
+                    user.isDiscoverable &&
+                    (user.name.contains(cleanQuery, ignoreCase = true) ||
+                     (!user.username.isNullOrEmpty() && user.username.contains(cleanQuery, ignoreCase = true)))
                 }
+                userAdapter.updateData(matchingUsers, getStatusMap(), friendsList)
             }
+        }
     }
 
     override fun onDestroyView() {

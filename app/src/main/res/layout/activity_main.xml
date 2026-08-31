@@ -70,18 +70,30 @@
                         android:textSize="20sp"
                         android:fontFamily="sans-serif-black" />
 
-                    <EditText
+                    <androidx.appcompat.widget.AppCompatEditText
                         android:id="@+id/etHeaderSearch"
+                        style="@style/Widget.AppCompat.EditText"
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
+                        android:layout_height="42dp"
                         android:background="@drawable/bg_search_header"
-                        android:hint="Search..."
+                        android:hint="Search chats, people, messages..."
                         android:imeOptions="actionSearch"
                         android:inputType="text"
-                        android:paddingHorizontal="16dp"
-                        android:textColor="?attr/colorOnPrimary"
-                        android:textColorHint="#CCFFFFFF"
-                        android:textSize="14sp"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:gravity="center_vertical"
+                        android:includeFontPadding="false"
+                        android:paddingTop="0dp"
+                        android:paddingBottom="0dp"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:drawableStart="@android:drawable/ic_menu_search"
+                        android:drawablePadding="8dp"
+                        android:drawableTint="#757575"
+                        android:textColor="#1A1C1E"
+                        android:textColorHint="#757575"
+                        android:textSize="13sp"
+                        android:textCursorDrawable="@null"
                         android:visibility="gone" />
                 </FrameLayout>
 

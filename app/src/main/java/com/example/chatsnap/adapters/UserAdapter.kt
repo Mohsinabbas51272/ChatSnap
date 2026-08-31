@@ -43,7 +43,12 @@ class UserAdapter(
             binding.tvUserName.text = user.name
             
             val mutualCount = user.friends.intersect(currentFriends.toSet()).size
-            val subText = if (mutualCount > 0) "$mutualCount mutual friends" else (if (user.phone.isNotEmpty()) user.phone else user.email)
+            val subText = when {
+                mutualCount > 0 -> "$mutualCount mutual friends"
+                !user.username.isNullOrEmpty() -> "@${user.username}"
+                !user.bio.isNullOrEmpty() -> user.bio
+                else -> "ChatSnap Member"
+            }
             binding.tvUserEmail.text = subText
             
             // Show Admin Badge

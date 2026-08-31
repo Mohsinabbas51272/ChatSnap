@@ -22,5 +22,9 @@ data class User(
     val lastSeen: Long? = null,
     val fcmToken: String? = null,
     val selectedTheme: String? = null,
-    val notificationsEnabled: Boolean = true
+    val notificationsEnabled: Boolean = true,
+    val username: String? = null,
+    val bio: String? = null,
+    val ghostMode: Boolean = false,
+    val isDiscoverable: Boolean = true
 )

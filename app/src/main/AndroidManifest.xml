@@ -78,6 +78,9 @@
             android:exported="false" />
 
         <activity android:name=".AppLockActivity" />
+        <activity android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
         <activity android:name=".CreateGroupActivity" />
         <activity android:name=".AdminActivity" />
         <activity android:name=".ForwardActivity" android:theme="@style/Theme.ChatSnap.NoActionBar" />

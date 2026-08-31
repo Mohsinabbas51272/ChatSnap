@@ -151,6 +151,9 @@ dependencies {
     // QR Scanner
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 
+    // Image Cropping
+    implementation("com.github.yalantis:ucrop:2.2.8")
+
     // CameraX
     implementation(libs.androidx.camera.core)
     implementation(libs.androidx.camera.camera2)

@@ -165,82 +165,40 @@
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <!-- Log In Button -->
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/loginButton"
+                    <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
-                        android:layout_marginTop="24dp"
-                        android:text="Log In"
-                        android:textAllCaps="false"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        app:cornerRadius="12dp"
-                        android:backgroundTint="@color/primary_container"
-                        app:icon="@android:drawable/ic_menu_send"
-                        app:iconGravity="textEnd"
-                        android:elevation="12dp" />
+                        android:layout_marginTop="24dp">
 
-                    <!-- Divider -->
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="24dp"
-                        android:layout_marginBottom="24dp">
-
-                        <View
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/loginButton"
                             android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="@color/secondary_container"
-                            android:layout_centerInParent="true"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="OR CONTINUE WITH"
-                            android:textSize="11sp"
+                            android:layout_height="match_parent"
+                            android:text="Log In"
+                            android:textAllCaps="false"
+                            android:textSize="16sp"
                             android:textStyle="bold"
-                            android:textColor="?attr/colorOnSurfaceVariant"
-                            android:background="?attr/colorSurface"
-                            android:paddingHorizontal="8dp"
-                            android:layout_centerInParent="true"/>
-                    </RelativeLayout>
-
-                    <!-- Social Logins -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <com.google.android.material.button.MaterialButton
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="6dp"
-                            android:text="Google"
-                            android:textAllCaps="false"
-                            android:textColor="@color/on_surface"
-                            app:strokeColor="@color/secondary_container"
                             app:cornerRadius="12dp"
-                            app:icon="@android:drawable/ic_menu_compass"
-                            app:iconTint="@null"/>
+                            android:backgroundTint="?attr/colorPrimary"
+                            android:textColor="?attr/colorOnPrimary"
+                            app:iconGravity="textEnd"
+                            android:elevation="12dp" />
 
-                        <com.google.android.material.button.MaterialButton
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="6dp"
-                            android:text="Apple"
-                            android:textAllCaps="false"
-                            android:textColor="@color/on_surface"
-                            app:strokeColor="@color/secondary_container"
-                            app:cornerRadius="12dp"
-                            app:icon="@android:drawable/ic_menu_send"
-                            app:iconTint="@color/black"/>
-                    </LinearLayout>
+                        <com.google.android.material.progressindicator.CircularProgressIndicator
+                            android:id="@+id/loginProgress"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:visibility="gone"
+                            app:indicatorColor="?attr/colorOnPrimary"
+                            app:trackColor="#33FFFFFF"
+                            app:trackThickness="3dp"
+                            app:indicatorSize="28dp" />
+
+                    </FrameLayout>
 
                 </LinearLayout>
+
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Footnote -->

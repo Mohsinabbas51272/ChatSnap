@@ -17,6 +17,19 @@ class LoginActivity : BaseActivity() {
     private lateinit var firestore: FirebaseFirestore
     private var typedPassword = ""
 
+    private fun setLoading(loading: Boolean) {
+        if (loading) {
+            binding.loginButton.text = ""
+            binding.loginButton.icon = null
+            binding.loginButton.isEnabled = false
+            binding.loginProgress.visibility = android.view.View.VISIBLE
+        } else {
+            binding.loginButton.text = "Log In"
+            binding.loginButton.isEnabled = true
+            binding.loginProgress.visibility = android.view.View.GONE
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,13 +57,11 @@ class LoginActivity : BaseActivity() {
             }
 
             typedPassword = password
-            binding.loginButton.isEnabled = false
+            setLoading(true)
 
             if (android.util.Patterns.EMAIL_ADDRESS.matcher(input).matches()) {
-                // Login with Email
                 loginWithEmail(input, password)
             } else {
-                // Login with Phone Number (finding email associated with phone)
                 loginWithPhone(input, password)
             }
         }
@@ -124,33 +135,32 @@ class LoginActivity : BaseActivity() {
                 if (task.isSuccessful) {
                     checkProfileCompletion(auth.currentUser!!.uid)
                 } else {
-                    binding.loginButton.isEnabled = true
+                    setLoading(false)
                     com.example.chatsnap.utils.ToastUtils.showToast(this, "Login Failed: ${task.exception?.message}")
                 }
             }
     }
 
     private fun loginWithPhone(phone: String, password: String) {
-        // Find user by phone in Firestore to get their email
         firestore.collection("users")
             .whereEqualTo("phone", phone)
             .get()
             .addOnSuccessListener { documents ->
                 if (documents.isEmpty) {
-                    binding.loginButton.isEnabled = true
+                    setLoading(false)
                     com.example.chatsnap.utils.ToastUtils.showToast(this, "Phone number not found")
                 } else {
                     val email = documents.documents[0].getString("email")
                     if (email != null) {
                         loginWithEmail(email, password)
                     } else {
-                        binding.loginButton.isEnabled = true
+                        setLoading(false)
                         com.example.chatsnap.utils.ToastUtils.showToast(this, "Internal error: No email for this phone")
                     }
                 }
             }
             .addOnFailureListener {
-                binding.loginButton.isEnabled = true
+                setLoading(false)
                 com.example.chatsnap.utils.ToastUtils.showToast(this, "Error: ${it.message}")
             }
     }
@@ -162,8 +172,8 @@ class LoginActivity : BaseActivity() {
                     val isBlocked = document.getBoolean("isBlocked") ?: false
                     if (isBlocked) {
                         auth.signOut()
+                        setLoading(false)
                         com.example.chatsnap.utils.ToastUtils.showToast(this, "Your account has been suspended by the administrator.")
-                        binding.loginButton.isEnabled = true
                         return@addOnSuccessListener
                     }
 
@@ -202,7 +212,7 @@ class LoginActivity : BaseActivity() {
                 }
             }
             .addOnFailureListener { e ->
-                binding.loginButton.isEnabled = true
+                setLoading(false)
                 com.example.chatsnap.utils.ToastUtils.showToast(this, "Error checking profile: ${e.message}")
             }
     }

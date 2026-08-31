@@ -12,6 +12,7 @@ import com.example.chatsnap.databinding.ActivityProfileSetupBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.yalantis.ucrop.UCrop
 import id.zelory.compressor.Compressor
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -24,11 +25,42 @@ class ProfileSetupActivity : BaseActivity() {
     private lateinit var storage: FirebaseStorage
     private var selectedImageUri: Uri? = null
 
+    // Pick image from gallery, then launch uCrop
     private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
-            selectedImageUri = uri
-            binding.ivProfilePic.setImageURI(uri)
+            launchCrop(uri)
         }
+    }
+
+    // Receive cropped result from uCrop
+    private val cropLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK && result.data != null) {
+            val croppedUri = UCrop.getOutput(result.data!!)
+            if (croppedUri != null) {
+                selectedImageUri = croppedUri
+                binding.ivProfilePic.setImageURI(croppedUri)
+            }
+        }
+    }
+
+    private fun launchCrop(sourceUri: Uri) {
+        val destFile = File(cacheDir, "profile_crop_${System.currentTimeMillis()}.jpg")
+        val destUri = Uri.fromFile(destFile)
+
+        val cropIntent = UCrop.of(sourceUri, destUri)
+            .withAspectRatio(1f, 1f)
+            .withMaxResultSize(600, 600)
+            .withOptions(UCrop.Options().apply {
+                setCircleDimmedLayer(true)
+                setShowCropFrame(false)
+                setShowCropGrid(false)
+                setCompressionQuality(85)
+                setHideBottomControls(false)
+                setFreeStyleCropEnabled(false)
+            })
+            .getIntent(this)
+
+        cropLauncher.launch(cropIntent)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,24 +87,25 @@ class ProfileSetupActivity : BaseActivity() {
                 binding.etName.error = "Please enter your name"
                 return@setOnClickListener
             }
-
-            handleProfileSave(name)
+            val bio = binding.etBio.text.toString().trim()
+            val username = binding.etUsername.text.toString().trim()
+            handleProfileSave(name, bio, username)
         }
     }
 
-    private fun handleProfileSave(name: String) {
+    private fun handleProfileSave(name: String, bio: String, username: String) {
         val userId = auth.currentUser?.uid ?: return
         showLoading(true)
 
         lifecycleScope.launch {
             try {
                 var imageUrl: String? = null
-                
+
                 if (selectedImageUri != null) {
                     imageUrl = uploadProfileImage(userId, selectedImageUri!!)
                 }
 
-                saveProfileToFirestore(userId, name, imageUrl)
+                saveProfileToFirestore(userId, name, bio, username, imageUrl)
             } catch (e: Exception) {
                 showLoading(false)
                 Toast.makeText(this@ProfileSetupActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -83,13 +116,12 @@ class ProfileSetupActivity : BaseActivity() {
     private suspend fun uploadProfileImage(userId: String, uri: Uri): String {
         val inputStream = contentResolver.openInputStream(uri)
         val bytes = inputStream?.readBytes() ?: throw Exception("Failed to read image")
-        
+
         val bitmap = android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
         val out = java.io.ByteArrayOutputStream()
-        // Resize to 300x300 and compress for small footprint in Firestore
-        val resized = android.graphics.Bitmap.createScaledBitmap(bitmap, 300, 300, true)
-        resized.compress(android.graphics.Bitmap.CompressFormat.JPEG, 60, out)
-        
+        // uCrop already handled cropping & sizing — just compress
+        bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 75, out)
+
         val base64 = android.util.Base64.encodeToString(out.toByteArray(), android.util.Base64.DEFAULT)
         return "data:image/jpeg;base64,$base64"
     }
@@ -99,16 +131,19 @@ class ProfileSetupActivity : BaseActivity() {
         binding.btnSaveProfile.isEnabled = !isLoading
         binding.fabAddPhoto.isEnabled = !isLoading
         binding.etName.isEnabled = !isLoading
+        binding.etBio.isEnabled = !isLoading
+        binding.etUsername.isEnabled = !isLoading
     }
 
-    private fun saveProfileToFirestore(userId: String, name: String, imageUrl: String?) {
+    private fun saveProfileToFirestore(userId: String, name: String, bio: String, username: String, imageUrl: String?) {
         val userUpdates = mutableMapOf<String, Any>(
             "name" to name,
+            "bio" to bio,
+            "username" to username,
             "profileCompleted" to true
         )
         imageUrl?.let { userUpdates["profileImageUrl"] = it }
 
-        // Use set with merge instead of update to handle missing documents safely
         firestore.collection("users").document(userId)
             .set(userUpdates, com.google.firebase.firestore.SetOptions.merge())
             .addOnSuccessListener {
@@ -130,9 +165,14 @@ class ProfileSetupActivity : BaseActivity() {
         firestore.collection("users").document(uid).get().addOnSuccessListener { doc ->
             if (doc.exists()) {
                 val name = doc.getString("name")
+                val bio = doc.getString("bio") ?: ""
+                val username = doc.getString("username") ?: ""
                 val imageUrl = doc.getString("profileImageUrl")
-                
+
                 binding.etName.setText(name)
+                binding.etBio.setText(bio)
+                binding.etUsername.setText(username)
+
                 if (!imageUrl.isNullOrEmpty()) {
                     if (imageUrl.startsWith("data:image") || imageUrl.length > 1000) {
                         try {

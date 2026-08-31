@@ -173,11 +173,13 @@ class MainActivity : BaseActivity() {
             binding.etHeaderSearch.visibility = View.GONE
             binding.tvHeaderTitle.visibility = View.VISIBLE
             binding.etHeaderSearch.setText("")
+            binding.btnSearch.setImageResource(android.R.drawable.ic_menu_search)
             val imm = getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
             imm.hideSoftInputFromWindow(binding.etHeaderSearch.windowToken, 0)
         } else {
             binding.etHeaderSearch.visibility = View.VISIBLE
             binding.tvHeaderTitle.visibility = View.GONE
+            binding.btnSearch.setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
             binding.etHeaderSearch.requestFocus()
             val imm = getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
             imm.showSoftInput(binding.etHeaderSearch, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
