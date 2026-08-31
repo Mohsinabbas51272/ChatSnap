@@ -427,10 +427,14 @@ class WebVideoDownloaderActivity : BaseActivity() {
             putExtra(DownloadService.EXTRA_THUMBNAIL_URL, newTask.thumbnailUrl)
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(intent)
-        } else {
-            startService(intent)
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(intent)
+            } else {
+                startService(intent)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start DownloadService: ${e.message}", e)
         }
 
         // Asynchronously load thumbnail if not youtube and none provided

@@ -126,11 +126,38 @@ class DownloadService : Service() {
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         db = AppDatabase.getInstance(this)
         createNotificationChannel()
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startForeground(
+                    FOREGROUND_NOTIFICATION_ID,
+                    buildSummaryNotification(),
+                    android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+                )
+            } else {
+                startForeground(FOREGROUND_NOTIFICATION_ID, buildSummaryNotification())
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start foreground in onCreate: ${e.message}", e)
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startForeground(
+                    FOREGROUND_NOTIFICATION_ID,
+                    buildSummaryNotification(),
+                    android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+                )
+            } else {
+                startForeground(FOREGROUND_NOTIFICATION_ID, buildSummaryNotification())
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start foreground in onStartCommand: ${e.message}", e)
+        }
+
         when (intent?.action) {
             ACTION_START_DOWNLOAD -> {
                 val taskId = intent.getStringExtra(EXTRA_TASK_ID)
@@ -357,9 +384,9 @@ class DownloadService : Service() {
                     val c = URL(url).openConnection() as HttpURLConnection
                     c.instanceFollowRedirects = false
                     c.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-                    c.connectTimeout = 10000
-                    c.readTimeout = 10000
-                    c.requestMethod = "HEAD"
+                    c.connectTimeout = 4000
+                    c.readTimeout = 4000
+                    c.requestMethod = "GET"
                     c.connect()
                     c
                 }
@@ -381,21 +408,22 @@ class DownloadService : Service() {
 
     /**
      * TikTok download: Multi-approach fallback system.
-     * Approach 1: Lovetik proxy (works without VPN, direct stream CDN)
+     * Approach 1: SSSTik (proxies media bytes via tikcdn.io - unblocked worldwide)
      * Approach 2: tikwm.com API (POST)
      * Approach 3: tikwm.com API (GET alternative)
-     * Approach 4: yt-dlp (last resort)
+     * Approach 4: Lovetik proxy
+     * Approach 5: yt-dlp (last resort)
      */
     private suspend fun downloadTikTok(task: TaskInfo): File {
         val resolvedUrl = resolveTikTokUrl(task.url)
         val cacheDownloadsDir = File(cacheDir, "downloads")
         if (!cacheDownloadsDir.exists()) cacheDownloadsDir.mkdirs()
 
-        Log.d(TAG, "TikTok: Trying Approach 1: Lovetik for $resolvedUrl")
+        Log.d(TAG, "TikTok: Trying Approach 1: SSSTik for $resolvedUrl")
         try {
-            return downloadTikTokViaLovetik(task, resolvedUrl)
+            return downloadTikTokViaSSSTik(task, resolvedUrl)
         } catch (e0: Exception) {
-            Log.w(TAG, "TikTok Approach 1 (Lovetik) failed: ${e0.message}. Trying Approach 2: tikwm POST API...")
+            Log.w(TAG, "TikTok Approach 1 (SSSTik) failed: ${e0.message}. Trying Approach 2: tikwm POST API...")
             try {
                 return downloadTikTokViaTikwm(task, resolvedUrl)
             } catch (e1: Exception) {
@@ -403,16 +431,94 @@ class DownloadService : Service() {
                 try {
                     return downloadTikTokViaTikwmGet(task, resolvedUrl)
                 } catch (e2: Exception) {
-                    Log.w(TAG, "TikTok Approach 3 (tikwm GET) failed: ${e2.message}. Trying Approach 4: yt-dlp...")
+                    Log.w(TAG, "TikTok Approach 3 (tikwm GET) failed: ${e2.message}. Trying Approach 4: Lovetik...")
                     try {
-                        return executeYtDlp(task, cacheDownloadsDir, resolvedUrl)
+                        return downloadTikTokViaLovetik(task, resolvedUrl)
                     } catch (e3: Exception) {
-                        Log.e(TAG, "TikTok Approach 4 (yt-dlp) failed: ${e3.message}")
-                        throw Exception("TikTok download failed. Checked Lovetik, tikwm, and yt-dlp. Last error: ${e3.message}")
+                        Log.w(TAG, "TikTok Approach 4 (Lovetik) failed: ${e3.message}. Trying Approach 5: yt-dlp...")
+                        try {
+                            return executeYtDlp(task, cacheDownloadsDir, resolvedUrl)
+                        } catch (e4: Exception) {
+                            Log.e(TAG, "TikTok Approach 5 (yt-dlp) failed: ${e4.message}")
+                            throw Exception("TikTok download failed. Last error: ${e4.message}")
+                        }
                     }
                 }
             }
         }
+    }
+
+    /**
+     * TikTok via SSSTik (Proxies media bytes via tikcdn.io directly)
+     * 100% unblocked globally, no watermark, works on short & long links.
+     */
+    private suspend fun downloadTikTokViaSSSTik(task: TaskInfo, urlToFetch: String): File {
+        Log.d(TAG, "TikTok SSSTik: fetching video info for: $urlToFetch")
+
+        task.title = "Fetching TikTok video..."
+        notificationManager.notify(task.notificationId, buildTaskNotification(task))
+        sendBroadcast(task, BROADCAST_PROGRESS)
+
+        val apiUrl = URL("https://ssstik.io/abc?url=dl")
+        val conn = withContext(Dispatchers.IO) {
+            val c = apiUrl.openConnection() as HttpURLConnection
+            c.requestMethod = "POST"
+            c.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
+            c.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+            c.setRequestProperty("hx-request", "true")
+            c.setRequestProperty("hx-current-url", "https://ssstik.io/en")
+            c.setRequestProperty("Origin", "https://ssstik.io")
+            c.setRequestProperty("Referer", "https://ssstik.io/en")
+            c.connectTimeout = 12000
+            c.readTimeout = 12000
+            c.doOutput = true
+            c.instanceFollowRedirects = true
+            c
+        }
+
+        val postData = "id=" + java.net.URLEncoder.encode(urlToFetch, "UTF-8") + "&locale=en&tt=0"
+        withContext(Dispatchers.IO) {
+            conn.outputStream.use { os ->
+                os.write(postData.toByteArray(Charsets.UTF_8))
+            }
+        }
+
+        val responseCode = conn.responseCode
+        if (responseCode != 200) {
+            conn.disconnect()
+            throw Exception("SSSTik API returned HTTP $responseCode")
+        }
+
+        val responseHtml = conn.inputStream.bufferedReader().use { it.readText() }
+        conn.disconnect()
+
+        val downloadPattern = """href=["'](https://tikcdn\.io/ssstik/[^"']+)["']""".toRegex()
+        val downloadMatch = downloadPattern.find(responseHtml)
+            ?: throw Exception("No download link found in SSSTik response")
+
+        val downloadUrl = downloadMatch.groupValues[1]
+
+        val titlePattern = """<p class=["']maintext["']>([^<]+)</p>""".toRegex()
+        val titleMatch = titlePattern.find(responseHtml)
+        val extractedTitle = titleMatch?.groupValues?.get(1)?.trim()
+
+        val thumbPattern = """<img[^>]+class=["']result_author["'][^>]+src=["']([^"']+)["']""".toRegex()
+        val thumbMatch = thumbPattern.find(responseHtml)
+        if (thumbMatch != null && task.thumbnailUrl.isNullOrEmpty()) {
+            task.thumbnailUrl = thumbMatch.groupValues[1]
+        }
+
+        val displayTitle = if (!extractedTitle.isNullOrEmpty()) {
+            extractedTitle.replace(Regex("[^\\w\\s-]"), "").trim().take(40).ifEmpty { "TikTok_${System.currentTimeMillis()}" }
+        } else {
+            "TikTok_${System.currentTimeMillis()}"
+        }
+
+        task.title = "$displayTitle.mp4"
+        sendBroadcast(task, BROADCAST_PROGRESS)
+
+        Log.d(TAG, "TikTok SSSTik: downloading from $downloadUrl")
+        return downloadFileDirectly(task, downloadUrl, "${displayTitle}.mp4")
     }
 
     /**
@@ -581,23 +687,25 @@ class DownloadService : Service() {
         task.title = "$displayTitle.mp4"
         sendBroadcast(task, BROADCAST_PROGRESS)
 
-        // Try tikwm proxy URL first (bypasses CDN blocks in regions like Pakistan)
-        val proxyUrl = "https://www.tikwm.com/video/media/hdplay/$videoId.mp4"
-        Log.d(TAG, "TikTok tikwm: trying proxy download from $proxyUrl")
-        try {
-            return downloadFileDirectly(task, proxyUrl, "${displayTitle}_$videoId.mp4")
-        } catch (proxyError: Exception) {
-            Log.w(TAG, "TikTok tikwm proxy download failed: ${proxyError.message}, trying direct CDN URL...")
-            // Fallback: try standard play proxy URL
-            val playProxyUrl = "https://www.tikwm.com/video/media/play/$videoId.mp4"
+        // 1. Try direct CDN videoUrl first
+        if (videoUrl.isNotEmpty()) {
             try {
-                return downloadFileDirectly(task, playProxyUrl, "${displayTitle}_$videoId.mp4")
-            } catch (playProxyError: Exception) {
-                Log.w(TAG, "TikTok tikwm play proxy also failed: ${playProxyError.message}, trying direct CDN...")
-                // Final fallback: try direct CDN URL
-                Log.d(TAG, "TikTok tikwm: downloading from direct CDN $videoUrl")
+                Log.d(TAG, "TikTok tikwm: downloading direct videoUrl $videoUrl")
                 return downloadFileDirectly(task, videoUrl, "${displayTitle}_$videoId.mp4")
+            } catch (directEx: Exception) {
+                Log.w(TAG, "TikTok tikwm direct URL failed: ${directEx.message}, trying proxy...")
             }
+        }
+
+        // 2. Fallback to tikwm media proxy URL
+        val playProxyUrl = "https://www.tikwm.com/video/media/play/$videoId.mp4"
+        try {
+            Log.d(TAG, "TikTok tikwm: trying play proxy $playProxyUrl")
+            return downloadFileDirectly(task, playProxyUrl, "${displayTitle}_$videoId.mp4")
+        } catch (playProxyError: Exception) {
+            Log.w(TAG, "TikTok tikwm play proxy failed: ${playProxyError.message}, trying hdplay proxy...")
+            val hdProxyUrl = "https://www.tikwm.com/video/media/hdplay/$videoId.mp4"
+            return downloadFileDirectly(task, hdProxyUrl, "${displayTitle}_$videoId.mp4")
         }
     }
 
@@ -619,8 +727,8 @@ class DownloadService : Service() {
             c.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36")
             c.setRequestProperty("Accept", "application/json, text/plain, */*")
             c.setRequestProperty("Referer", "https://www.tikwm.com/")
-            c.connectTimeout = 20000
-            c.readTimeout = 20000
+            c.connectTimeout = 15000
+            c.readTimeout = 15000
             c.instanceFollowRedirects = true
             c
         }
@@ -633,8 +741,6 @@ class DownloadService : Service() {
 
         val responseBody = conn.inputStream.bufferedReader().use { it.readText() }
         conn.disconnect()
-
-        Log.d(TAG, "tikwm GET response: ${responseBody.take(300)}")
 
         val json = JSONObject(responseBody)
         val code = json.optInt("code", -1)
@@ -672,21 +778,21 @@ class DownloadService : Service() {
         task.title = "$displayTitle.mp4"
         sendBroadcast(task, BROADCAST_PROGRESS)
 
-        // Try tikwm proxy URL first (bypasses CDN blocks in regions like Pakistan)
-        val proxyUrl = "https://www.tikwm.com/video/media/hdplay/$videoId.mp4"
-        Log.d(TAG, "TikTok tikwm GET: trying proxy download from $proxyUrl")
-        try {
-            return downloadFileDirectly(task, proxyUrl, "${displayTitle}_$videoId.mp4")
-        } catch (proxyError: Exception) {
-            Log.w(TAG, "TikTok tikwm GET proxy download failed: ${proxyError.message}, trying play proxy...")
-            val playProxyUrl = "https://www.tikwm.com/video/media/play/$videoId.mp4"
+        if (videoUrl.isNotEmpty()) {
             try {
-                return downloadFileDirectly(task, playProxyUrl, "${displayTitle}_$videoId.mp4")
-            } catch (playProxyError: Exception) {
-                Log.w(TAG, "TikTok tikwm GET play proxy also failed: ${playProxyError.message}, trying direct CDN...")
-                Log.d(TAG, "TikTok tikwm GET: downloading from direct CDN $videoUrl")
+                Log.d(TAG, "TikTok tikwm GET: downloading direct videoUrl $videoUrl")
                 return downloadFileDirectly(task, videoUrl, "${displayTitle}_$videoId.mp4")
+            } catch (directEx: Exception) {
+                Log.w(TAG, "TikTok tikwm GET direct URL failed: ${directEx.message}, trying proxy...")
             }
+        }
+
+        val playProxyUrl = "https://www.tikwm.com/video/media/play/$videoId.mp4"
+        try {
+            return downloadFileDirectly(task, playProxyUrl, "${displayTitle}_$videoId.mp4")
+        } catch (playProxyError: Exception) {
+            val hdProxyUrl = "https://www.tikwm.com/video/media/hdplay/$videoId.mp4"
+            return downloadFileDirectly(task, hdProxyUrl, "${displayTitle}_$videoId.mp4")
         }
     }
 
@@ -920,72 +1026,69 @@ class DownloadService : Service() {
 
         val destFile = File(cacheDownloadsDir, filename)
 
-        val videoConn = URL(videoUrl).openConnection() as HttpURLConnection
-        if (videoConn is HttpsURLConnection && isTikTokUrl(task.url)) {
-            try {
-                val defaultFactory = HttpsURLConnection.getDefaultSSLSocketFactory()
-                videoConn.sslSocketFactory = SNIStrippingSSLSocketFactory(defaultFactory)
-                videoConn.hostnameVerifier = HostnameVerifier { hostname, session ->
-                    val hostLower = hostname.lowercase()
-                    if (hostLower.contains("tiktokcdn") || hostLower.contains("v16m") || hostLower.contains("akamaized")) {
-                        true
-                    } else {
-                        HttpsURLConnection.getDefaultHostnameVerifier().verify(hostname, session)
-                    }
-                }
-                Log.d(TAG, "Applied SNIStrippingSSLSocketFactory and HostnameVerifier for TikTok download: $videoUrl")
-            } catch (sslEx: Exception) {
-                Log.w(TAG, "Failed to apply SNIStrippingSSLSocketFactory: ${sslEx.message}")
+        val videoConn = withContext(Dispatchers.IO) {
+            val c = URL(videoUrl).openConnection() as HttpURLConnection
+            c.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
+            c.setRequestProperty("Accept", "*/*")
+            c.setRequestProperty("Accept-Encoding", "identity")
+            if (videoUrl.contains("tikcdn.io")) {
+                c.setRequestProperty("Referer", "https://ssstik.io/")
+            } else if (videoUrl.contains("tikwm.com")) {
+                c.setRequestProperty("Referer", "https://www.tikwm.com/")
+            } else if (isTikTokUrl(task.url)) {
+                c.setRequestProperty("Referer", "https://www.tiktok.com/")
             }
+            c.connectTimeout = 15000
+            c.readTimeout = 60000
+            c.instanceFollowRedirects = true
+            c
         }
-        videoConn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
-        videoConn.setRequestProperty("Accept", "*/*")
-        videoConn.setRequestProperty("Accept-Encoding", "identity")
-        videoConn.connectTimeout = 30000
-        videoConn.readTimeout = 60000
-        videoConn.instanceFollowRedirects = true
 
         val totalBytes = videoConn.contentLength.toLong()
         var downloadedBytes = 0L
         var lastNotifyTime = 0L
         val startTime = System.currentTimeMillis()
+        val bufferSize = 128 * 1024 // 128KB buffer for high download throughput
 
-        BufferedInputStream(videoConn.inputStream).use { input ->
-            FileOutputStream(destFile).use { output ->
-                val buffer = ByteArray(8192)
-                var bytesRead: Int
-                while (input.read(buffer).also { bytesRead = it } != -1) {
-                    output.write(buffer, 0, bytesRead)
-                    downloadedBytes += bytesRead
+        withContext(Dispatchers.IO) {
+            java.io.BufferedInputStream(videoConn.inputStream, bufferSize).use { input ->
+                java.io.BufferedOutputStream(FileOutputStream(destFile), bufferSize).use { output ->
+                    val buffer = ByteArray(bufferSize)
+                    var bytesRead: Int
+                    while (input.read(buffer).also { bytesRead = it } != -1) {
+                        output.write(buffer, 0, bytesRead)
+                        downloadedBytes += bytesRead
 
-                    // Update progress, speed and size in MB
-                    val now = System.currentTimeMillis()
-                    val timeDiff = now - startTime
-                    val speed = if (timeDiff > 0) {
-                        val bytesPerSec = (downloadedBytes * 1000) / timeDiff
-                        val mbPerSec = bytesPerSec.toDouble() / (1024 * 1024)
-                        String.format(java.util.Locale.US, "%.2f MB/s", mbPerSec)
-                    } else {
-                        "0.00 MB/s"
+                        // Update progress, speed and size in MB
+                        val now = System.currentTimeMillis()
+                        val timeDiff = now - startTime
+                        val speed = if (timeDiff > 0) {
+                            val bytesPerSec = (downloadedBytes * 1000) / timeDiff
+                            val mbPerSec = bytesPerSec.toDouble() / (1024 * 1024)
+                            String.format(java.util.Locale.US, "%.2f MB/s", mbPerSec)
+                        } else {
+                            "0.00 MB/s"
+                        }
+                        task.speed = speed
+
+                        val downloadedMb = downloadedBytes.toDouble() / (1024 * 1024)
+                        if (totalBytes > 0) {
+                            val progress = ((downloadedBytes * 100) / totalBytes).toInt()
+                            task.progress = progress
+                            val totalMb = totalBytes.toDouble() / (1024 * 1024)
+                            task.size = String.format(java.util.Locale.US, "%.2f MB", totalMb)
+                        } else {
+                            task.size = String.format(java.util.Locale.US, "%.2f MB", downloadedMb)
+                        }
+
+                        // Throttle notification updates
+                        if (now - lastNotifyTime > 500) {
+                            lastNotifyTime = now
+                            notificationManager.notify(task.notificationId, buildTaskNotification(task))
+                            sendBroadcast(task, BROADCAST_PROGRESS)
+                        }
                     }
-                    task.speed = speed
-
-                    val downloadedMb = downloadedBytes.toDouble() / (1024 * 1024)
-                    if (totalBytes > 0) {
-                        val progress = ((downloadedBytes * 100) / totalBytes).toInt()
-                        task.progress = progress
-                        val totalMb = totalBytes.toDouble() / (1024 * 1024)
-                        task.size = String.format(java.util.Locale.US, "%.2f MB", totalMb)
-                    } else {
-                        task.size = String.format(java.util.Locale.US, "%.2f MB", downloadedMb)
-                    }
-
-                    // Throttle notification updates
-                    if (now - lastNotifyTime > 800) {
-                        lastNotifyTime = now
-                        notificationManager.notify(task.notificationId, buildTaskNotification(task))
-                        sendBroadcast(task, BROADCAST_PROGRESS)
-                    }
+                    output.flush()
                 }
             }
         }
@@ -1236,7 +1339,10 @@ class DownloadService : Service() {
         val availableSlots = maxConcurrentTasks - currentlyRunning
         if (availableSlots <= 0) return
 
-        val queuedTasks = sharedTasks.filter { it.status == DownloadTask.Status.QUEUED }.take(availableSlots)
+        val queuedTasks = sharedTasks.filter { 
+            (it.status == DownloadTask.Status.QUEUED || it.status == DownloadTask.Status.DOWNLOADING) && !activeTasks.containsKey(it.id)
+        }.take(availableSlots)
+
         for (task in queuedTasks) {
             if (activeTasks.containsKey(task.id)) continue
 
@@ -1250,20 +1356,28 @@ class DownloadService : Service() {
                 isPlaylist = task.isPlaylist,
                 notificationId = notificationIdCounter.getAndIncrement(),
                 userId = task.userId ?: "",
-                thumbnailUrl = task.thumbnailUrl
+                thumbnailUrl = task.thumbnailUrl,
+                title = if (task.title.isNotEmpty() && task.title != "Queued Video...") task.title else "Starting download..."
             )
             activeTasks[task.id] = taskInfo
 
             // Start as foreground with summary notification
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                startForeground(
-                    FOREGROUND_NOTIFICATION_ID,
-                    buildSummaryNotification(),
-                    android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
-                )
-            } else {
-                startForeground(FOREGROUND_NOTIFICATION_ID, buildSummaryNotification())
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    startForeground(
+                        FOREGROUND_NOTIFICATION_ID,
+                        buildSummaryNotification(),
+                        android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+                    )
+                } else {
+                    startForeground(FOREGROUND_NOTIFICATION_ID, buildSummaryNotification())
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Foreground notification start error: ${e.message}", e)
             }
+
+            // Immediately broadcast progress to update UI to downloading state
+            sendBroadcast(taskInfo, BROADCAST_PROGRESS)
 
             // Launch download coroutine
             serviceScope.launch {
@@ -1301,11 +1415,15 @@ class DownloadService : Service() {
             request.addOption("--merge-output-format", "mp4")
         }
 
-        // Reliability options & global User-Agent spoofing
+        // Reliability and speed optimizations
+        request.addOption("--concurrent-fragments", "4")
+        request.addOption("--buffer-size", "1024K")
+        request.addOption("--no-mtime")
         request.addOption("--no-check-certificates")
         request.addOption("--no-cache-dir")
-        request.addOption("--socket-timeout", "30")
-        request.addOption("--retries", "5")
+        request.addOption("--socket-timeout", "20")
+        request.addOption("--retries", "3")
+        request.addOption("--fragment-retries", "3")
         request.addOption("--force-ipv4")
         request.addOption("--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
 
@@ -1552,7 +1670,7 @@ class DownloadService : Service() {
 
         return try {
             resolver.openOutputStream(uri)?.use { out ->
-                srcFile.inputStream().use { inp -> inp.copyTo(out) }
+                srcFile.inputStream().use { inp -> inp.copyTo(out, bufferSize = 256 * 1024) }
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 contentValues.clear()

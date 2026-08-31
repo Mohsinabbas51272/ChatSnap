@@ -603,8 +603,8 @@ class DownloaderActivity : BaseActivity() {
                 val conn = java.net.URL(oembedUrl).openConnection() as java.net.HttpURLConnection
                 conn.requestMethod = "GET"
                 conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
-                conn.connectTimeout = 8000
-                conn.readTimeout = 8000
+                conn.connectTimeout = 3000
+                conn.readTimeout = 3000
                 if (conn.responseCode == 200) {
                     val response = conn.inputStream.bufferedReader().use { it.readText() }
                     conn.disconnect()
@@ -618,8 +618,8 @@ class DownloaderActivity : BaseActivity() {
                 val conn = java.net.URL(oembedUrl).openConnection() as java.net.HttpURLConnection
                 conn.requestMethod = "GET"
                 conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
-                conn.connectTimeout = 8000
-                conn.readTimeout = 8000
+                conn.connectTimeout = 3000
+                conn.readTimeout = 3000
                 if (conn.responseCode == 200) {
                     val response = conn.inputStream.bufferedReader().use { it.readText() }
                     conn.disconnect()
@@ -634,8 +634,8 @@ class DownloaderActivity : BaseActivity() {
             conn.requestMethod = "GET"
             conn.setRequestProperty("User-Agent", "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)")
             conn.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
-            conn.connectTimeout = 10000
-            conn.readTimeout = 10000
+            conn.connectTimeout = 3000
+            conn.readTimeout = 3000
             conn.instanceFollowRedirects = true
 
             val responseCode = conn.responseCode
@@ -796,10 +796,6 @@ class DownloaderActivity : BaseActivity() {
     }
 
     private fun startDownloadService(task: DownloadTask) {
-        task.status = DownloadTask.Status.DOWNLOADING
-        val index = downloadTasks.indexOf(task)
-        if (index != -1) taskAdapter.notifyItemChanged(index)
-
         // Start the foreground service
         val intent = Intent(this, DownloadService::class.java).apply {
             action = DownloadService.ACTION_START_DOWNLOAD
@@ -812,10 +808,14 @@ class DownloaderActivity : BaseActivity() {
             putExtra(DownloadService.EXTRA_THUMBNAIL_URL, task.thumbnailUrl)
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(intent)
-        } else {
-            startService(intent)
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(intent)
+            } else {
+                startService(intent)
+            }
+        } catch (e: Exception) {
+            Log.e("DownloaderActivity", "Failed to start DownloadService: ${e.message}", e)
         }
 
         Log.d("DownloaderActivity", "Started DownloadService for: ${task.url}")

@@ -249,10 +249,23 @@ class MainActivity : BaseActivity() {
                                 while (isActive) {
                                     for (update in statusUpdates) {
                                         val displayText = if (update.isMe) "You are: ${update.status}" else "${update.name} is: ${update.status}"
-                                        binding.tvRollingStatus.text = displayText
-                                        loadStatusImage(update.photoUrl)
-                                        binding.tvRollingStatus.isSelected = true 
-                                        delay(3500)
+                                        binding.tvRollingStatus.animate()
+                                            .alpha(0f)
+                                            .translationY(-6f)
+                                            .setDuration(120)
+                                            .withEndAction {
+                                                binding.tvRollingStatus.text = displayText
+                                                loadStatusImage(update.photoUrl)
+                                                binding.tvRollingStatus.translationY = 6f
+                                                binding.tvRollingStatus.animate()
+                                                    .alpha(1f)
+                                                    .translationY(0f)
+                                                    .setDuration(150)
+                                                    .start()
+                                                binding.tvRollingStatus.isSelected = true 
+                                            }
+                                            .start()
+                                        delay(3000)
                                     }
                                 }
                             }
@@ -286,51 +299,129 @@ class MainActivity : BaseActivity() {
     }
 
     private fun showSetStatusDialog() {
-        val rootLayout = LinearLayout(this)
-        rootLayout.orientation = LinearLayout.VERTICAL
-        val margin = (20 * resources.displayMetrics.density).toInt()
-        rootLayout.setPadding(margin, margin / 2, margin, margin)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_set_mode, null)
+        val etModeInput = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etModeInput)
+        val llEmojiContainer = dialogView.findViewById<LinearLayout>(R.id.llEmojiContainer)
+        val llPresetsContainer = dialogView.findViewById<LinearLayout>(R.id.llPresetsContainer)
+        val btnModeClear = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnModeClear)
+        val btnModeCancel = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnModeCancel)
+        val btnModeUpdate = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnModeUpdate)
 
-        val input = EditText(this)
-        input.hint = "What's your mode?"
-        rootLayout.addView(input)
+        val emojis = listOf("✨", "🔥", "💻", "🎮", "💤", "🏃", "☕", "🚗", "🎵", "📚", "🍔", "🏖️", "🚀", "😴", "🎧", "🍕", "⚡", "❤️")
+        val density = resources.displayMetrics.density
 
-        val emojiScroll = HorizontalScrollView(this)
-        val emojiContainer = LinearLayout(this)
-        emojiContainer.orientation = LinearLayout.HORIZONTAL
-        
-        val emojis = listOf("😊", "💻", "🏠", "🚗", "🍱", "💤", "🏃", "🎮", "⚽", "🎵", "📚", "🔥", "💯", "✨")
+        // Resolve theme colors dynamically
+        val surfaceVariantVal = TypedValue()
+        theme.resolveAttribute(com.google.android.material.R.attr.colorSurfaceVariant, surfaceVariantVal, true)
+        val surfaceVariantColor = if (surfaceVariantVal.resourceId != 0) ContextCompat.getColor(this, surfaceVariantVal.resourceId) else surfaceVariantVal.data
+
+        val outlineVariantVal = TypedValue()
+        theme.resolveAttribute(com.google.android.material.R.attr.colorOutlineVariant, outlineVariantVal, true)
+        val outlineVariantColor = if (outlineVariantVal.resourceId != 0) ContextCompat.getColor(this, outlineVariantVal.resourceId) else outlineVariantVal.data
+
+        val textColorVal = TypedValue()
+        theme.resolveAttribute(android.R.attr.textColorPrimary, textColorVal, true)
+        val textColorPrimary = if (textColorVal.resourceId != 0) ContextCompat.getColor(this, textColorVal.resourceId) else textColorVal.data
+
+        val accentVal = TypedValue()
+        theme.resolveAttribute(R.attr.themeAccentColor, accentVal, true)
+        val accentColor = if (accentVal.resourceId != 0) ContextCompat.getColor(this, accentVal.resourceId) else accentVal.data
+
+        btnModeUpdate.backgroundTintList = android.content.res.ColorStateList.valueOf(accentColor)
+        btnModeUpdate.setTextColor(android.graphics.Color.WHITE)
+
         emojis.forEach { emoji ->
-            val emojiView = TextView(this)
-            emojiView.text = emoji
-            emojiView.textSize = 24f
-            emojiView.setPadding(16, 16, 16, 16)
-            emojiView.setOnClickListener { input.append(emoji) }
-            emojiContainer.addView(emojiView)
-        }
-        
-        emojiScroll.addView(emojiContainer)
-        rootLayout.addView(emojiScroll)
-        
-        val uid = auth.currentUser?.uid ?: return
-        firestore.collection("users").document(uid).get().addOnSuccessListener { 
-            input.setText(it.getString("status") ?: "")
-            input.setSelection(input.text.length)
+            val emojiCard = com.google.android.material.card.MaterialCardView(this).apply {
+                layoutParams = LinearLayout.LayoutParams((44 * density).toInt(), (44 * density).toInt()).apply {
+                    marginEnd = (8 * density).toInt()
+                }
+                radius = 22 * density
+                cardElevation = 0f
+                strokeWidth = (1 * density).toInt()
+                setStrokeColor(outlineVariantColor)
+                setCardBackgroundColor(surfaceVariantColor)
+                isClickable = true
+                isFocusable = true
+                setOnClickListener {
+                    val cur = etModeInput.text?.toString() ?: ""
+                    val separator = if (cur.isNotEmpty() && !cur.endsWith(" ")) " " else ""
+                    etModeInput.append("$separator$emoji")
+                    etModeInput.setSelection(etModeInput.text?.length ?: 0)
+                }
+            }
+            val tv = TextView(this).apply {
+                layoutParams = android.widget.FrameLayout.LayoutParams(android.widget.FrameLayout.LayoutParams.WRAP_CONTENT, android.widget.FrameLayout.LayoutParams.WRAP_CONTENT, android.view.Gravity.CENTER)
+                text = emoji
+                textSize = 19f
+            }
+            emojiCard.addView(tv)
+            llEmojiContainer.addView(emojiCard)
         }
 
-        AlertDialog.Builder(this)
-            .setTitle("Set Your Mode")
-            .setView(rootLayout)
-            .setPositiveButton("Update") { _, _ ->
-                val newStatus = input.text.toString().trim()
-                firestore.collection("users").document(uid).update("status", newStatus, "lastStatusUpdate", System.currentTimeMillis())
-                    .addOnSuccessListener {
-                        Toast.makeText(this, "Mode updated!", Toast.LENGTH_SHORT).show()
-                        startRollingStatus()
-                    }
+        val presets = listOf("Available ✨", "At Work 💻", "Gaming 🎮", "Sleeping 💤", "Busy 🔥", "At Gym 🏃", "Listening to Music 🎧", "On the Way 🚗", "Reading 📚", "Chilling 🏖️")
+        presets.forEach { preset ->
+            val presetButton = com.google.android.material.button.MaterialButton(this).apply {
+                layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, (40 * density).toInt()).apply {
+                    marginEnd = (8 * density).toInt()
+                }
+                text = preset
+                textSize = 12.5f
+                cornerRadius = (20 * density).toInt()
+                strokeWidth = (1 * density).toInt()
+                strokeColor = android.content.res.ColorStateList.valueOf(outlineVariantColor)
+                backgroundTintList = android.content.res.ColorStateList.valueOf(surfaceVariantColor)
+                setTextColor(textColorPrimary)
+                elevation = 0f
+                setPadding((14 * density).toInt(), 0, (14 * density).toInt(), 0)
+                setOnClickListener {
+                    etModeInput.setText(preset)
+                    etModeInput.setSelection(preset.length)
+                }
             }
-            .setNegativeButton("Cancel", null)
-            .show()
+            llPresetsContainer.addView(presetButton)
+        }
+
+        val uid = auth.currentUser?.uid ?: return
+        firestore.collection("users").document(uid).get().addOnSuccessListener { doc ->
+            val currentStatus = doc.getString("status") ?: ""
+            etModeInput.setText(currentStatus)
+            etModeInput.setSelection(currentStatus.length)
+        }
+
+        val dialog = android.app.Dialog(this)
+        dialog.setContentView(dialogView)
+        dialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
+
+        btnModeClear.setOnClickListener {
+            etModeInput.setText("")
+        }
+
+        btnModeCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        btnModeUpdate.setOnClickListener {
+            val newStatus = etModeInput.text?.toString()?.trim() ?: ""
+            btnModeUpdate.isEnabled = false
+            firestore.collection("users").document(uid)
+                .update(
+                    "status", newStatus,
+                    "lastStatusUpdate", System.currentTimeMillis()
+                )
+                .addOnSuccessListener {
+                    Toast.makeText(this, if (newStatus.isEmpty()) "Mode cleared!" else "Mode updated: $newStatus", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                    startRollingStatus()
+                }
+                .addOnFailureListener { e ->
+                    btnModeUpdate.isEnabled = true
+                    Toast.makeText(this, "Failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+
+        dialog.show()
+        val dialogWidth = (resources.displayMetrics.widthPixels * 0.90).toInt()
+        dialog.window?.setLayout(dialogWidth, android.view.ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
     private fun syncSystemNavigationColor() {
