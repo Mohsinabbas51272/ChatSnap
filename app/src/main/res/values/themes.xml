@@ -60,9 +60,9 @@
         <item name="android:activityCloseExitAnimation">@anim/slide_out_right</item>
     </style>
 
-    <style name="Theme.ChatSnap" parent="Base.Theme.ChatSnap" />
+    <style name="Theme.ChatSnap" parent="Theme.ChatSnap.Magenta" />
 
-    <style name="Theme.ChatSnap.NoActionBar">
+    <style name="Theme.ChatSnap.NoActionBar" parent="Theme.ChatSnap.Magenta">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>

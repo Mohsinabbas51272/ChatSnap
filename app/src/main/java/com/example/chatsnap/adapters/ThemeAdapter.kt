@@ -25,16 +25,16 @@ class ThemeAdapter(
         holder.binding.tvThemeName.text = theme.displayName
 
         val previewColor = when (theme) {
-            ThemeManager.AppTheme.DEFAULT -> android.graphics.Color.parseColor("#1663CE")
+            ThemeManager.AppTheme.DEFAULT -> android.graphics.Color.parseColor("#0086D6")
             ThemeManager.AppTheme.FULL_BLACK -> android.graphics.Color.BLACK
             ThemeManager.AppTheme.FULL_WHITE -> android.graphics.Color.WHITE
             ThemeManager.AppTheme.EMERALD_GREEN -> android.graphics.Color.parseColor("#008B5B")
-            ThemeManager.AppTheme.SAKURA_PINK -> android.graphics.Color.parseColor("#E05275")
-            ThemeManager.AppTheme.NEON_PINK -> android.graphics.Color.parseColor("#D869A7")
-            ThemeManager.AppTheme.MAROON -> android.graphics.Color.parseColor("#9A0523")
+            ThemeManager.AppTheme.SAKURA_PINK -> android.graphics.Color.parseColor("#F5ABBE")
+            ThemeManager.AppTheme.NEON_PINK -> android.graphics.Color.parseColor("#E794C3")
+            ThemeManager.AppTheme.MAROON -> android.graphics.Color.parseColor("#88001B")
             ThemeManager.AppTheme.MAGENTA -> android.graphics.Color.parseColor("#0086D6")
             ThemeManager.AppTheme.TEAL -> android.graphics.Color.parseColor("#008E8E")
-            ThemeManager.AppTheme.CORAL -> android.graphics.Color.parseColor("#FF0000")
+            ThemeManager.AppTheme.CORAL -> android.graphics.Color.parseColor("#2490AD")
         }
 
         holder.binding.cardColorPreview.setCardBackgroundColor(previewColor)
