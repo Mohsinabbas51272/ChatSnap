@@ -241,6 +241,10 @@
                 <include
                     android:id="@+id/itemMultiAccount"
                     layout="@layout/view_setting_item" />
+
+                <include
+                    android:id="@+id/itemAppRestrictor"
+                    layout="@layout/view_setting_item" />
              </LinearLayout>
 
             <!-- General Settings Header -->

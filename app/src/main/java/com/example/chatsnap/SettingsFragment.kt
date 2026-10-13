@@ -65,6 +65,7 @@ class SettingsFragment : Fragment() {
             binding.itemDiscoverable.root,
             binding.itemContacts.root,
             binding.itemMultiAccount.root,
+            binding.itemAppRestrictor.root,
             binding.btnLogout
         )
         com.example.chatsnap.utils.AnimUtils.animateStaggered(viewsToAnimate, 200)
@@ -310,6 +311,16 @@ class SettingsFragment : Fragment() {
             }
         }
 
+        // App Restrictor (Disguise / Fake Server Down Error Blocker)
+        binding.itemAppRestrictor.apply {
+            ivItemIcon.setImageResource(com.example.chatsnap.R.drawable.ic_lock)
+            tvItemTitle.text = "App Restrictor"
+            tvItemValue.text = "Block apps with fake server error disguise"
+            root.setOnClickListener {
+                startActivity(Intent(requireContext(), com.example.chatsnap.restrictor.AppRestrictorActivity::class.java))
+            }
+        }
+
 
         // Admin Panel removed from visible UI - access only via secret tap
     }
@@ -520,6 +531,7 @@ class SettingsFragment : Fragment() {
             "web downloader site" to binding.itemWebDownloader.root,
             "contacts sync phone" to binding.itemContacts.root,
             "multi account switch" to binding.itemMultiAccount.root,
+            "app restrictor block fake server down lock apps" to binding.itemAppRestrictor.root,
             "notifications alert sound" to binding.itemNotifications.root,
             "ghost mode stealth online" to binding.itemGhostMode.root,
             "app lock passcode pin" to binding.itemAppLock.root,

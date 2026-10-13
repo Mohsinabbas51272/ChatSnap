@@ -42,6 +42,11 @@ class ChatSnapApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        // Start App Restrictor service if feature is enabled
+        if (com.example.chatsnap.restrictor.AppRestrictionManager.isFeatureEnabled(this)) {
+            com.example.chatsnap.restrictor.AppRestrictionManager.startBlockerService(this)
+        }
+
         // Initialize YoutubeDL, FFmpeg and Aria2c asynchronously
         CoroutineScope(Dispatchers.IO).launch {
             try {
